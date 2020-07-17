@@ -4,26 +4,6 @@ html, body {
     overflow: hidden;
     overscroll-behavior: none;
   }
-  
-  button {
-    font-size: 48px;
-    outline: none;
-    border: none;
-    color: rgb(22, 43, 30);
-    background-color: rgb(133, 196, 133);
-    padding: 13px 20px;
-  }
-  
-  button:hover {
-    color: rgb(48, 82, 61);
-    background-color: rgb(189, 233, 185);
-  }
-
-  button:focus {
-    outline: none;
-    color: rgb(48, 82, 61);
-    background-color: rgb(189, 233, 185);
-  }
 
   #game-canvas {
     width: 100%;
@@ -31,8 +11,24 @@ html, body {
   }
 
   #game-menu {
+    top : 20%;
+    left : 40%;
     position: fixed;
-    top: 50%;
-    left: 50%;
   }
-  
+  #human {
+    border-radius: 12px;
+    font-size: 48px;
+    color: black;
+    background: #eaaa3e;
+  }
+  #zombie {
+    border-radius: 12px;
+    font-size: 48px;
+    color: black;
+    background: #3eef1a;
+  }
+  #Choose-your-role {
+    font-family: Arial, Helvetica, Verdana, sans-serif; /* Гарнитура шрифта */
+    font-size: 48px; /* Размер текста */
+    font-weight: bolder;
+  }

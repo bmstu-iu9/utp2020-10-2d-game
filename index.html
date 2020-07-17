@@ -5,18 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Game</title>
-    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <link rel="stylesheet" href="css/style.css" >
     <script src = "/socket.io/socket.io.js"></script>
    <script>
-      var socket = io();
+      let socket = io();
+      let name
+      let role
+      function setHumanName() {
+          name = document.getElementById('nameOfHuman').value
+          role = "Human"
+          socket.emit('setHumanName', name)
+      }
+      function addNewHuman() {//Добавляем нового человека в игру
+          document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfHuman" placeholder = "Enter your name">\
+          <button type = "button" name = "button" onclick = "setHumanName()">Set name</button>' //всплывает окошко в которое можно вписать свой ник
+      }
+      socket.on('usersExists' , function(data) {//событие происходящие если выбран ник, который уже занят
+          console.log(data)
+          document.getElementById('nameError').innerHTML  = data
+      })
    </script>
    <script src="play.js"></script>
 </head>
 
 <body>
-    <canvas id="game-canvas"></canvas>
-    <div id="game-menu">
-        <button id="play-button">PLAY</button>
+    <div id="game-menu"><h1 id = "Choose-your-role">Choose your role</h1>
+        <button type = "button" id="human" onclick="addNewHuman()">HUMAN</button>
+        <button id="zombie">ZOMBIE</button>
     </div>
 </body>
 
