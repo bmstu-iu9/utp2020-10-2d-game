@@ -9,13 +9,26 @@
     <script src = "/socket.io/socket.io.js"></script>
    <script>
       var socket = io();
+      let name
+      function setHumanName() {
+          name = document.getElementById('nameOfHuman').value
+          socket.emit('setHumanName', name)
+      }
+      function addNewHuman() {
+          document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfHuman" placeholder = "Enter your name">\
+          <button type = "button" name = "button" onclick = "setHumanName()">Set name</button>'
+      }
+      socket.on('usersExists' , function(data) {
+          console.log(data)
+          document.getElementById('nameError').innerHTML  = data
+      })
    </script>
    <script src="play.js"></script>
 </head>
 
 <body>
     <div id="game-menu"><h1 id = "Choose-your-role">Choose your role</h1>
-        <button id="human">HUMAN</button>
+        <button type = "button" id="human" onclick="addNewHuman()">HUMAN</button>
         <button id="zombie">ZOMBIE</button>
     </div>
 </body>
