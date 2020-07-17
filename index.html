@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Game</title>
-    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <link rel="stylesheet" href="css/style.css" >
     <script src = "/socket.io/socket.io.js"></script>
    <script>
       var socket = io();
@@ -14,9 +14,9 @@
 </head>
 
 <body>
-    <canvas id="game-canvas"></canvas>
-    <div id="game-menu">
-        <button id="play-button">PLAY</button>
+    <div id="game-menu"><h1 id = "Choose-your-role">Choose your role</h1>
+        <button id="human">HUMAN</button>
+        <button id="zombie">ZOMBIE</button>
     </div>
 </body>
 
