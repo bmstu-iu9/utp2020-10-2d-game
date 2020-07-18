@@ -3,10 +3,17 @@ const express = require('express'),
    app = express(),
    http = require('http').createServer(app),
    io = require('socket.io')(http);
-let players = new Map();
+let players = {};
+
+class Player{
+   constructor(role, name){
+      this.name = name;
+      this.role = role;
+   }
+}
 function findName(name) {
-   for(let value of players)
-      if (value[1].name.localeCompare(name) == 0)
+   for(let key in players)
+      if (players[key] === name)
          return 1;
    return 0;
 }
@@ -17,16 +24,18 @@ io.on('connection', socket => {
          socket.emit('invalidNickname', 'nickname is invalid');
       } else {
          if (findName(player.name) == 0) { //проверяем есть ли игок с таким ником
-            players.set(socket.id, {role: player.role, name: player.name});
+            players[socket.id] = new Player(player.role, player.name);
             console.log('a new player ' + player.name + ' is ' + player.role);
-            socket.emit('PlayTheGame');
+            socket.emit('PlayTheGame', players);
+
+            let timerId = setInterval(function () { socket.emit('render', players) }, 100);
          } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
       }
    });
    socket.on('disconnect', () => {
-      if (players.get(socket.id)) {
-         console.log("Player " + players.get(socket.id).name + " disconnect");
-         players.delete(socket.id);
+      if (socket.id in players) {
+         console.log("Player " + players[socket.id].name + " disconnect");
+         delete players[socket.id];
       } else console.log("Player (no name) disconnect");
    });
 });
