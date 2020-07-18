@@ -8,21 +8,25 @@
     <link rel="stylesheet" href="css/style.css" >
     <script src = "/socket.io/socket.io.js"></script>
    <script>
-      let socket = io();
-      let name
-      let role
-      function setHumanName() {
-          name = document.getElementById('nameOfHuman').value
-          role = "Human"
-          socket.emit('setHumanName', name)
+      let socket = io(),
+          name,
+          role;
+      function setPlayerName() {
+          name = document.getElementById('nameOfPlayer').value;
+          socket.emit('setPlayerName', {role: role , name: name});
       }
-      function addNewHuman() {//Добавляем нового человека в игру
-          document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfHuman" placeholder = "Enter your name">\
-          <button type = "button" name = "button" onclick = "setHumanName()">Set name</button>' //всплывает окошко в которое можно вписать свой ник
+      function addNewPlayer(rl) {
+          role = rl;
+          document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
+          <button type = "button" name = "button" onclick = "setPlayerName()">Set name</button>'
       }
       socket.on('usersExists' , function(data) {//событие происходящие если выбран ник, который уже занят
-          console.log(data)
-          document.getElementById('nameError').innerHTML  = data
+          console.log(data);
+          document.getElementById('nameError').innerHTML  = data;
+      })
+      socket.on('invalidNickname' , function (data) {//если ник некорректный
+          console.log(data);
+          document.getElementById('nameError').innerHTML  = data;
       })
    </script>
    <script src="play.js"></script>
@@ -30,8 +34,8 @@
 
 <body>
     <div id="game-menu"><h1 id = "Choose-your-role">Choose your role</h1>
-        <button type = "button" id="human" onclick="addNewHuman()">HUMAN</button>
-        <button id="zombie">ZOMBIE</button>
+        <button type = "button" id="human"  onclick="addNewPlayer('Human')">HUMAN</button>
+        <button id="zombie" id = "zombie"  onclick = "addNewPlayer('Zombie')">ZOMBIE</button>
     </div>
 </body>
 
