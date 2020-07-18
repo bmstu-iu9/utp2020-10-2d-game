@@ -8,25 +8,23 @@
     <link rel="stylesheet" href="css/style.css" >
     <script src = "/socket.io/socket.io.js"></script>
    <script>
-      let socket = io();
-      let name = ''
-      let role = ''
-      let mark = 0
+      let socket = io(),
+          name,
+          role;
       function setPlayerName() {
           name = document.getElementById('nameOfPlayer').value;
-          socket.emit('setPlayerName', {name: name, role: role});
+          socket.emit('setPlayerName', {role: role , name: name});
       }
-      function addNewPlayer(role) {
-          mark = 1;
-          this.role = role;
-          console.log(role);
+      function addNewPlayer(rl) {
+          role = rl;
           document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
           <button type = "button" name = "button" onclick = "setPlayerName()">Set name</button>'
       }
-      socket.on('deletePlayer' ,function () {
-            socket.emit();
-      })
       socket.on('usersExists' , function(data) {//событие происходящие если выбран ник, который уже занят
+          console.log(data);
+          document.getElementById('nameError').innerHTML  = data;
+      })
+      socket.on('invalidNickname' , function (data) {//если ник некорректный
           console.log(data);
           document.getElementById('nameError').innerHTML  = data;
       })
@@ -36,8 +34,8 @@
 
 <body>
     <div id="game-menu"><h1 id = "Choose-your-role">Choose your role</h1>
-        <button type = "button" id="human" onclick="addNewPlayer(document.getElementById('human').value)">HUMAN</button>
-        <button id="zombie" id = "zombie" onclick = "addNewPlayer(document.getElementById('zombie').value)">ZOMBIE</button>
+        <button type = "button" id="human"  onclick="addNewPlayer('Human')">HUMAN</button>
+        <button id="zombie" id = "zombie"  onclick = "addNewPlayer('Zombie')">ZOMBIE</button>
     </div>
 </body>
 
