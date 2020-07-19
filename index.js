@@ -13,7 +13,7 @@ class Player{
 }
 function findName(name) {
    for(let key in players)
-      if (players[key] === name)
+      if (players[key].name === name)
          return 1;
    return 0;
 }
