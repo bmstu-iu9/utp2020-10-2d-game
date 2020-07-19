@@ -10,7 +10,9 @@
     <script>
         let socket = io(),
             name,
-            role;
+            role,
+            canvas,
+            context;
         function setPlayerName() {
             name = document.getElementById('nameOfPlayer').value;
             socket.emit('setPlayerName', { role: role, name: name });
@@ -21,16 +23,21 @@
           <button type = "button" name = "button" onclick = "setPlayerName()">Set name</button>'
         }
         socket.on('render', function(players) {
-            let canvas = document.getElementById('game-canvas');
-            let context = canvas.getContext('2d');
-            let text = '';
-            text += 'Online users:\n';
-            for (let key in players) {
-                text += players[key].name + '\n';
-            }
-            console.log(text);
-            context.fillText(text, 20, 50);
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawScore(players);
         })
+        function drawScore(players) {
+            context.font = "12px Arial";
+            context.fillStyle = "#0095DD";
+            let dy = 20,
+                y = 50;
+            context.fillText('Online users:', 20, y);
+            y += dy;
+            for (let key in players) {
+                context.fillText(players[key].name +" - " + players[key].role, 40, y);
+                y += dy;
+            }
+        }
         socket.on('usersExists', function (data) {//событие происходящие если выбран ник, который уже занят
             console.log(data);
             document.getElementById('nameError').innerHTML = data;
@@ -41,6 +48,8 @@
         })
         socket.on('PlayTheGame', function (players) {
             document.body.innerHTML = '<canvas id = "game-canvas"></canvas>';
+            canvas = document.getElementById('game-canvas');
+            context = canvas.getContext('2d');
         })
     </script>
     <script src="play.js"></script>
