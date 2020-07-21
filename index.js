@@ -2,7 +2,8 @@
 const express = require('express'),
    app = express(),
    http = require('http').createServer(app),
-   io = require('socket.io')(http);
+   io = require('socket.io')(http),
+   fs = require('fs');
 let players = {};
 
 class Player{
@@ -45,6 +46,12 @@ io.on('connection', socket => {
 app.get('/', function (req, res) {
    res.sendfile('index.html');
 });
+app.get('/client.js', function(req, res){
+   fs.readFile('client.js', (err, code) =>{
+      res.writeHead(200, {'Content-Type': 'text/javascript'});
+      res.end(code);
+   })
+})
 app.use('/css', express.static(`${__dirname}/css`));
 
 http.listen(3000, function () {
