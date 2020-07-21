@@ -6,9 +6,11 @@ const express = require('express'),
 let players = {};
 
 class Player{
-   constructor(role, name){
+   constructor(role, name, w, h){
       this.name = name;
       this.role = role;
+      this.x = w * (Math.random() - 90/w);
+      this.y = h * (Math.random() - 90/h);
    }
 }
 function findName(name) {
@@ -19,12 +21,12 @@ function findName(name) {
 }
 io.on('connection', socket => {
    console.log('user connected');
-   socket.on('setPlayerName', function (player) {
+   socket.on('setPlayerName', function (player, width, height) {
       if (player.name.length == 0) { //пустое имя недопустимо
          socket.emit('invalidNickname', 'nickname is invalid');
       } else {
          if (findName(player.name) == 0) { //проверяем есть ли игок с таким ником
-            players[socket.id] = new Player(player.role, player.name);
+            players[socket.id] = new Player(player.role, player.name, width, height);
             console.log('a new player ' + player.name + ' is ' + player.role);
             socket.emit('PlayTheGame', players);
 
