@@ -41,7 +41,7 @@ io.on('connection', socket => {
       }
    });
    socket.on('moveDown', function () {
-      if (players[socket.id].y - 105 < screenHeight) {
+      if (players[socket.id].y + 105 < screenHeight) {
          players[socket.id].y += 1;
       }
    })
@@ -56,7 +56,7 @@ io.on('connection', socket => {
       }
    })
    socket.on('moveRight', function () {
-      if (players[socket.id].x - 90 < screenWidth) {
+      if (players[socket.id].x + 90 < screenWidth) {
          players[socket.id].x += 1;
       }
    })
