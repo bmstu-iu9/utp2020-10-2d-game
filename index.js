@@ -5,17 +5,22 @@ const express = require('express'),
    io = require('socket.io')(http),
    fs = require('fs');
 let players = {};
+let screenWidth, screenHeight;
 
-class Player{
-   constructor(role, name, w, h){
+class Player {
+   constructor(role, name, w, h) {
       this.name = name;
       this.role = role;
-      this.x = w * (Math.random() - 90/w);
-      this.y = h * (Math.random() - 90/h);
+      this.x = 0;
+      this.y = 0;
+      screenHeight = h;
+      screenWidth = w;
+      //this.x = w * (Math.random() - 90 / w);
+      //this.y = h * (Math.random() - 90 / h);
    }
 }
 function findName(name) {
-   for(let key in players)
+   for (let key in players)
       if (players[key].name === name)
          return 1;
    return 0;
@@ -35,6 +40,26 @@ io.on('connection', socket => {
          } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
       }
    });
+   socket.on('moveDown', function () {
+      if (players[socket.id].y - 105 < screenHeight) {
+         players[socket.id].y += 1;
+      }
+   })
+   socket.on('moveLeft', function () {
+      if (players[socket.id].x > 0) {
+         players[socket.id].x -= 1;
+      }
+   })
+   socket.on('moveUp', function () {
+      if (players[socket.id].y > 0) {
+         players[socket.id].y -= 1;
+      }
+   })
+   socket.on('moveRight', function () {
+      if (players[socket.id].x - 90 < screenWidth) {
+         players[socket.id].x += 1;
+      }
+   })
    socket.on('disconnect', () => {
       if (socket.id in players) {
          console.log("Player " + players[socket.id].name + " disconnect");
@@ -46,9 +71,9 @@ io.on('connection', socket => {
 app.get('/', function (req, res) {
    res.sendfile('index.html');
 });
-app.get('/client.js', function(req, res){
-   fs.readFile('client.js', (err, code) =>{
-      res.writeHead(200, {'Content-Type': 'text/javascript'});
+app.get('/client.js', function (req, res) {
+   fs.readFile('client.js', (err, code) => {
+      res.writeHead(200, { 'Content-Type': 'text/javascript' });
       res.end(code);
    })
 })

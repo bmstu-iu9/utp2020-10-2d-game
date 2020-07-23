@@ -3,6 +3,8 @@ let socket = io(),
     role,
     canvas,
     context;
+
+
 function setPlayerName() {
     name = document.getElementById('nameOfPlayer').value;
     width = document.body.clientWidth; // ширина клиентской части окна браузера
@@ -43,10 +45,10 @@ function drawPlayers(players) {
     context.font = "12px Arial";
     context.fillStyle = "#0095DD";
     let dy = 15,
-        y = 10,
-        dx = 100,
-        x = 10;
+        dx = 100;
     for (let key in players) {
+        let x = players[key].x,
+            y = players[key].y + 12;
         context.fillText(players[key].name + " - " + players[key].role, x, y, 90);
         y += dy;
         if (players[key].role === 'Human') {
@@ -56,7 +58,7 @@ function drawPlayers(players) {
             context.drawImage(imgs['halloween.svg'], x, y, 90, 90);
         }
         y -= dy;
-        x += dx;
+        //x += dx;
     }
 }
 socket.on('usersExists', function (data) {//событие происходящие если выбран ник, который уже занят
@@ -74,3 +76,20 @@ socket.on('PlayTheGame', function (players) {
     canvas.width = document.documentElement.clientWidth;
     canvas.height = document.documentElement.clientHeight;
 })
+
+window.onkeydown = (event) => {
+    //кнопка "вниз"
+    if (event.keyCode == 40) {
+        socket.emit('moveDown');
+    }
+    //кнопка "вправо"
+    else if (event.keyCode == 39){
+        socket.emit('moveRight');
+    }
+    else if (event.keyCode == 38){
+        socket.emit('moveUp');
+    }
+    else if (event.keyCode == 37){
+        socket.emit('moveLeft');
+    }
+}
