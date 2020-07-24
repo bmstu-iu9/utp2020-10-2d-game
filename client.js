@@ -7,8 +7,9 @@ let socket = io(),
 
 function setPlayerName() {
     name = document.getElementById('nameOfPlayer').value;
-    width = document.body.clientWidth; // ширина клиентской части окна браузера
-    height = document.body.clientHeight; // высота клиентской части окна браузера
+    width = document.documentElement.clientWidth; // ширина клиентской части окна браузера
+    height = document.documentElement.clientHeight; // высота клиентской части окна браузера
+    console.log('height : ' ,height)
     socket.emit('setPlayerName', { role: role, name: name }, width, height);
 }
 function addNewPlayer(rl) {
