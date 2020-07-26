@@ -2,8 +2,35 @@ let socket = io(),
     name,
     role,
     canvas,
-    context;
-
+    context,
+    width,
+    height,
+    rightPressed = false,
+    leftPressed = false,
+    downPressed = false,
+    upPressed = false;
+document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keyup", keyUpHandler, false);
+function keyDownHandler(e) { //детектит нажатие клавишы
+    if (e.key === "d" || e.key === "ArrowRight")
+        rightPressed = true;
+    else if (e.key === "a" || e.key === "ArrowLeft")
+        leftPressed = true;
+    else if (e.key === "w" || e.key === "ArrowUp")
+        upPressed = true;
+    else if (e.key === "s" || e.key === "ArrowDown")
+        downPressed = true;
+}
+function keyUpHandler(e) { //детектит отпускание клавиши
+    if (e.key === "d" || e.key === "ArrowRight")
+        rightPressed = false;
+    else if (e.key === "a" || e.key === "ArrowLeft")
+        leftPressed = false;
+    else if (e.key === "w" || e.key === "ArrowUp")
+        upPressed = false;
+    else if (e.key === "s" || e.key === "ArrowDown")
+        downPressed = false;
+}
 
 function setPlayerName() {
     name = document.getElementById('nameOfPlayer').value;
@@ -19,6 +46,14 @@ function addNewPlayer(rl) {
 }
 socket.on('render', function (players) {
     context.clearRect(0, 0, canvas.width, canvas.height);
+    if (leftPressed)
+        socket.emit('moveLeft');
+    if (rightPressed)
+        socket.emit('moveRight');
+    if (upPressed)
+        socket.emit('moveUp');
+    if (downPressed)
+        socket.emit('moveDown');
     drawPlayers(players);
 })
 
@@ -45,7 +80,7 @@ Promise.all(IMG_NAMES.map(downloadImage)).then(() => console.log('All images dow
 function drawPlayers(players) {
     context.font = "12px Arial";
     context.fillStyle = "#0095DD";
-    let dy = 15,
+    let dy = 50,
         dx = 100;
     for (let key in players) {
         let x = players[key].x,
@@ -77,20 +112,3 @@ socket.on('PlayTheGame', function (players) {
     canvas.width = document.documentElement.clientWidth;
     canvas.height = document.documentElement.clientHeight;
 })
-
-window.onkeydown = (event) => {
-    //кнопка "вниз"
-    if (event.keyCode == 40) {
-        socket.emit('moveDown');
-    }
-    //кнопка "вправо"
-    else if (event.keyCode == 39){
-        socket.emit('moveRight');
-    }
-    else if (event.keyCode == 38){
-        socket.emit('moveUp');
-    }
-    else if (event.keyCode == 37){
-        socket.emit('moveLeft');
-    }
-}
