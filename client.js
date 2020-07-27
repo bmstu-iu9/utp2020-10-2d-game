@@ -1,16 +1,25 @@
 let socket = io(),
-    name,
-    role,
-    canvas,
+    name, //имя игрока
+    role, //роль игрока(zombie или human)
+    canvas, //холст на котором проходит игра
     context,
     width,
     height,
     rightPressed = false,
     leftPressed = false,
     downPressed = false,
-    upPressed = false;
+    upPressed = false,
+    spacePressed = false,
+    coughWidth = 10,
+    coughHeight = 10;
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
+class Cough {
+    constructor(x,y) {
+        this.x = x;
+        this.y = y;
+    }
+}
 function keyDownHandler(e) { //детектит нажатие клавишы
     if (e.key === "d" || e.key === "ArrowRight")
         rightPressed = true;
@@ -20,6 +29,9 @@ function keyDownHandler(e) { //детектит нажатие клавишы
         upPressed = true;
     else if (e.key === "s" || e.key === "ArrowDown")
         downPressed = true;
+    else if (e.key === " ")
+        spacePressed = true;
+
 }
 function keyUpHandler(e) { //детектит отпускание клавиши
     if (e.key === "d" || e.key === "ArrowRight")
@@ -30,6 +42,8 @@ function keyUpHandler(e) { //детектит отпускание клавиш�
         upPressed = false;
     else if (e.key === "s" || e.key === "ArrowDown")
         downPressed = false;
+    else if (e.key === " ")
+        spacePressed = false;
 }
 
 function setPlayerName() {
@@ -54,9 +68,14 @@ socket.on('render', function (players) {
         socket.emit('moveUp');
     if (downPressed)
         socket.emit('moveDown');
+    if (role === "Zombie") {
+        if (spacePressed)
+            socket.emit('newCough', {x: players[socket.id].x + 80, y: players[socket.id].y + 65})
+        socket.emit('moveCough')
+    }
+    drawCough(players);
     drawPlayers(players);
 })
-
 //скачиваем все нужные изображения в объект imgs для быстрого доступа
 const IMG_NAMES = [
     'halloween.svg',
@@ -66,7 +85,7 @@ const imgs = {};
 function downloadImage(imageName) {
     return new Promise(resolve => {
         const img = new Image();
-        img.src = `/css/${imageName}`;
+        img.src = `/css/${imageNam e}`;
         img.onload = () => {
             console.log(`Downloaded ${imageName}`);
             imgs[imageName] = img;
@@ -75,7 +94,20 @@ function downloadImage(imageName) {
     });
 }
 Promise.all(IMG_NAMES.map(downloadImage)).then(() => console.log('All images downloaded'));
-
+//рисуем снаряды - "кашель"
+function drawCough(players) {
+    console.log(players[socket.id].allCough.length);
+    for (let key in players) {
+        console.log(players.length);
+        for (let i = 0; i < players[key].allCough.length; i++) {
+            context.beginPath();
+            context.rect(players[key].allCough[i].x, players[key].allCough[i].y, coughWidth, coughHeight);
+            context.fillStyle = "#dd00d9";
+            context.fill();
+            context.closePath();
+        }
+    }
+}
 //рисуем игроков
 function drawPlayers(players) {
     context.font = "12px Arial";

@@ -13,10 +13,17 @@ class Player {
       this.role = role;
       this.x = 0;
       this.y = 0;
+      this.allCough = [];
       screenHeight = h;
       screenWidth = w;
       //this.x = w * (Math.random() - 90 / w);
       //this.y = h * (Math.random() - 90 / h);
+   }
+}
+class Cough {
+   constructor(x,y) {
+      this.x = x;
+      this.y = y;
    }
 }
 function findName(name) {
@@ -28,10 +35,10 @@ function findName(name) {
 io.on('connection', socket => {
    console.log('user connected');
    socket.on('setPlayerName', function (player, width, height) {
-      if (player.name.length == 0) { //пустое имя недопустимо
+      if (player.name.length === 0) { //пустое имя недопустимо
          socket.emit('invalidNickname', 'nickname is invalid');
       } else {
-         if (findName(player.name) == 0) { //проверяем есть ли игок с таким ником
+         if (findName(player.name) === 0) { //проверяем есть ли игок с таким ником
             players[socket.id] = new Player(player.role, player.name, width, height);
             console.log('a new player ' + player.name + ' is ' + player.role);
             socket.emit('PlayTheGame', players);
@@ -58,6 +65,21 @@ io.on('connection', socket => {
    socket.on('moveRight', function () {
       if (players[socket.id].x + 90 < screenWidth) {
          players[socket.id].x += 1;
+      }
+   })
+   socket.on('newCough' , function (cough) {
+      players[socket.id].allCough.unshift(new Cough(cough.x,cough.y));
+   })
+   socket.on('moveCough' , function () {
+      let dx = 15;
+      for (let i = 0; i < players[socket.id].allCough.length; i++) {
+         if (players[socket.id].x + 200 < players[socket.id].allCough[i].x + dx) {
+            players[socket.id].allCough.splice(i,1);
+            --i;
+         }
+         else {
+            players[socket.id].allCough[i].x += dx;
+         }
       }
    })
    socket.on('disconnect', () => {
