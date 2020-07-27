@@ -5,10 +5,7 @@ html, body {
     overscroll-behavior: none;
   }
 
-  #game-canvas {
-    width: 100%;
-    height: 100%;
-  }
+ 
 
   #game-menu {
     top : 20%;

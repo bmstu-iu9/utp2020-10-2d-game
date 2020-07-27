@@ -7,52 +7,9 @@
     <title>Game</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-        let socket = io(),
-            name,
-            role,
-            canvas,
-            context;
-        function setPlayerName() {
-            name = document.getElementById('nameOfPlayer').value;
-            socket.emit('setPlayerName', { role: role, name: name });
-        }
-        function addNewPlayer(rl) {
-            role = rl;
-            document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
-          <button type = "button" name = "button" onclick = "setPlayerName()">Set name</button>'
-        }
-        socket.on('render', function(players) {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            drawScore(players);
-        })
-        function drawScore(players) {
-            context.font = "12px Arial";
-            context.fillStyle = "#0095DD";
-            let dy = 20,
-                y = 50;
-            context.fillText('Online users:', 20, y);
-            y += dy;
-            for (let key in players) {
-                context.fillText(players[key].name +" - " + players[key].role, 40, y);
-                y += dy;
-            }
-        }
-        socket.on('usersExists', function (data) {//событие происходящие если выбран ник, который уже занят
-            console.log(data);
-            document.getElementById('nameError').innerHTML = data;
-        })
-        socket.on('invalidNickname', function (data) {//если ник некорректный
-            console.log(data);
-            document.getElementById('nameError').innerHTML = data;
-        })
-        socket.on('PlayTheGame', function (players) {
-            document.body.innerHTML = '<canvas id = "game-canvas"></canvas>';
-            canvas = document.getElementById('game-canvas');
-            context = canvas.getContext('2d');
-        })
+    <script src="client.js">
+        
     </script>
-    <script src="play.js"></script>
 </head>
 
 <body>
