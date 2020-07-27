@@ -93,10 +93,12 @@ function drawPlayers(players) {
             context.fillText(players[key].name, x, y, 90);
         }
         y += dy;
+        context.fillStyle = "#000000";
+        context.fillRect(x, y, 90, 8);
         context.fillStyle = "#32CD32";
-        context.fillRect(x, y, 90 * players[key].health, 8);
+        context.fillRect(x + 1, y + 1, 88 * players[key].health, 6);
         context.fillStyle = "#B22222";
-        context.fillRect(x + 90 * players[key].health, y, 90 * (1 - players[key].health), 8);
+        context.fillRect(x + 1 + 88 * players[key].health, y + 1, 88 * (1 - players[key].health), 6);
         y += dy;
         if (players[key].role === 'Human') {
             context.drawImage(imgs['back(1).svg'], x, y, 90, 90);
