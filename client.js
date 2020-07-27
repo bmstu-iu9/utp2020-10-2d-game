@@ -84,8 +84,14 @@ function drawPlayers(players) {
         dx = 100;
     for (let key in players) {
         let x = players[key].x,
-            y = players[key].y + 12;
-        context.fillText(players[key].name, x, y, 90);
+            y = players[key].y + 12,
+            text = context.measureText(players[key].name);
+        if (text.width <= 90) {
+            context.fillText(players[key].name, x + (90 - text.width) / 2, y, 90);
+        }
+        else{
+            context.fillText(players[key].name, x, y, 90);
+        }
         y += dy;
         context.fillStyle = "#32CD32";
         context.fillRect(x, y, 90 * players[key].health, 8);
