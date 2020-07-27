@@ -80,7 +80,7 @@ Promise.all(IMG_NAMES.map(downloadImage)).then(() => console.log('All images dow
 function drawPlayers(players) {
     context.font = "12px Arial";
     context.fillStyle = "#0095DD";
-    let dy = 50,
+    let dy = 15,
         dx = 100;
     for (let key in players) {
         let x = players[key].x,
