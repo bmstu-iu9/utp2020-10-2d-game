@@ -13,6 +13,7 @@ class Player {
       this.role = role;
       this.x = 0;
       this.y = 0;
+      this.health = 1.00;
       screenHeight = h;
       screenWidth = w;
       //this.x = w * (Math.random() - 90 / w);
@@ -41,7 +42,7 @@ io.on('connection', socket => {
       }
    });
    socket.on('moveDown', function () {
-      if (players[socket.id].y + 105 < screenHeight) {
+      if (players[socket.id].y + 120 < screenHeight) {
          players[socket.id].y += 1;
       }
    })

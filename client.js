@@ -36,7 +36,7 @@ function setPlayerName() {
     name = document.getElementById('nameOfPlayer').value;
     width = document.documentElement.clientWidth; // ширина клиентской части окна браузера
     height = document.documentElement.clientHeight; // высота клиентской части окна браузера
-    console.log('height : ' ,height)
+    console.log('height : ', height)
     socket.emit('setPlayerName', { role: role, name: name }, width, height);
 }
 function addNewPlayer(rl) {
@@ -85,7 +85,12 @@ function drawPlayers(players) {
     for (let key in players) {
         let x = players[key].x,
             y = players[key].y + 12;
-        context.fillText(players[key].name + " - " + players[key].role, x, y, 90);
+        context.fillText(players[key].name, x, y, 90);
+        y += dy;
+        context.fillStyle = "#32CD32";
+        context.fillRect(x, y, 90 * players[key].health, 8);
+        context.fillStyle = "#B22222";
+        context.fillRect(x + 90 * players[key].health, y, 90 * (1 - players[key].health), 8);
         y += dy;
         if (players[key].role === 'Human') {
             context.drawImage(imgs['back(1).svg'], x, y, 90, 90);
@@ -93,7 +98,7 @@ function drawPlayers(players) {
         else {
             context.drawImage(imgs['halloween.svg'], x, y, 90, 90);
         }
-        y -= dy;
+        y -= 2 * dy;
         //x += dx;
     }
 }
