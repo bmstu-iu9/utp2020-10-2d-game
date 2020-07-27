@@ -13,7 +13,10 @@ class Player {
       this.role = role;
       this.x = 0;
       this.y = 0;
-      this.health = 1.00;
+      if (role == 'Human')
+         this.health = 1.00;
+      else
+         this.health = 0.00;
       screenHeight = h;
       screenWidth = w;
       //this.x = w * (Math.random() - 90 / w);
