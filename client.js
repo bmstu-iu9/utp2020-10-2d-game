@@ -44,7 +44,7 @@ function addNewPlayer(rl) {
     document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
           <button type = "button" name = "button" onclick = "setPlayerName()">Set name</button>'
 }
-socket.on('render', function (players) {
+socket.on('render', function (players, pills) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     if (leftPressed)
         socket.emit('moveLeft');
@@ -54,13 +54,16 @@ socket.on('render', function (players) {
         socket.emit('moveUp');
     if (downPressed)
         socket.emit('moveDown');
+    
     drawPlayers(players);
+    drawPills(pills);
 })
 
 //скачиваем все нужные изображения в объект imgs для быстрого доступа
 const IMG_NAMES = [
     'halloween.svg',
     'back(1).svg',
+    'medicinedrawn.svg'
 ];
 const imgs = {};
 function downloadImage(imageName) {
@@ -89,7 +92,7 @@ function drawPlayers(players) {
         if (text.width <= 90) {
             context.fillText(players[key].name, x + (90 - text.width) / 2, y, 90);
         }
-        else{
+        else {
             context.fillText(players[key].name, x, y, 90);
         }
         y += dy;
@@ -110,6 +113,14 @@ function drawPlayers(players) {
         //x += dx;
     }
 }
+
+//рисуем лекарство в рандомной точке
+function drawPills(pills) {
+    for (let i in pills){
+        context.drawImage(imgs['medicinedrawn.svg'], pills[i].x, pills[i].y);
+    }
+}
+
 socket.on('usersExists', function (data) {//событие происходящие если выбран ник, который уже занят
     console.log(data);
     document.getElementById('nameError').innerHTML = data;
