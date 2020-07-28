@@ -1,14 +1,17 @@
 let socket = io(),
-    name,
-    role,
-    canvas,
+    name, //имя игрока
+    role, //роль игрока(zombie или human)
+    canvas, //холст на котором проходит игра
     context,
     width,
     height,
-    rightPressed = false,
-    leftPressed = false,
-    downPressed = false,
-    upPressed = false;
+    rightPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения вправа(d или стреловка вправо), true - нажата, false - не нажата
+    leftPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения влево(a или стреловка влево), true - нажата, false - не нажата
+    downPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения вниз(s или стреловка вниз), true - нажата, false - не нажата
+    upPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения вверх(w или стреловка вверх), true - нажата, false - не нажата
+    spacePressed = false,//проверяет нажат ли пробел , true - нажат, false - не нажат
+    coughWidth = 10, //длина
+    coughHeight = 10; //ширина
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 function keyDownHandler(e) { //детектит нажатие клавишы
@@ -20,6 +23,9 @@ function keyDownHandler(e) { //детектит нажатие клавишы
         upPressed = true;
     else if (e.key === "s" || e.key === "ArrowDown")
         downPressed = true;
+    else if (e.key === " ")
+        spacePressed = true;
+
 }
 function keyUpHandler(e) { //детектит отпускание клавиши
     if (e.key === "d" || e.key === "ArrowRight")
@@ -30,6 +36,8 @@ function keyUpHandler(e) { //детектит отпускание клавиш�
         upPressed = false;
     else if (e.key === "s" || e.key === "ArrowDown")
         downPressed = false;
+    else if (e.key === " ")
+        spacePressed = false;
 }
 
 function setPlayerName() {
@@ -44,6 +52,7 @@ function addNewPlayer(rl) {
     document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
           <button type = "button" name = "button" onclick = "setPlayerName()">Set name</button>'
 }
+//рисовка экрана пользователя
 socket.on('render', function (players, pills) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     if (leftPressed)
@@ -54,15 +63,19 @@ socket.on('render', function (players, pills) {
         socket.emit('moveUp');
     if (downPressed)
         socket.emit('moveDown');
-    
+    if (role === "Zombie") {
+        if (spacePressed)
+            socket.emit('newCough', {x: players[socket.id].x + 80, y: players[socket.id].y + 65})
+    }
+    drawCough(players);
     drawPlayers(players);
     drawPills(pills);
 })
-
 //скачиваем все нужные изображения в объект imgs для быстрого доступа
 const IMG_NAMES = [
-    'halloween.svg',
-    'back(1).svg',
+    'Zombie.svg', //Zombie
+    'Human.svg', //Human
+    'Virus.png',//моделька снарядов - кашля
     'medicinedrawn.svg'
 ];
 const imgs = {};
@@ -78,7 +91,20 @@ function downloadImage(imageName) {
     });
 }
 Promise.all(IMG_NAMES.map(downloadImage)).then(() => console.log('All images downloaded'));
-
+//рисуем снаряды - "кашель"
+function drawCough(players) {
+    console.log(players[socket.id].allCough.length);
+    for (let key in players) {
+        console.log(players.length);
+        for (let i = 0; i < players[key].allCough.length; i++) {
+            context.beginPath();
+            context.drawImage(imgs['Virus.png'], players[key].allCough[i].x, players[key].allCough[i].y, coughWidth, coughHeight);
+            context.fillStyle = "#dd00d9";
+            context.fill();
+            context.closePath();
+        }
+    }
+}
 //рисуем игроков
 function drawPlayers(players) {
     context.font = "12px Arial";
@@ -104,10 +130,10 @@ function drawPlayers(players) {
         context.fillRect(x + 1 + 88 * players[key].health, y + 1, 88 * (1 - players[key].health), 6);
         y += dy;
         if (players[key].role === 'Human') {
-            context.drawImage(imgs['back(1).svg'], x, y, 90, 90);
+            context.drawImage(imgs['Human.svg'], x, y, 90, 90);
         }
         else {
-            context.drawImage(imgs['halloween.svg'], x, y, 90, 90);
+            context.drawImage(imgs['Zombie.svg'], x, y, 90, 90);
         }
         y -= 2 * dy;
         //x += dx;
