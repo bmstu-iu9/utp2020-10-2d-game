@@ -10,8 +10,8 @@ let socket = io(),
     downPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения вниз(s или стреловка вниз), true - нажата, false - не нажата
     upPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения вверх(w или стреловка вверх), true - нажата, false - не нажата
     spacePressed = false,//проверяет нажат ли пробел , true - нажат, false - не нажат
-    coughWidth = 10, //длина
-    coughHeight = 10; //ширина
+    coughWidth = 10, //длина снаряда кашя
+    coughHeight = 10; //ширина снаряда кашля
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 function keyDownHandler(e) { //детектит нажатие клавишы

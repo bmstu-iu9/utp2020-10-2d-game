@@ -22,25 +22,28 @@ class Player {
       screenHeight = h;
       screenWidth = w;
    }
+   isTouchedToPill(x, y) {
+      return !(x > this.x + 90 ||
+          x + 30 < this.x ||
+          y > this.y + 90 ||
+          y + 30 < y);
+
+   }
+   increaseHealth() {
+      this.health += 0.10;
+      if (this.health > 1.00)
+         this.health = 1.00;
+   }
+   decreaseHealth(damage) {
+      this.health -= damage;
+      if (this.health < 0)
+         this.health = 0;
+   }
 }
 class Cough {
    constructor(x,y) {
       this.x = x;
       this.y = y;
-   }
-
-   isTouchedToPill(x, y) {
-      return !(x > this.x + 90 ||
-         x + 30 < this.x ||
-         y > this.y + 90 ||
-         y + 30 < y);
-
-   }
-
-   increaseHealth() {
-      this.health += 0.10;
-      if (this.health > 1.00)
-         this.health = 1.00;
    }
 }
 
@@ -50,13 +53,14 @@ class Pill {
       this.y = h * (Math.random() - 90 / h);
    }
 }
+//поиск имени среди уже существующих на сервере
 function findName(name) {
    for (let key in players)
       if (players[key].name === name)
          return 1;
    return 0;
 }
-
+//проверяет какие таблетки подобрал игрок
 function checkGatheredPills() {
    for (let i in players) {
       for (let j in pills) {
@@ -67,7 +71,21 @@ function checkGatheredPills() {
       }
    }
 }
-
+//движение снарядов - кашля
+function moveCough (socket) {
+   let dx = 15,
+       i = 0;
+   while (socket.id in players && i < players[socket.id].allCough.length) {
+      if (players[socket.id].x + 200 < players[socket.id].allCough[i].x + dx) {
+         players[socket.id].allCough.splice(i, 1);
+         --i;
+      } else players[socket.id].allCough[i].x += dx;
+      ++i;
+   }
+}
+function collisionWithCough() {
+   
+}
 io.on('connection', socket => {
    console.log('user connected');
    socket.on('setPlayerName', function (player, width, height) {
@@ -84,7 +102,8 @@ io.on('connection', socket => {
             }, 30000);
             let timerId = setInterval(function () {
                checkGatheredPills();
-               moveCough();
+               moveCough(socket);
+
                socket.emit('render', players, pills);
             }, 100);
          } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
@@ -113,18 +132,6 @@ io.on('connection', socket => {
    socket.on('newCough' , function (cough) {
       players[socket.id].allCough.unshift(new Cough(cough.x,cough.y));
    })
-   //движение снарядов - кашля
-   function moveCough () {
-      let dx = 15,
-          i = 0;
-      while (socket.id in players && i < players[socket.id].allCough.length) {
-         if (players[socket.id].x + 200 < players[socket.id].allCough[i].x + dx) {
-            players[socket.id].allCough.splice(i, 1);
-            --i;
-         } else players[socket.id].allCough[i].x += dx;
-         ++i;
-      }
-   }
    socket.on('disconnect', () => {
       if (socket.id in players) {
          console.log("Player " + players[socket.id].name + " disconnect");
