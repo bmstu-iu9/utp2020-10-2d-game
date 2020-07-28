@@ -10,16 +10,10 @@ let socket = io(),
     downPressed = false,
     upPressed = false,
     spacePressed = false,
-    coughWidth = 10,
-    coughHeight = 10;
+    coughWidth = 10, //длина
+    coughHeight = 10; //ширина
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
-class Cough {
-    constructor(x,y) {
-        this.x = x;
-        this.y = y;
-    }
-}
 function keyDownHandler(e) { //детектит нажатие клавишы
     if (e.key === "d" || e.key === "ArrowRight")
         rightPressed = true;
@@ -58,6 +52,7 @@ function addNewPlayer(rl) {
     document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
           <button type = "button" name = "button" onclick = "setPlayerName()">Set name</button>'
 }
+//рисовка экрана пользователя
 socket.on('render', function (players) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     if (leftPressed)
@@ -71,7 +66,6 @@ socket.on('render', function (players) {
     if (role === "Zombie") {
         if (spacePressed)
             socket.emit('newCough', {x: players[socket.id].x + 80, y: players[socket.id].y + 65})
-        socket.emit('moveCough')
     }
     drawCough(players);
     drawPlayers(players);
@@ -85,7 +79,7 @@ const imgs = {};
 function downloadImage(imageName) {
     return new Promise(resolve => {
         const img = new Image();
-        img.src = `/css/${imageNam e}`;
+        img.src = `/css/${imageName}`;
         img.onload = () => {
             console.log(`Downloaded ${imageName}`);
             imgs[imageName] = img;

@@ -16,8 +16,6 @@ class Player {
       this.allCough = [];
       screenHeight = h;
       screenWidth = w;
-      //this.x = w * (Math.random() - 90 / w);
-      //this.y = h * (Math.random() - 90 / h);
    }
 }
 class Cough {
@@ -42,8 +40,9 @@ io.on('connection', socket => {
             players[socket.id] = new Player(player.role, player.name, width, height);
             console.log('a new player ' + player.name + ' is ' + player.role);
             socket.emit('PlayTheGame', players);
-
-            let timerId = setInterval(function () { socket.emit('render', players) }, 100);
+            let timerId = setInterval(function () {
+               moveCough();
+               socket.emit('render', players); }, 100);
          } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
       }
    });
@@ -70,18 +69,17 @@ io.on('connection', socket => {
    socket.on('newCough' , function (cough) {
       players[socket.id].allCough.unshift(new Cough(cough.x,cough.y));
    })
-   socket.on('moveCough' , function () {
-      let dx = 15;
-      for (let i = 0; i < players[socket.id].allCough.length; i++) {
+   function moveCough () {
+      let dx = 15,
+          i = 0;
+      while (socket.id in players && i < players[socket.id].allCough.length) {
          if (players[socket.id].x + 200 < players[socket.id].allCough[i].x + dx) {
-            players[socket.id].allCough.splice(i,1);
+            players[socket.id].allCough.splice(i, 1);
             --i;
-         }
-         else {
-            players[socket.id].allCough[i].x += dx;
-         }
+         } else players[socket.id].allCough[i].x += dx;
+         ++i;
       }
-   })
+   }
    socket.on('disconnect', () => {
       if (socket.id in players) {
          console.log("Player " + players[socket.id].name + " disconnect");
