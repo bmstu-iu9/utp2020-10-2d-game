@@ -74,6 +74,7 @@ socket.on('render', function (players) {
 const IMG_NAMES = [
     'halloween.svg',
     'back(1).svg',
+    'Virus.png'
 ];
 const imgs = {};
 function downloadImage(imageName) {
@@ -95,7 +96,7 @@ function drawCough(players) {
         console.log(players.length);
         for (let i = 0; i < players[key].allCough.length; i++) {
             context.beginPath();
-            context.rect(players[key].allCough[i].x, players[key].allCough[i].y, coughWidth, coughHeight);
+            context.drawImage(imgs['Virus.png'], players[key].allCough[i].x, players[key].allCough[i].y, coughWidth, coughHeight);
             context.fillStyle = "#dd00d9";
             context.fill();
             context.closePath();
