@@ -44,7 +44,7 @@ function setPlayerName() {
     name = document.getElementById('nameOfPlayer').value;
     width = document.documentElement.clientWidth; // ширина клиентской части окна браузера
     height = document.documentElement.clientHeight; // высота клиентской части окна браузера
-    console.log('height : ' ,height)
+    console.log('height : ', height)
     socket.emit('setPlayerName', { role: role, name: name }, width, height);
 }
 function addNewPlayer(rl) {
@@ -53,7 +53,7 @@ function addNewPlayer(rl) {
           <button type = "button" name = "button" onclick = "setPlayerName()">Set name</button>'
 }
 //рисовка экрана пользователя
-socket.on('render', function (players) {
+socket.on('render', function (players, pills) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     if (leftPressed)
         socket.emit('moveLeft');
@@ -69,12 +69,14 @@ socket.on('render', function (players) {
     }
     drawCough(players);
     drawPlayers(players);
+    drawPills(pills);
 })
 //скачиваем все нужные изображения в объект imgs для быстрого доступа
 const IMG_NAMES = [
     'Zombie.svg', //Zombie
     'Human.svg', //Human
     'Virus.png',//моделька снарядов - кашля
+    'medicinedrawn.svg'
 ];
 const imgs = {};
 function downloadImage(imageName) {
@@ -111,8 +113,21 @@ function drawPlayers(players) {
         dx = 100;
     for (let key in players) {
         let x = players[key].x,
-            y = players[key].y + 12;
-        context.fillText(players[key].name + " - " + players[key].role, x, y, 90);
+            y = players[key].y + 12,
+            text = context.measureText(players[key].name);
+        if (text.width <= 90) {
+            context.fillText(players[key].name, x + (90 - text.width) / 2, y, 90);
+        }
+        else {
+            context.fillText(players[key].name, x, y, 90);
+        }
+        y += dy;
+        context.fillStyle = "#000000";
+        context.fillRect(x, y, 90, 8);
+        context.fillStyle = "#32CD32";
+        context.fillRect(x + 1, y + 1, 88 * players[key].health, 6);
+        context.fillStyle = "#B22222";
+        context.fillRect(x + 1 + 88 * players[key].health, y + 1, 88 * (1 - players[key].health), 6);
         y += dy;
         if (players[key].role === 'Human') {
             context.drawImage(imgs['Human.svg'], x, y, 90, 90);
@@ -120,10 +135,18 @@ function drawPlayers(players) {
         else {
             context.drawImage(imgs['Zombie.svg'], x, y, 90, 90);
         }
-        y -= dy;
+        y -= 2 * dy;
         //x += dx;
     }
 }
+
+//рисуем лекарство в рандомной точке
+function drawPills(pills) {
+    for (let i in pills){
+        context.drawImage(imgs['medicinedrawn.svg'], pills[i].x, pills[i].y);
+    }
+}
+
 socket.on('usersExists', function (data) {//событие происходящие если выбран ник, который уже занят
     console.log(data);
     document.getElementById('nameError').innerHTML = data;
