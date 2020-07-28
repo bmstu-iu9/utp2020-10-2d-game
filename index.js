@@ -5,15 +5,17 @@ const express = require('express'),
    io = require('socket.io')(http),
    fs = require('fs');
 let players = {},
-   pills = {};
-let screenWidth, screenHeight;
-
+    pills = {},
+    screenWidth,
+    screenHeight;
 class Player {
-   constructor(role, name, w, h) {
+   constructor(role, name, w, h, playerWidth, playerHeight) {
       this.name = name;
       this.role = role;
       this.x = 0;
       this.y = 0;
+      this.playerWidth = playerWidth;
+      this.playerHeight = playerHeight;
       this.allCough = [];
       if (role == 'Human')
          this.health = 1.00;
@@ -41,9 +43,11 @@ class Player {
    }
 }
 class Cough {
-   constructor(x,y) {
+   constructor(x,y,coughWidth,coughHeight) {
       this.x = x;
       this.y = y;
+      this.coughWidth = coughWidth;
+      this.coughHeight = coughHeight
    }
 }
 
@@ -83,27 +87,27 @@ function moveCough (socket) {
       ++i;
    }
 }
-function collisionWithCough() {
-   
-}
 io.on('connection', socket => {
+   let timerOfPills,
+       timerOfRender;
    console.log('user connected');
-   socket.on('setPlayerName', function (player, width, height) {
+   socket.on('setPlayerName', function (player, width, height, playerWidth, playerHeight) {
       if (player.name.length === 0) { //пустое имя недопустимо
          socket.emit('invalidNickname', 'nickname is invalid');
       } else {
          if (findName(player.name) === 0) { //проверяем есть ли игок с таким ником
-            players[socket.id] = new Player(player.role, player.name, width, height);
+            players[socket.id] = new Player(player.role, player.name, width, height, playerWidth, playerHeight);
             console.log('a new player ' + player.name + ' is ' + player.role);
             socket.emit('PlayTheGame', players);
-            setInterval(function () {
+            timerOfPills = setInterval(function () {
                let p = new Pill(width, height);
                pills[p.x + '#' + p.y] = p;
             }, 30000);
-            let timerId = setInterval(function () {
+            timerOfRender = setInterval(function () {
                checkGatheredPills();
                moveCough(socket);
-
+               if (players[socket.id].role === 'Human')
+                  collisionWithCough();
                socket.emit('render', players, pills);
             }, 100);
          } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
@@ -129,8 +133,8 @@ io.on('connection', socket => {
          players[socket.id].x += 5;
       }
    })
-   socket.on('newCough' , function (cough) {
-      players[socket.id].allCough.unshift(new Cough(cough.x,cough.y));
+   socket.on('newCough', function (cough) {
+      players[socket.id].allCough.unshift(new Cough(cough.x, cough.y, cough.width, cough.height));
    })
    socket.on('disconnect', () => {
       if (socket.id in players) {
@@ -138,6 +142,32 @@ io.on('connection', socket => {
          delete players[socket.id];
       } else console.log("Player (no name) disconnect");
    });
+
+   function collisionWithCough() {
+      let player = players[socket.id];
+      for (let key in players) {
+         if (key !== socket.id && players[key].role === 'Zombie') {
+            for (let i = 0; i < players[key].allCough.length; i++) {
+               let cough = players[key].allCough[i];
+               if ((cough.x >= player.x && cough.x <= player.x + player.playerWidth && cough.y >= player.y && cough.y <= player.y + player.playerHeight) || //проверяем попадание верхнего левого края модельки кашля в модельку игрока
+                   (cough.x + cough.coughWidth >= player.x && cough.x + cough.coughWidth <= player.x + player.playerWidth && cough.y >= player.y && cough.y <= player.y + player.playerHeight) || //врехнего правого угла
+                   (cough.x >= player.x && cough.x <= player.x + player.playerWidth && cough.y + cough.coughHeight >= player.y && cough.y + cough.coughHeight <= player.y + player.playerHeight) || //левый нижний
+                   (cough.x + cough.coughWidth >= player.x && cough.x + cough.coughWidth <= player.x + player.playerWidth && cough.y + cough.coughHeight >= player.y && cough.y + cough.coughHeight <= player.y + player.playerHeight)) { //правый нижний
+                  console.log("player - " + players[key].name + " hits player - " + players[socket.id].name);
+                  players[key].allCough.splice(i, 1);//удалаяем снаряд кашля который попал
+                  players[socket.id].decreaseHealth(0.05);//уменьшаем здоровье игрока, по которому попали
+                  if (players[socket.id].health === 0) {
+                     clearInterval(timerOfPills); //завершаем создание лекарства от этого пользователя
+                     clearInterval(timerOfRender); //завершаем рендер этого игрока
+                     delete players[socket.id]; //удаляем его из списка игроков
+                     socket.emit('gameOver');
+                     return;
+                  }
+               }
+            }
+         }
+      }
+   }
 });
 
 app.get('/', function (req, res) {

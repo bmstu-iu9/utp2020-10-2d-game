@@ -11,7 +11,9 @@ let socket = io(),
     upPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения вверх(w или стреловка вверх), true - нажата, false - не нажата
     spacePressed = false,//проверяет нажат ли пробел , true - нажат, false - не нажат
     coughWidth = 10, //длина снаряда кашя
-    coughHeight = 10; //ширина снаряда кашля
+    coughHeight = 10, //ширина снаряда кашля
+    playerWidth = 90, //длина
+    playerHeight = 90; //ширина прямоугольника модельки человека
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 function keyDownHandler(e) { //детектит нажатие клавишы
@@ -45,7 +47,7 @@ function setPlayerName() {
     width = document.documentElement.clientWidth; // ширина клиентской части окна браузера
     height = document.documentElement.clientHeight; // высота клиентской части окна браузера
     console.log('height : ', height)
-    socket.emit('setPlayerName', { role: role, name: name }, width, height);
+    socket.emit('setPlayerName', { role: role, name: name }, width, height , playerWidth , playerHeight);
 }
 function addNewPlayer(rl) {
     role = rl;
@@ -65,7 +67,12 @@ socket.on('render', function (players, pills) {
         socket.emit('moveDown');
     if (role === "Zombie") {
         if (spacePressed)
-            socket.emit('newCough', {x: players[socket.id].x + 80, y: players[socket.id].y + 65})
+            socket.emit('newCough', {
+                x: players[socket.id].x + 80,
+                y: players[socket.id].y + 65,
+                width: coughWidth,
+                height: coughHeight
+            })
     }
     drawCough(players);
     drawPlayers(players);
@@ -130,10 +137,10 @@ function drawPlayers(players) {
         context.fillRect(x + 1 + 88 * players[key].health, y + 1, 88 * (1 - players[key].health), 6);
         y += dy;
         if (players[key].role === 'Human') {
-            context.drawImage(imgs['Human.svg'], x, y, 90, 90);
+            context.drawImage(imgs['Human.svg'], x, y, playerWidth, playerHeight);
         }
         else {
-            context.drawImage(imgs['Zombie.svg'], x, y, 90, 90);
+            context.drawImage(imgs['Zombie.svg'], x, y, playerWidth, playerHeight);
         }
         y -= 2 * dy;
         //x += dx;
@@ -146,7 +153,9 @@ function drawPills(pills) {
         context.drawImage(imgs['medicinedrawn.svg'], pills[i].x, pills[i].y);
     }
 }
-
+socket.on('gameOver' , function () {
+    document.body.innerHTML = '<div> <h1>GAME OVER</h1></div>'
+})
 socket.on('usersExists', function (data) {//событие происходящие если выбран ник, который уже занят
     console.log(data);
     document.getElementById('nameError').innerHTML = data;
