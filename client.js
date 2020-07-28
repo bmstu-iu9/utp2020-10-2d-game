@@ -85,7 +85,7 @@ const imgs = {};
 function downloadImage(imageName) {
     return new Promise(resolve => {
         const img = new Image();
-        img.src = `/css/${imageNam e}`;
+        img.src = `/css/${imageName}`;
         img.onload = () => {
             console.log(`Downloaded ${imageName}`);
             imgs[imageName] = img;
