@@ -69,6 +69,7 @@ io.on('connection', socket => {
    socket.on('newCough' , function (cough) {
       players[socket.id].allCough.unshift(new Cough(cough.x,cough.y));
    })
+   //движение снарядов - кашля
    function moveCough () {
       let dx = 15,
           i = 0;

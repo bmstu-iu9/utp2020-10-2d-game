@@ -5,11 +5,11 @@ let socket = io(),
     context,
     width,
     height,
-    rightPressed = false,
-    leftPressed = false,
-    downPressed = false,
-    upPressed = false,
-    spacePressed = false,
+    rightPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения вправа(d или стреловка вправо), true - нажата, false - не нажата
+    leftPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения влево(a или стреловка влево), true - нажата, false - не нажата
+    downPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения вниз(s или стреловка вниз), true - нажата, false - не нажата
+    upPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения вверх(w или стреловка вверх), true - нажата, false - не нажата
+    spacePressed = false,//проверяет нажат ли пробел , true - нажат, false - не нажат
     coughWidth = 10, //длина
     coughHeight = 10; //ширина
 document.addEventListener("keydown", keyDownHandler, false);
@@ -72,9 +72,9 @@ socket.on('render', function (players) {
 })
 //скачиваем все нужные изображения в объект imgs для быстрого доступа
 const IMG_NAMES = [
-    'halloween.svg',
-    'back(1).svg',
-    'Virus.png'
+    'Zombie.svg', //Zombie
+    'Human.svg', //Human
+    'Virus.png',//моделька снарядов - кашля
 ];
 const imgs = {};
 function downloadImage(imageName) {
@@ -115,10 +115,10 @@ function drawPlayers(players) {
         context.fillText(players[key].name + " - " + players[key].role, x, y, 90);
         y += dy;
         if (players[key].role === 'Human') {
-            context.drawImage(imgs['back(1).svg'], x, y, 90, 90);
+            context.drawImage(imgs['Human.svg'], x, y, 90, 90);
         }
         else {
-            context.drawImage(imgs['halloween.svg'], x, y, 90, 90);
+            context.drawImage(imgs['Zombie.svg'], x, y, 90, 90);
         }
         y -= dy;
         //x += dx;
