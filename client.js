@@ -12,11 +12,21 @@ let socket = io(),
     spacePressed = false,//проверяет нажат ли пробел , true - нажат, false - не нажат
     coughWidth = 10, //длина снаряда кашя
     coughHeight = 10, //ширина снаряда кашля
-    playerWidth = 90, //длина
-    playerHeight = 90; //ширина прямоугольника модельки человека
+    playerWidth = 90, //длина прямоугольника модельки человека
+    playerHeight = 90, //ширина прямоугольника модельки человека
+    mouseX = 0,
+    mouseY = 0,
+    mouseMove = false;
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
-function keyDownHandler(e) { //детектит нажатие клавишы
+document.addEventListener("mousemove", mouseMoveHandler, false);
+function mouseMoveHandler(event) {
+    mouseMove = true;
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+}
+//детектит нажатие клавишы
+function keyDownHandler(e) {
     if (e.key === "d" || e.key === "ArrowRight")
         rightPressed = true;
     else if (e.key === "a" || e.key === "ArrowLeft")
@@ -29,7 +39,8 @@ function keyDownHandler(e) { //детектит нажатие клавишы
         spacePressed = true;
 
 }
-function keyUpHandler(e) { //детектит отпускание клавиши
+//детектит отпускание клавиши
+function keyUpHandler(e) {
     if (e.key === "d" || e.key === "ArrowRight")
         rightPressed = false;
     else if (e.key === "a" || e.key === "ArrowLeft")
@@ -71,7 +82,10 @@ socket.on('render', function (players, pills) {
                 x: players[socket.id].x + 80,
                 y: players[socket.id].y + 65,
                 width: coughWidth,
-                height: coughHeight
+                height: coughHeight,
+                mouseX : mouseX,
+                mouseY : mouseY,
+                mouseMove : mouseMove
             })
     }
     drawCough(players);
