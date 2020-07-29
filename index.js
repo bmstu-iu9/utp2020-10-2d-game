@@ -105,7 +105,6 @@ function moveCough (socket) {
              sP = points.secondPoint,
              fDist = findDist(new Point(player.x + player.playerWidth / 2, player.y + player.playerHeight / 2), fP),
              sDist = findDist(new Point(player.x + player.playerWidth / 2, player.y + player.playerHeight / 2), sP);
-         console.log(fDist + " " + sDist )
          if (fDist > sDist)
             if (fDist < 200) {
                players[socket.id].allCough[i].x = fP.x;
@@ -186,7 +185,7 @@ io.on('connection', socket => {
                  player.y + player.playerHeight / 2,
                  cough.mouseX,
                  cough.mouseY,
-                 player.playerHeight * player.playerHeight + player.playerWidth * player.playerWidth),
+                 (player.playerHeight * player.playerHeight + player.playerWidth * player.playerWidth)/4),
              fP = points.firstPoint,
              sP = points.secondPoint;
          if (findDist(new Point(cough.mouseX, cough.mouseY), fP)
