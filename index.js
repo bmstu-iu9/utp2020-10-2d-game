@@ -23,13 +23,13 @@ class Player {
          this.countOfBulletInWeapon = 5; //текущее количесьтво пуль в оружии
          this.weaponCapacity = 5; //максимальная ёмкость в обойме
          this.reloading = false; //показывает находится ли оружие в процессе перезарядки
-         this.projectileDamage = 0.10;
-         this.projectileFlightDistance = 400;
+         this.projectileDamage = 0.10; //урон от пули из оружие игрока
+         this.projectileFlightDistance = 400; //дальность полёта пули из оружия игрока
       }
       else {
-         this.projectileDamage = 0.05;
-         this.typeOfWeapon = 'cough';
-         this.projectileFlightDistance = 200;
+         this.projectileDamage = 0.05;  //урон от пули из оружие игрока
+         this.typeOfWeapon = 'cough'; //тип оружия
+         this.projectileFlightDistance = 200; //дальность полёта пули из оружия игрока
       }
       screenHeight = h;
       screenWidth = w;
@@ -52,7 +52,7 @@ class Player {
          else return false;
       }
    }
-   weaponIsEmpty() {
+   isWeaponEmpty() {
       if (this.role === 'Zombie')
          return false;
       else return this.countOfBulletInWeapon === 0;
@@ -90,6 +90,7 @@ class Point {
       this.y = y;
    }
 }
+//класс лекарства
 class Pill {
    constructor(w, h) {
       this.x = w * (Math.random() - 90 / w);
@@ -206,7 +207,7 @@ io.on('connection', socket => {
       }
    });
    socket.on('newProjectile', function (projectile) {
-      if (players[socket.id].weaponIsEmpty()) { //если патроны закончились
+      if (players[socket.id].isWeaponEmpty()) { //если патроны закончились
          console.log("weapon is empty")
          if (!players[socket.id].reloading) { //если оружие не перезаряжается
             players[socket.id].reloading = true;
