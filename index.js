@@ -1,4 +1,5 @@
 'use strict'
+
 const express = require('express'),
    app = express(),
    http = require('http').createServer(app),
@@ -42,8 +43,9 @@ class Player {
          this.health = 0;
    }
 }
+
 class Cough {
-   constructor(x,y,coughWidth,coughHeight,mouseX,mouseY,mouseMove) {
+   constructor(x, y, coughWidth, coughHeight, mouseX, mouseY, mouseMove) {
       this.x = x;
       this.y = y;
       this.coughWidth = coughWidth;
@@ -53,18 +55,21 @@ class Cough {
       this.mouseMove = mouseMove;
    }
 }
+
 class Point {
    constructor(x,y) {
       this.x = x;
       this.y = y;
    }
 }
+
 class Pill {
    constructor(w, h) {
       this.x = w * (Math.random() - 90 / w);
       this.y = h * (Math.random() - 90 / h);
    }
 }
+
 //поиск имени среди уже существующих на сервере
 function findName(name) {
    for (let key in players)
@@ -157,22 +162,22 @@ io.on('connection', socket => {
    });
    socket.on('moveDown', function () {
       if (players[socket.id].y + 120 < screenHeight) {
-         players[socket.id].y += 5;
+         players[socket.id].y += 15;
       }
    });
    socket.on('moveLeft', function () {
       if (players[socket.id].x > 0) {
-         players[socket.id].x -= 5;
+         players[socket.id].x -= 15;
       }
    });
    socket.on('moveUp', function () {
       if (players[socket.id].y > 0) {
-         players[socket.id].y -= 5;
+         players[socket.id].y -= 15;
       }
    });
    socket.on('moveRight', function () {
       if (players[socket.id].x + 90 < screenWidth) {
-         players[socket.id].x += 5;
+         players[socket.id].x += 15;
       }
    });
    socket.on('newCough', function (cough) {
