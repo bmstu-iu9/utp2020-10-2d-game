@@ -17,10 +17,20 @@ class Player {
       this.playerWidth = playerWidth;
       this.playerHeight = playerHeight;
       this.projectiles = [];
-      if (role === 'Human')
-         this.health = 1.00;
-      else
-         this.health = 0.00;
+      this.health = 1.00;
+      if (role === 'Human') {
+         this.typeOfWeapon = 'pistol'; //тип оружия
+         this.countOfBulletInWeapon = 5; //текущее количесьтво пуль в оружии
+         this.weaponCapacity = 5; //максимальная ёмкость в обойме
+         this.reloading = false; //показывает находится ли оружие в процессе перезарядки
+         this.projectileDamage = 0.10;
+         this.projectileFlightDistance = 400;
+      }
+      else {
+         this.projectileDamage = 0.05;
+         this.typeOfWeapon = 'cough';
+         this.projectileFlightDistance = 200;
+      }
       screenHeight = h;
       screenWidth = w;
    }
@@ -29,7 +39,23 @@ class Player {
           x + 30 < this.x ||
           y > this.y + 90 ||
           y + 30 < y);
-
+   }
+   shoot() {
+      if (this.role === 'Zombie') {
+         return true;
+      }
+      else {
+         if (this.countOfBulletInWeapon > 0) {
+            --this.countOfBulletInWeapon;
+            return true;
+         }
+         else return false;
+      }
+   }
+   weaponIsEmpty() {
+      if (this.role === 'Zombie')
+         return false;
+      else return this.countOfBulletInWeapon === 0;
    }
    increaseHealth() {
       this.health += 0.10;
@@ -44,16 +70,17 @@ class Player {
 }
 //класс снаряда
 class Projectile {
-   constructor(x,y,projectileWidth,projectileHeight,mouseX,mouseY,mouseMove,type,projectileSpeed) {
+   constructor(x,y,projectileWidth,projectileHeight,mouseX,mouseY,mouseMove,type,projectileSpeed,damage) {
       this.x = x;
       this.y = y;
       this.projectileWidth = projectileWidth;
       this.projectileHeight = projectileHeight;
-      this.mouseX = mouseX;
-      this.mouseY = mouseY;
+      this.mouseX = mouseX; //координаты мышки в момент выпуска сняряда
+      this.mouseY = mouseY; //используяются для определения траектории полёта снаряда
       this.mouseMove = mouseMove;
       this.type = type;
-      this.projectileSpeed = projectileSpeed;
+      this.projectileSpeed = projectileSpeed; //скорость снаряда
+      this.damage = damage; //урон от попадание этим снарядом
    }
 }
 //класс точка с координатами в прямоугольной декартовой системе на плоскости
@@ -110,12 +137,12 @@ function moveProjectile(socket) {
              fDist = findDist(new Point(player.x + player.playerWidth / 2, player.y + player.playerHeight / 2), fP),
              sDist = findDist(new Point(player.x + player.playerWidth / 2, player.y + player.playerHeight / 2), sP);
          if (fDist > sDist)
-            if (fDist < 200) {
+            if (fDist < player.projectileFlightDistance) {
                players[socket.id].projectiles[i].x = fP.x;
                players[socket.id].projectiles[i].y = fP.y;
             } else players[socket.id].projectiles.splice(i, 1);
          else
-            if (sDist < 200) {
+            if (sDist < player.projectileFlightDistance) {
                players[socket.id].projectiles[i].x = sP.x;
                players[socket.id].projectiles[i].y = sP.y;
             } else players[socket.id].projectiles.splice(i, 1);
@@ -179,24 +206,36 @@ io.on('connection', socket => {
       }
    });
    socket.on('newProjectile', function (projectile) {
-      if (!projectile.mouseMove) {
-         players[socket.id].projectiles.unshift
-         (new Projectile(projectile.x, projectile.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove,projectile.type,projectile.projectileSpeed));
+      if (players[socket.id].weaponIsEmpty()) { //если патроны закончились
+         console.log("weapon is empty")
+         if (!players[socket.id].reloading) { //если оружие не перезаряжается
+            players[socket.id].reloading = true;
+            setTimeout(function () {
+               players[socket.id].countOfBulletInWeapon = players[socket.id].weaponCapacity;
+               players[socket.id].reloading = false;
+            }, 5000);
+         }
       } else {
-         let player = players[socket.id],
-             points = findPoint(player.x + player.playerWidth / 2,
-                 player.y + player.playerHeight / 2,
-                 projectile.mouseX,
-                 projectile.mouseY,
-                 (player.playerHeight * player.playerHeight + player.playerWidth * player.playerWidth)/4),
-             fP = points.firstPoint,
-             sP = points.secondPoint;
-         if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
-             > findDist(new Point(projectile.mouseX, projectile.mouseY), sP))
+         players[socket.id].shoot();
+         if (!projectile.mouseMove) {
             players[socket.id].projectiles.unshift
-            (new Projectile(sP.x, sP.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove,projectile.type,projectile.projectileSpeed));
-         else players[socket.id].projectiles.unshift
-         (new Projectile(fP.x, fP.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove,projectile.type,projectile.projectileSpeed));
+            (new Projectile(projectile.x, projectile.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed,players[socket.id].projectileDamage));
+         } else {
+            let player = players[socket.id],
+                points = findPoint(player.x + player.playerWidth / 2,
+                    player.y + player.playerHeight / 2,
+                    projectile.mouseX,
+                    projectile.mouseY,
+                    (player.playerHeight * player.playerHeight + player.playerWidth * player.playerWidth) / 4),
+                fP = points.firstPoint,
+                sP = points.secondPoint;
+            if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
+                > findDist(new Point(projectile.mouseX, projectile.mouseY), sP))
+               players[socket.id].projectiles.unshift
+               (new Projectile(sP.x, sP.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed,player.projectileDamage));
+            else players[socket.id].projectiles.unshift
+            (new Projectile(fP.x, fP.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed,player.projectileDamage));
+         }
       }
    });
    socket.on('disconnect', () => {
@@ -208,7 +247,7 @@ io.on('connection', socket => {
    function collisionWithProjectile() {
       let player = players[socket.id];
       for (let key in players) {
-         if (key !== socket.id && players[key].role !== player.role) {
+         if (key in players && key !== socket.id && players[key].role !== player.role) {
             for (let i = 0; i < players[key].projectiles.length; i++) {
                let projectile = players[key].projectiles[i];
                if ((projectile.x >= player.x && projectile.x <= player.x + player.playerWidth && projectile.y >= player.y && projectile.y <= player.y + player.playerHeight) || //проверяем попадание верхнего левого края модельки кашля в модельку игрока
@@ -216,8 +255,9 @@ io.on('connection', socket => {
                    (projectile.x >= player.x && projectile.x <= player.x + player.playerWidth && projectile.y + projectile.projectileHeight >= player.y && projectile.y + projectile.projectileHeight <= player.y + player.playerHeight) || //левый нижний
                    (projectile.x + projectile.projectileWidth >= player.x && projectile.x + projectile.projectileWidth <= player.x + player.playerWidth && projectile.y + projectile.projectileHeight >= player.y && projectile.y + projectile.projectileHeight <= player.y + player.playerHeight)) { //правый нижний
                   console.log("player - " + players[key].name + " hits player - " + players[socket.id].name);
-                  players[key].projectiles.splice(i, 1);//удалаяем снаряд кашля который попал
-                  players[socket.id].decreaseHealth(0.05);//уменьшаем здоровье игрока, по которому попали
+                  console.log(players[key].projectiles[i].damage)
+                  players[socket.id].decreaseHealth(players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
+                  players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
                   if (players[socket.id].health === 0) {
                      clearInterval(timerOfPills); //завершаем создание лекарства от этого пользователя
                      clearInterval(timerOfRender); //завершаем рендер этого игрока

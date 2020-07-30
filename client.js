@@ -14,12 +14,12 @@ let socket = io(),
     coughHeight = 10, //ширина снаряда кашля
     playerWidth = 90, //длина прямоугольника модельки человека
     playerHeight = 90, //ширина прямоугольника модельки человека
-    mouseX = 0,
-    mouseY = 0,
-    mouseMove = false,
-    mousePressed = false,
-    bulletWidth = 10,
-    bulletHeight = 10;
+    mouseX = 0, //X кооордината положения мыши
+    mouseY = 0, //Y кооордината положения мыши
+    mouseMove = false, //перемещалась ли мышь
+    mousePressed = false, //нажата ли кнопка мышт
+    bulletWidth = 10, //длина модельки пули
+    bulletHeight = 10; //ширина модельки пули
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
@@ -112,7 +112,7 @@ socket.on('render', function (players, pills) {
             mouseY: mouseY,
             mouseMove: mouseMove,
             type: 'bullet',
-            projectileSpeed: 15
+            projectileSpeed: 30
         })
     drawProjectiles(players);
     drawPlayers(players);
