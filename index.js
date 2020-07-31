@@ -83,6 +83,37 @@ class Projectile {
       this.damage = damage; //урон от попадание этим снарядом
    }
 }
+class Rect {
+   constructor(x,y,width,height) {
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
+   }
+   leftUp() {
+      return new Point(this.x,this.y);
+   }
+   rightUp() {
+      return new Point(this.x + this.width , this.y);
+   }
+   leftDown() {
+      return new Point(this.x,this.y + this.height);
+   }
+   rightDown() {
+      return new Point(this.x + this.width ,  this.y + this.height);
+   }
+   //проверка лежит ли точка point в прямоугольнике
+   hasPoint(point) {
+      return point.x >= this.leftUp().x && point.x <= this.rightUp().x && point.y >= this.leftUp().y && point.y <= this.rightDown().y;
+   }
+   //проверка пересекается ли прямоугольник this с rect
+   intersect(rect) {
+      return this.hasPoint(rect.leftUp()) ||
+          this.hasPoint(rect.rightUp()) ||
+          this.hasPoint(rect.leftDown()) ||
+          this.hasPoint(rect.rightDown());
+   }
+}
 //класс точка с координатами в прямоугольной декартовой системе на плоскости
 class Point {
    constructor(x,y) {
@@ -114,17 +145,6 @@ function checkGatheredPills() {
          }
       }
    }
-}
-//проверка лежит ли точка в прямоугольнике с вершиной в точке rectP, длиной rectW, шириной rectH
-function pointInRect(point,rectP,rectH,rectW) {
-   return point.x >= rectP.x && point.x <= rectP.x + rectW && point.y >= rectP.y && point.y <= rectP.y + rectH;
-}
-//проверка пересекается ли прямоугольник с вершиной в точке firstP, длиной firstPW, шириной firstPH и прямоугльнком second
-function twoRectIntersect(firstP,firstPH,firstPW,secondP,secondPH,secondPW) {
-   return pointInRect(firstP,secondP,secondPH,secondPW) ||
-       pointInRect(new Point(firstP.x + firstPW,firstP.y),secondP,secondPH,secondPW) ||
-       pointInRect(new Point(firstP.x,firstP.y + firstPH),secondP,secondPH,secondPW) ||
-       pointInRect(new Point(firstP.x + firstPW,firstP.y + firstPH),secondP,secondPH,secondPW);
 }
 //нахождение расстояние между 2 точками в прямоугольной декартовой системе на плоскости
 function findDist(fP,sP) {
@@ -230,7 +250,7 @@ io.on('connection', socket => {
          players[socket.id].shoot();
          if (!projectile.mouseMove) {
             players[socket.id].projectiles.unshift
-            (new Projectile(projectile.x, projectile.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed,players[socket.id].projectileDamage));
+            (new Projectile(projectile.x, projectile.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed, players[socket.id].projectileDamage));
          } else {
             let player = players[socket.id],
                 points = findPoint(player.x + player.playerWidth / 2,
@@ -243,15 +263,15 @@ io.on('connection', socket => {
             if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
                 > findDist(new Point(projectile.mouseX, projectile.mouseY), sP))
                players[socket.id].projectiles.unshift
-               (new Projectile(sP.x, sP.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed,player.projectileDamage));
+               (new Projectile(sP.x, sP.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed, player.projectileDamage));
             else players[socket.id].projectiles.unshift
-            (new Projectile(fP.x, fP.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed,player.projectileDamage));
+            (new Projectile(fP.x, fP.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed, player.projectileDamage));
          }
       }
    });
    //добавлянм нового игрока  - зомби, событие происходит когда был убит человек
-   socket.on('addNewZombie' , function (player) {
-      players[socket.id] = new Player('Zombie',player.name,player.w,player.h,player.playerWidth,player.playerHeight);
+   socket.on('addNewZombie', function (player) {
+      players[socket.id] = new Player('Zombie', player.name, player.w, player.h, player.playerWidth, player.playerHeight);
       players[socket.id].x = player.x;
       players[socket.id].y = player.y;
    })
@@ -261,19 +281,16 @@ io.on('connection', socket => {
          delete players[socket.id];
       } else console.log("Player (no name) disconnect");
    });
+   //просчитываем получение урона игроком player от снарядов других игроков
    function collisionWithProjectile() {
-      let player = players[socket.id]; //просчитываем получение урона игроком player от снарядов других
+      let player = players[socket.id];
       for (let key in players) {
          if (socket.id in players && key in players && key !== socket.id && players[key].role !== player.role) {
             for (let i = 0; i < players[key].projectiles.length; i++) {
-               let projectile = players[key].projectiles[i];
-               if (twoRectIntersect({
-                  x: projectile.x,
-                  y: projectile.y
-               }, projectile.projectileHeight, projectile.projectileWidth, {
-                  x: player.x,
-                  y: player.y
-               }, player.playerHeight, player.playerWidth)) {
+               let projectile = players[key].projectiles[i],
+                   playerHitbox = new Rect(player.x, player.y, player.playerWidth, player.playerHeight),
+                   projectileHitbox = new Rect(projectile.x, projectile.y, projectile.projectileWidth, projectile.projectileHeight);
+               if (playerHitbox.intersect(projectileHitbox)) {
                   console.log("player - " + players[key].name + " hits player - " + players[socket.id].name);
                   players[socket.id].decreaseHealth(players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
                   players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
@@ -284,12 +301,11 @@ io.on('connection', socket => {
                         delete players[socket.id]; //удаляем его из списка игроков
                         socket.emit('gameOver');
                         return;
-                     }
-                     else {
+                     } else {
                         let x = players[socket.id].x,
                             y = players[socket.id].y;
                         delete players[socket.id]; //удаляем его из списка игроков
-                        socket.emit('turningIntoZombie' , {x : x,y : y});
+                        socket.emit('turningIntoZombie', {x: x, y: y});
                      }
                   }
                }
