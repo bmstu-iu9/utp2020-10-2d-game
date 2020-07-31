@@ -115,6 +115,17 @@ function checkGatheredPills() {
       }
    }
 }
+//проверка лежит ли точка в прямоугольнике с вершиной в точке rectP, длиной rectW, шириной rectH
+function pointInRect(point,rectP,rectH,rectW) {
+   return point.x >= rectP.x && point.x <= rectP.x + rectW && point.y >= rectP.y && point.y <= rectP.y + rectH;
+}
+//проверка пересекается ли прямоугольник с вершиной в точке firstP, длиной firstPW, шириной firstPH и прямоугльнком second
+function twoRectIntersect(firstP,firstPH,firstPW,secondP,secondPH,secondPW) {
+   return pointInRect(firstP,secondP,secondPH,secondPW) ||
+       pointInRect(new Point(firstP.x + firstPW,firstP.y),secondP,secondPH,secondPW) ||
+       pointInRect(new Point(firstP.x,firstP.y + firstPH),secondP,secondPH,secondPW) ||
+       pointInRect(new Point(firstP.x + firstPW,firstP.y + firstPH),secondP,secondPH,secondPW);
+}
 //нахождение расстояние между 2 точками в прямоугольной декартовой системе на плоскости
 function findDist(fP,sP) {
    return Math.round(Math.sqrt((sP.x - fP.x) * (sP.x - fP.x) + (sP.y - fP.y) * (sP.y - fP.y)));
@@ -251,12 +262,14 @@ io.on('connection', socket => {
          if (key in players && key !== socket.id && players[key].role !== player.role) {
             for (let i = 0; i < players[key].projectiles.length; i++) {
                let projectile = players[key].projectiles[i];
-               if ((projectile.x >= player.x && projectile.x <= player.x + player.playerWidth && projectile.y >= player.y && projectile.y <= player.y + player.playerHeight) || //проверяем попадание верхнего левого края модельки кашля в модельку игрока
-                   (projectile.x + projectile.projectiles >= player.x && projectile.x + projectile.projectileWidth <= player.x + player.playerWidth && projectile.y >= player.y && projectile.y <= player.y + player.playerHeight) || //врехнего правого угла
-                   (projectile.x >= player.x && projectile.x <= player.x + player.playerWidth && projectile.y + projectile.projectileHeight >= player.y && projectile.y + projectile.projectileHeight <= player.y + player.playerHeight) || //левый нижний
-                   (projectile.x + projectile.projectileWidth >= player.x && projectile.x + projectile.projectileWidth <= player.x + player.playerWidth && projectile.y + projectile.projectileHeight >= player.y && projectile.y + projectile.projectileHeight <= player.y + player.playerHeight)) { //правый нижний
+               if (twoRectIntersect({
+                  x: projectile.x,
+                  y: projectile.y
+               }, projectile.projectileHeight, projectile.projectileWidth, {
+                  x: player.x,
+                  y: player.y
+               }, player.playerHeight, player.playerWidth)) {
                   console.log("player - " + players[key].name + " hits player - " + players[socket.id].name);
-                  console.log(players[key].projectiles[i].damage)
                   players[socket.id].decreaseHealth(players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
                   players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
                   if (players[socket.id].health === 0) {

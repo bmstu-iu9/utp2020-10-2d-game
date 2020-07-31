@@ -17,7 +17,7 @@ let socket = io(),
     mouseX = 0, //X кооордината положения мыши
     mouseY = 0, //Y кооордината положения мыши
     mouseMove = false, //перемещалась ли мышь
-    mousePressed = false, //нажата ли кнопка мышт
+    mousePressed = false, //нажата ли кнопка мыши
     bulletWidth = 10, //длина модельки пули
     bulletHeight = 10; //ширина модельки пули
 document.addEventListener("keydown", keyDownHandler, false);
