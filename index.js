@@ -219,7 +219,6 @@ io.on('connection', socket => {
    });
    socket.on('newProjectile', function (projectile) {
       if (players[socket.id].isWeaponEmpty()) { //если патроны закончились
-         console.log("weapon is empty")
          if (!players[socket.id].reloading) { //если оружие не перезаряжается
             players[socket.id].reloading = true;
             setTimeout(function () {
@@ -250,6 +249,12 @@ io.on('connection', socket => {
          }
       }
    });
+   //добавлянм нового игрока  - зомби, событие происходит когда был убит человек
+   socket.on('addNewZombie' , function (player) {
+      players[socket.id] = new Player('Zombie',player.name,player.w,player.h,player.playerWidth,player.playerHeight);
+      players[socket.id].x = player.x;
+      players[socket.id].y = player.y;
+   })
    socket.on('disconnect', () => {
       if (socket.id in players) {
          console.log("Player " + players[socket.id].name + " disconnect");
@@ -257,9 +262,9 @@ io.on('connection', socket => {
       } else console.log("Player (no name) disconnect");
    });
    function collisionWithProjectile() {
-      let player = players[socket.id];
+      let player = players[socket.id]; //просчитываем получение урона игроком player от снарядов других
       for (let key in players) {
-         if (key in players && key !== socket.id && players[key].role !== player.role) {
+         if (socket.id in players && key in players && key !== socket.id && players[key].role !== player.role) {
             for (let i = 0; i < players[key].projectiles.length; i++) {
                let projectile = players[key].projectiles[i];
                if (twoRectIntersect({
@@ -273,11 +278,19 @@ io.on('connection', socket => {
                   players[socket.id].decreaseHealth(players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
                   players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
                   if (players[socket.id].health === 0) {
-                     clearInterval(timerOfPills); //завершаем создание лекарства от этого пользователя
-                     clearInterval(timerOfRender); //завершаем рендер этого игрока
-                     delete players[socket.id]; //удаляем его из списка игроков
-                     socket.emit('gameOver');
-                     return;
+                     if (player.role === 'Zombie') {
+                        clearInterval(timerOfPills); //завершаем создание лекарства от этого пользователя
+                        clearInterval(timerOfRender); //завершаем рендер этого игрока
+                        delete players[socket.id]; //удаляем его из списка игроков
+                        socket.emit('gameOver');
+                        return;
+                     }
+                     else {
+                        let x = players[socket.id].x,
+                            y = players[socket.id].y;
+                        delete players[socket.id]; //удаляем его из списка игроков
+                        socket.emit('turningIntoZombie' , {x : x,y : y});
+                     }
                   }
                }
             }

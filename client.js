@@ -199,6 +199,19 @@ function drawPills(pills) {
         context.drawImage(imgs['medicinedrawn.svg'], pills[i].x, pills[i].y);
     }
 }
+//при смерти человека вызывается это событие
+socket.on('turningIntoZombie' , function (coordinates) {
+    role = 'Zombie';
+    socket.emit('addNewZombie', {
+        name: name,
+        w: width,
+        h: height,
+        playerWidth: playerWidth,
+        playerHeight: playerHeight,
+        x: coordinates.x,
+        y: coordinates.y
+    });
+})
 socket.on('gameOver' , function () {
     document.body.innerHTML = '<div> <h1>GAME OVER</h1></div>'
 })
