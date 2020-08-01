@@ -19,7 +19,9 @@ let socket = io(),
     mouseMove = false, //перемещалась ли мышь
     mousePressed = false, //нажата ли кнопка мыши
     bulletWidth = 10, //длина модельки пули
-    bulletHeight = 10; //ширина модельки пули
+    bulletHeight = 10, //ширина модельки пули
+    speedOfCough = 5, //скорость полёта кашля
+    speedOfBullet = 10; //скорость полёта пули
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
@@ -100,7 +102,7 @@ socket.on('render', function (players, pills) {
                 mouseY: mouseY,
                 mouseMove: mouseMove,
                 type: 'cough',
-                projectileSpeed: 15
+                projectileSpeed: speedOfCough
             })
     } else if (mousePressed)
         socket.emit('newProjectile', {
@@ -112,7 +114,7 @@ socket.on('render', function (players, pills) {
             mouseY: mouseY,
             mouseMove: mouseMove,
             type: 'bullet',
-            projectileSpeed: 30
+            projectileSpeed: speedOfBullet
         })
     drawProjectiles(players);
     drawPlayers(players);

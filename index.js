@@ -203,28 +203,28 @@ io.on('connection', socket => {
                moveProjectile(socket);
                collisionWithProjectile();
                socket.emit('render', players, pills);
-            }, 100);
+            }, 20);
          } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
       }
    });
    socket.on('moveDown', function () {
       if (players[socket.id].y + 120 < screenHeight) {
-         players[socket.id].y += 5;
+         players[socket.id].y += 2;
       }
    });
    socket.on('moveLeft', function () {
       if (players[socket.id].x > 0) {
-         players[socket.id].x -= 5;
+         players[socket.id].x -= 2;
       }
    });
    socket.on('moveUp', function () {
       if (players[socket.id].y > 0) {
-         players[socket.id].y -= 5;
+         players[socket.id].y -= 2;
       }
    });
    socket.on('moveRight', function () {
       if (players[socket.id].x + 90 < screenWidth) {
-         players[socket.id].x += 5;
+         players[socket.id].x += 2;
       }
    });
    socket.on('newProjectile', function (projectile) {
@@ -279,6 +279,9 @@ io.on('connection', socket => {
       if (socket.id in players) {
          console.log("Player " + players[socket.id].name + " disconnect");
          delete players[socket.id];
+         clearInterval(timerOfPills);
+         clearInterval(timerOfRender);
+
       } else console.log("Player (no name) disconnect");
    });
 
