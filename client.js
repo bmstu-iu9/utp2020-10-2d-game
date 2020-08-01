@@ -196,7 +196,7 @@ function drawPlayers(players) {
 //рисуем лекарство в рандомной точке
 function drawPills(pills) {
     for (let i in pills){
-        context.drawImage(imgs['medicinedrawn.svg'], pills[i].x, pills[i].y);
+        context.drawImage(imgs['medicinedrawn.svg'], pills[i].x, pills[i].y,50,50);
     }
 }
 //при смерти человека вызывается это событие
