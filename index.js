@@ -70,7 +70,7 @@ class Player {
 }
 //класс снаряда
 class Projectile {
-   constructor(x,y,projectileWidth,projectileHeight,mouseX,mouseY,mouseMove,type,projectileSpeed,damage) {
+   constructor(x, y, projectileWidth, projectileHeight, mouseX, mouseY, mouseMove, type, projectileSpeed, damage) {
       this.x = x;
       this.y = y;
       this.projectileWidth = projectileWidth;
@@ -81,6 +81,15 @@ class Projectile {
       this.type = type;
       this.projectileSpeed = projectileSpeed; //скорость снаряда
       this.damage = damage; //урон от попадание этим снарядом
+   }
+   //заменяет свойства this,с именами из массива fields, одноимёнными свойствами из props(если в props их нет, то оствялет то, что было в this)
+   cloneWith(props) {
+      const fields = ['x', 'y', 'projectileWidth', 'projectileHeight', 'mouseX', 'mouseY', 'mouseMove', 'type', 'projectileSpeed', 'damage'],
+          res = new Projectile();
+      for (let field in fields) {
+         res[fields[field]] = (props[fields[field]] == undefined) ? this[fields[field]] : props[fields[field]];
+      }
+      return res;
    }
 }
 class Rect {
@@ -249,8 +258,8 @@ io.on('connection', socket => {
       } else {
          players[socket.id].shoot();
          if (!projectile.mouseMove) {
-            players[socket.id].projectiles.unshift
-            (new Projectile(projectile.x, projectile.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed, players[socket.id].projectileDamage));
+            let pr = new Projectile();
+            players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({damage: players[socket.id].projectileDamage}));
          } else {
             let player = players[socket.id],
                 points = findPoint(player.x + player.playerWidth / 2,
@@ -261,11 +270,21 @@ io.on('connection', socket => {
                 fP = points.firstPoint,
                 sP = points.secondPoint;
             if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
-                > findDist(new Point(projectile.mouseX, projectile.mouseY), sP))
-               players[socket.id].projectiles.unshift
-               (new Projectile(sP.x, sP.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed, player.projectileDamage));
-            else players[socket.id].projectiles.unshift
-            (new Projectile(fP.x, fP.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed, player.projectileDamage));
+                > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
+               let pr = new Projectile();
+               players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
+                  x: sP.x,
+                  y: sP.y,
+                  damage: player.projectileDamage
+               }));
+            } else {
+               let pr = new Projectile();
+               players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
+                  x: fP.x,
+                  y: fP.y,
+                  damage: player.projectileDamage
+               }));
+            }
          }
       }
    });

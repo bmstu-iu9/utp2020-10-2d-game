@@ -94,8 +94,8 @@ socket.on('render', function (players, pills) {
             socket.emit('newProjectile', {
                 x: players[socket.id].x + 80,
                 y: players[socket.id].y + 65,
-                width: coughWidth,
-                height: coughHeight,
+                projectileWidth: coughWidth,
+                projectileHeight: coughHeight,
                 mouseX: mouseX,
                 mouseY: mouseY,
                 mouseMove: mouseMove,
@@ -106,8 +106,8 @@ socket.on('render', function (players, pills) {
         socket.emit('newProjectile', {
             x: players[socket.id].x + 80,
             y: players[socket.id].y + 65,
-            width: bulletWidth,
-            height: bulletHeight,
+            projectileWidth: bulletWidth,
+            projectileHeight: bulletHeight,
             mouseX: mouseX,
             mouseY: mouseY,
             mouseMove: mouseMove,
