@@ -140,36 +140,39 @@ function findName(name) {
 function findDist(fP,sP) {
    return Math.round(Math.sqrt((sP.x - fP.x) * (sP.x - fP.x) + (sP.y - fP.y) * (sP.y - fP.y)));
 }
-//движение снарядов - кашля
+//движение снарядов
 function moveProjectile(socket) {
    let i = 0;
-   while (socket.id in players && i < players[socket.id].projectiles.length) {
-      let projectile = players[socket.id].projectiles[i],
-          player = players[socket.id],
-          dist = projectile.projectileSpeed;
-      if (!projectile.mouseMove) {
-         if (players[socket.id].x + 200 < players[socket.id].projectiles[i].x + dist) {
-            players[socket.id].projectiles.splice(i, 1);
-            --i;
-         } else players[socket.id].projectiles[i].x += dist;
-      } else {
-         let points = findPoint(projectile.x, projectile.y, projectile.mouseX, projectile.mouseY, dist*dist),
-             fP = points.firstPoint,
-             sP = points.secondPoint,
-             fDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), fP),
-             sDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), sP);
-         if (fDist > sDist)
-            if (fDist < player.projectileFlightDistance) {
-               players[socket.id].projectiles[i].x = fP.x;
-               players[socket.id].projectiles[i].y = fP.y;
-            } else players[socket.id].projectiles.splice(i, 1);
-         else
-            if (sDist < player.projectileFlightDistance) {
+   try {
+      while (i < players[socket.id].projectiles.length) {
+         let projectile = players[socket.id].projectiles[i],
+             player = players[socket.id],
+             dist = projectile.projectileSpeed;
+         if (!projectile.mouseMove) {
+            if (players[socket.id].x + 200 < players[socket.id].projectiles[i].x + dist) {
+               players[socket.id].projectiles.splice(i, 1);
+               --i;
+            } else players[socket.id].projectiles[i].x += dist;
+         } else {
+            let points = findPoint(projectile.x, projectile.y, projectile.mouseX, projectile.mouseY, dist * dist),
+                fP = points.firstPoint,
+                sP = points.secondPoint,
+                fDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), fP),
+                sDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), sP);
+            if (fDist > sDist)
+               if (fDist < player.projectileFlightDistance) {
+                  players[socket.id].projectiles[i].x = fP.x;
+                  players[socket.id].projectiles[i].y = fP.y;
+               } else players[socket.id].projectiles.splice(i, 1);
+            else if (sDist < player.projectileFlightDistance) {
                players[socket.id].projectiles[i].x = sP.x;
                players[socket.id].projectiles[i].y = sP.y;
             } else players[socket.id].projectiles.splice(i, 1);
+         }
+         ++i;
       }
-      ++i;
+   } catch (error) {
+      console.log("NEW ERROR " + error.name + " \n" + error.message);
    }
 }
 //находит пару точек (x,y), которые лежат на расстоянии sqrt(dist) от (x1,y1) и принадлежат прямой (x1,y1) (x2,y2)
@@ -208,65 +211,89 @@ io.on('connection', socket => {
       }
    });
    socket.on('moveDown', function () {
-      if (players[socket.id].y + 120 < screenHeight) {
-         players[socket.id].y += 2;
+      try {
+         if (players[socket.id].y + 120 < screenHeight) {
+            players[socket.id].y += 2;
+         }
+      }
+      catch (error) {
+         console.log("NEW ERROR " + error.name + " \n" + error.message);
       }
    });
    socket.on('moveLeft', function () {
-      if (players[socket.id].x > 0) {
-         players[socket.id].x -= 2;
+      try {
+         if (players[socket.id].x > 0) {
+            players[socket.id].x -= 2;
+         }
+      }
+      catch (error) {
+         console.log("NEW ERROR " + error.name + " \n" + error.message);
       }
    });
    socket.on('moveUp', function () {
-      if (players[socket.id].y > 0) {
-         players[socket.id].y -= 2;
+      try {
+         if (players[socket.id].y > 0) {
+            players[socket.id].y -= 2;
+         }
+      }
+      catch (error) {
+         console.log("NEW ERROR " + error.name + " \n" + error.message);
       }
    });
    socket.on('moveRight', function () {
-      if (players[socket.id].x + 90 < screenWidth) {
-         players[socket.id].x += 2;
+      try {
+         if (players[socket.id].x + 90 < screenWidth) {
+            players[socket.id].x += 2;
+         }
+      }
+      catch (error) {
+         console.log("NEW ERROR " + error.name + " \n" + error.message);
       }
    });
    socket.on('newProjectile', function (projectile) {
-      if (players[socket.id].isWeaponEmpty()) { //если патроны закончились
-         if (!players[socket.id].reloading) { //если оружие не перезаряжается
-            players[socket.id].reloading = true;
-            setTimeout(function () {
-               players[socket.id].countOfBulletInWeapon = players[socket.id].weaponCapacity;
-               players[socket.id].reloading = false;
-            }, 5000);
-         }
-      } else {
-         players[socket.id].shoot();
-         if (!projectile.mouseMove) {
-            let pr = new Projectile();
-            players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({damage: players[socket.id].projectileDamage}));
+      try {
+         if (players[socket.id].isWeaponEmpty()) { //если патроны закончились
+            if (!players[socket.id].reloading) { //если оружие не перезаряжается
+               players[socket.id].reloading = true;
+               setTimeout(function () {
+                  players[socket.id].countOfBulletInWeapon = players[socket.id].weaponCapacity;
+                  players[socket.id].reloading = false;
+               }, 5000);
+            }
          } else {
-            let player = players[socket.id],
-                points = findPoint(player.x + player.w / 2,
-                    player.y + player.h / 2,
-                    projectile.mouseX,
-                    projectile.mouseY,
-                    (player.h * player.h + player.w * player.w) / 4),
-                fP = points.firstPoint,
-                sP = points.secondPoint;
-            if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
-                > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
+            players[socket.id].shoot();
+            if (!projectile.mouseMove) {
                let pr = new Projectile();
-               players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
-                  x: sP.x,
-                  y: sP.y,
-                  damage: player.projectileDamage
-               }));
+               players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({damage: players[socket.id].projectileDamage}));
             } else {
-               let pr = new Projectile();
-               players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
-                  x: fP.x,
-                  y: fP.y,
-                  damage: player.projectileDamage
-               }));
+               let player = players[socket.id],
+                   points = findPoint(player.x + player.w / 2,
+                       player.y + player.h / 2,
+                       projectile.mouseX,
+                       projectile.mouseY,
+                       (player.h * player.h + player.w * player.w) / 4),
+                   fP = points.firstPoint,
+                   sP = points.secondPoint;
+               if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
+                   > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
+                  let pr = new Projectile();
+                  players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
+                     x: sP.x,
+                     y: sP.y,
+                     damage: player.projectileDamage
+                  }));
+               } else {
+                  let pr = new Projectile();
+                  players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
+                     x: fP.x,
+                     y: fP.y,
+                     damage: player.projectileDamage
+                  }));
+               }
             }
          }
+      } catch (error) {
+         console.log("NEW ERROR " + error.name + " \n" + error.message);
       }
    });
    //добавлянм нового игрока  - зомби, событие происходит когда был убит человек
@@ -287,43 +314,53 @@ io.on('connection', socket => {
 
    //просчитываем получение урона игроком player от снарядов других игроков
    function collisionWithProjectile() {
-      let player = players[socket.id];
-      for (let key in players) {
-         if (socket.id in players && key in players && key !== socket.id && players[key].role !== player.role) {
-            for (let i = 0; i < players[key].projectiles.length; i++) {
-               let projectile = players[key].projectiles[i];
-               if (player.intersect(projectile)) {
-                  console.log("player - " + players[key].name + " hits player - " + players[socket.id].name);
-                  players[socket.id].decreaseHealth(players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
-                  players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
-                  if (players[socket.id].health === 0) {
-                     if (player.role === 'Zombie') {
-                        clearInterval(timerOfPills); //завершаем создание лекарства от этого пользователя
-                        clearInterval(timerOfRender); //завершаем рендер этого игрока
-                        delete players[socket.id]; //удаляем его из списка игроков
-                        socket.emit('gameOver');
-                        return;
-                     } else {
-                        let x = players[socket.id].x,
-                            y = players[socket.id].y;
-                        delete players[socket.id]; //удаляем его из списка игроков
-                        socket.emit('turningIntoZombie', {x: x, y: y});
+      try {
+         let player = players[socket.id];
+         for (let key in players) {
+            if (key !== socket.id && players[key].role !== player.role) {
+               for (let i = 0; i < players[key].projectiles.length; i++) {
+                  let projectile = players[key].projectiles[i];
+                  if (player.intersect(projectile)) {
+                     // console.log("player - " + players[key].name + " hits player - " + players[socket.id].name);
+                     players[socket.id].decreaseHealth(players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
+                     players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
+                     if (players[socket.id].health === 0) {
+                        if (player.role === 'Zombie') {
+                           clearInterval(timerOfPills); //завершаем создание лекарства от этого пользователя
+                           clearInterval(timerOfRender); //завершаем рендер этого игрока
+                           delete players[socket.id]; //удаляем его из списка игроков
+                           socket.emit('gameOver');
+                           return;
+                        } else {
+                           let x = players[socket.id].x,
+                               y = players[socket.id].y;
+                           delete players[socket.id]; //удаляем его из списка игроков
+                           socket.emit('turningIntoZombie', {x: x, y: y});
+                        }
                      }
                   }
                }
             }
          }
       }
+      catch (error) {
+         console.log("NEW ERROR " + error.name + " \n" + error.message);
+      }
    }
 
    //проверяет какие таблетки подобрал игрок
    function collisionWithPills() {
-      let player = players[socket.id];
-      for (let i in pills)
-         if (player.intersect(pills[i])) {
-            players[socket.id].increaseHealth(pills[i].health);
-            delete pills[i];
-         }
+      try {
+         let player = players[socket.id];
+         for (let i in pills)
+            if (player.intersect(pills[i])) {
+               players[socket.id].increaseHealth(pills[i].health);
+               delete pills[i];
+            }
+      }
+      catch (error) {
+         console.log("NEW ERROR " + error.name + " \n" + error.message);
+      }
    }
 });
 
