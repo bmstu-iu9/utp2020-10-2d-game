@@ -1,35 +1,37 @@
 'use strict'
+
 const express = require('express'),
    app = express(),
    http = require('http').createServer(app),
    io = require('socket.io')(http),
    fs = require('fs');
 let players = {},
-    pills = {},
-    screenWidth,
-    screenHeight,
-    pillWidth = 50,
-    pillHeight = 50,
-    healthOfPill = 0.10;
+   pills = {},
+   screenWidth,
+   screenHeight,
+   outbreakRadius = 300;
+pillWidth = 50,
+   pillHeight = 50,
+   healthOfPill = 0.10;
 //используется как родительский класс для объектов типа player, projectile и т.д. для упрощения определения столкновений
 class Rect {
-   constructor(x,y,width,height) {
+   constructor(x, y, width, height) {
       this.x = x;
       this.y = y;
       this.w = width;
       this.h = height;
    }
    leftUp() {
-      return new Point(this.x,this.y);
+      return new Point(this.x, this.y);
    }
    rightUp() {
-      return new Point(this.x + this.w , this.y);
+      return new Point(this.x + this.w, this.y);
    }
    leftDown() {
-      return new Point(this.x,this.y + this.h);
+      return new Point(this.x, this.y + this.h);
    }
    rightDown() {
-      return new Point(this.x + this.w ,  this.y + this.h);
+      return new Point(this.x + this.w, this.y + this.h);
    }
    //проверка лежит ли точка point в прямоугольнике
    hasPoint(point) {
@@ -38,14 +40,57 @@ class Rect {
    //проверка пересекается ли прямоугольник this с rect
    intersect(rect) {
       return this.hasPoint(rect.leftUp()) ||
-          this.hasPoint(rect.rightUp()) ||
-          this.hasPoint(rect.leftDown()) ||
-          this.hasPoint(rect.rightDown());
+         this.hasPoint(rect.rightUp()) ||
+         this.hasPoint(rect.leftDown()) ||
+         this.hasPoint(rect.rightDown());
+   }
+   //проверка пересекается ли прямоугольник this с кругом
+   intersectCircle(circle) {
+      return circle.hasPoint(this.x, this.y) ||
+         circle.intersect(this.x, this.y, this.leftDown.x, this.leftDown.y) ||
+         circle.intersect(this.leftDown.x, this.leftDown.y, this.rightDown.x, this.rightDown.y) ||
+         circle.intersect(this.rightDown.x, this.rightDown.y, this.rightUp.x, this.rightUp.y) ||
+         circle.intersect(this.rightUp.x, this.rightUp.y, this.x, this.y);
    }
 }
-class Player extends Rect{
+
+class Circle {
+   constructor(o, r) {
+      this.o = o;
+      this.radius = r;
+   }
+   //проверка пересекает ли отрезок окружность this
+   intersect(x1, y1, x2, y2) {
+      let a = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1),
+         b = - 2 * ((x1 - this.o.x) * (x2 - x1) + (y1 - this.o.y) * (y2 - y1)),
+         c = (x1 - this.o.x) * (x1 - this.o.x) +
+            (y1 - this.o.y) * (y1 - this.o.y) -
+            this.radius * this.radius,
+         t1 = (- b + Math.sqrt(b * b - 4 * a * c)) / (2 * a),
+         t2 = (- b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+
+      let curX = x1 + t1 * (x2 - x1);
+
+      if ((x1 <= x2 && curX <= x2 && curX >= x1) ||
+         (x1 > x2 && curX <= x1 && curX >= x2))
+         return true;
+      else {
+         curX = x1 + t2 * (x2 - x1);
+         if ((x1 <= x2 && curX <= x2 && curX >= x1) ||
+            (x1 > x2 && curX <= x1 && curX >= x2))
+            return true;
+      }
+      return false;
+   }
+   //проверка находится ли точка внутри окружности this
+   hasPoint(x, y) {
+      return (this.o.x - x) * (this.o.x - x) +
+         (this.o.y - y) * (this.o.y - y) <= this.radius * this.radius;
+   }
+}
+class Player extends Rect {
    constructor(role, name, w, h, playerWidth, playerHeight) {
-      super(0,0,playerWidth,playerHeight);
+      super(0, 0, playerWidth, playerHeight);
       this.name = name;
       this.role = role;
       this.projectiles = [];
@@ -94,12 +139,14 @@ class Player extends Rect{
          this.health = 0;
    }
 }
+
 //класс снаряда
-class Projectile extends Rect{
+class Projectile extends Rect {
    constructor(x, y, projectileWidth, projectileHeight, mouseX, mouseY, mouseMove, type, projectileSpeed, damage) {
-      super(x,y,projectileWidth,projectileHeight);
+      super(x, y, projectileWidth, projectileHeight);
       this.mouseX = mouseX; //координаты мышки в момент выпуска сняряда
       this.mouseY = mouseY; //используяются для определения траектории полёта снаряда
+
       this.mouseMove = mouseMove;
       this.type = type;
       this.projectileSpeed = projectileSpeed; //скорость снаряда
@@ -108,27 +155,28 @@ class Projectile extends Rect{
    //заменяет свойства this,с именами из массива fields, одноимёнными свойствами из props(если в props их нет, то оствялет то, что было в this)
    cloneWith(props) {
       const fields = ['x', 'y', 'w', 'h', 'mouseX', 'mouseY', 'mouseMove', 'type', 'projectileSpeed', 'damage'],
-          res = new Projectile();
+         res = new Projectile();
       for (let field in fields) {
          res[fields[field]] = (props[fields[field]] == undefined) ? this[fields[field]] : props[fields[field]];
       }
       return res;
    }
 }
-//класс точка с координатами в прямоугольной декартовой системе на плоскости
+//класс точка с координатами в прямоугольной декартовой системе на плоскости\
 class Point {
-   constructor(x,y) {
+   constructor(x, y) {
       this.x = x;
       this.y = y;
    }
 }
 //класс лекарства
-class Pill extends Rect{
-   constructor(w, h,pillWidth,pillHeight,health) {
-      super(w * (Math.random() - 90 / w),h * (Math.random() - 90 / h),pillWidth,pillHeight);
+class Pill extends Rect {
+   constructor(w, h, pillWidth, pillHeight, health) {
+      super(w * (Math.random() - 90 / w), h * (Math.random() - 90 / h), pillWidth, pillHeight);
       this.health = health;
    }
 }
+
 //поиск имени среди уже существующих на сервере
 function findName(name) {
    for (let key in players)
@@ -137,7 +185,7 @@ function findName(name) {
    return 0;
 }
 //нахождение расстояние между 2 точками в прямоугольной декартовой системе на плоскости
-function findDist(fP,sP) {
+function findDist(fP, sP) {
    return Math.round(Math.sqrt((sP.x - fP.x) * (sP.x - fP.x) + (sP.y - fP.y) * (sP.y - fP.y)));
 }
 //движение снарядов - кашля
@@ -145,19 +193,19 @@ function moveProjectile(socket) {
    let i = 0;
    while (socket.id in players && i < players[socket.id].projectiles.length) {
       let projectile = players[socket.id].projectiles[i],
-          player = players[socket.id],
-          dist = projectile.projectileSpeed;
+         player = players[socket.id],
+         dist = projectile.projectileSpeed;
       if (!projectile.mouseMove) {
          if (players[socket.id].x + 200 < players[socket.id].projectiles[i].x + dist) {
             players[socket.id].projectiles.splice(i, 1);
             --i;
          } else players[socket.id].projectiles[i].x += dist;
       } else {
-         let points = findPoint(projectile.x, projectile.y, projectile.mouseX, projectile.mouseY, dist*dist),
-             fP = points.firstPoint,
-             sP = points.secondPoint,
-             fDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), fP),
-             sDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), sP);
+         let points = findPoint(projectile.x, projectile.y, projectile.mouseX, projectile.mouseY, dist * dist),
+            fP = points.firstPoint,
+            sP = points.secondPoint,
+            fDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), fP),
+            sDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), sP);
          if (fDist > sDist)
             if (fDist < player.projectileFlightDistance) {
                players[socket.id].projectiles[i].x = fP.x;
@@ -172,19 +220,57 @@ function moveProjectile(socket) {
       ++i;
    }
 }
+
 //находит пару точек (x,y), которые лежат на расстоянии sqrt(dist) от (x1,y1) и принадлежат прямой (x1,y1) (x2,y2)
-function findPoint(x1,y1,x2,y2,dist) {
+function findPoint(x1, y1, x2, y2, dist) {
    let modulYMinusY1 = Math.sqrt(dist * (y2 - y1) * (y2 - y1) / ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))),
-       firstY = modulYMinusY1 + y1,
-       firstX = (firstY - y1) * (x2 - x1) / (y2 - y1) + x1,
-       secondY = y1 - modulYMinusY1,
-       secondX = (secondY - y1) * (x2 - x1) / (y2 - y1) + x1;
-   return {firstPoint: new Point(Math.round(firstX), Math.round(firstY)),
-      secondPoint: new Point(Math.round(secondX), Math.round(secondY))};
+      firstY = modulYMinusY1 + y1,
+      firstX = (firstY - y1) * (x2 - x1) / (y2 - y1) + x1,
+      secondY = y1 - modulYMinusY1,
+      secondX = (secondY - y1) * (x2 - x1) / (y2 - y1) + x1;
+   return {
+      firstPoint: new Point(Math.round(firstX), Math.round(firstY)),
+      secondPoint: new Point(Math.round(secondX), Math.round(secondY))
+   };
 }
+
+//проверка, что людей становится слишком много
+function demographicImbalance() {
+   return humanCount > zombieCount && humanCount - zombieCount > 2;
+}
+
+//возвращает точку с координатами около рандомного игрока, являющегося человеком
+function randomHuman() {
+   let keys = Object.keys(players);
+   let curPlayer = players[keys[Math.round(keys.length * Math.random())]];
+   while (curPlayer.role !== 'Human')
+      curPlayer = players[keys[Math.round(keys.length * Math.random())]];
+   return new Point(Math.round(curPlayer.x - 50), Math.round(curPlayer.y - 50));
+}
+//вспышка эпидемии случается рядом со случайным человеком
+function outbreak(center) {
+   let epidemicArea = new Circle(center, outbreakRadius);
+   for (let key in players) {
+      if (players[key].role === 'Human' &&
+         players[key].intersectCircle(epidemicArea)) { //люди, которых задело
+         let x = players[key].x,
+            y = players[key].y;
+         delete players[key];
+         socket.emit('turningIntoZombie', { x: x, y: y }); //превращаются в зомби
+      }
+   }
+}
+
+function balance() {
+   if (demographicImbalance){
+      let c = randomHuman();
+      setTimeout(outbreak(c), 5000); //оставляем возможность выбранному игроку выбраться из зоны поражения
+   }
+}
+
 io.on('connection', socket => {
    let timerOfPills,
-       timerOfRender;
+      timerOfRender;
    console.log('user connected');
    socket.on('setPlayerName', function (player, width, height, playerWidth, playerHeight) {
       if (player.name.length === 0) { //пустое имя недопустимо
@@ -202,6 +288,8 @@ io.on('connection', socket => {
                collisionWithPills();
                moveProjectile(socket);
                collisionWithProjectile();
+               balance();
+
                socket.emit('render', players, pills);
             }, 20);
          } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
@@ -209,22 +297,22 @@ io.on('connection', socket => {
    });
    socket.on('moveDown', function () {
       if (players[socket.id].y + 120 < screenHeight) {
-         players[socket.id].y += 2;
+         players[socket.id].y += 5;
       }
    });
    socket.on('moveLeft', function () {
       if (players[socket.id].x > 0) {
-         players[socket.id].x -= 2;
+         players[socket.id].x -= 5;
       }
    });
    socket.on('moveUp', function () {
       if (players[socket.id].y > 0) {
-         players[socket.id].y -= 2;
+         players[socket.id].y -= 5;
       }
    });
    socket.on('moveRight', function () {
       if (players[socket.id].x + 90 < screenWidth) {
-         players[socket.id].x += 2;
+         players[socket.id].x += 5;
       }
    });
    socket.on('newProjectile', function (projectile) {
@@ -240,18 +328,18 @@ io.on('connection', socket => {
          players[socket.id].shoot();
          if (!projectile.mouseMove) {
             let pr = new Projectile();
-            players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({damage: players[socket.id].projectileDamage}));
+            players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({ damage: players[socket.id].projectileDamage }));
          } else {
             let player = players[socket.id],
-                points = findPoint(player.x + player.w / 2,
-                    player.y + player.h / 2,
-                    projectile.mouseX,
-                    projectile.mouseY,
-                    (player.h * player.h + player.w * player.w) / 4),
-                fP = points.firstPoint,
-                sP = points.secondPoint;
+               points = findPoint(player.x + player.w / 2,
+                  player.y + player.h / 2,
+                  projectile.mouseX,
+                  projectile.mouseY,
+                  (player.h * player.h + player.w * player.w) / 4),
+               fP = points.firstPoint,
+               sP = points.secondPoint;
             if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
-                > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
+               > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
                let pr = new Projectile();
                players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
                   x: sP.x,
@@ -305,9 +393,9 @@ io.on('connection', socket => {
                         return;
                      } else {
                         let x = players[socket.id].x,
-                            y = players[socket.id].y;
+                           y = players[socket.id].y;
                         delete players[socket.id]; //удаляем его из списка игроков
-                        socket.emit('turningIntoZombie', {x: x, y: y});
+                        socket.emit('turningIntoZombie', { x: x, y: y });
                      }
                   }
                }
