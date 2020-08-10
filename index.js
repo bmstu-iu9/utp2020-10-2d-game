@@ -288,14 +288,23 @@ function outbreak() {
 }
 
 function collisionWithEpidemicArea(socket) {
-   for (let key in players) {
-      if (players[key].role === 'Human' &&
-         players[key].intersectCircle(epidemicArea)) { //люди, которых задело
-         let x = players[key].x,
-            y = players[key].y;
-         delete players[key];
-         socket.emit('turningIntoZombie', { x: x, y: y }); //превращаются в зомби
+   let errorName = socket.id;
+   try{
+      for (let key in players) {
+         if (players[key].role === 'Human' &&
+            players[key].intersectCircle(epidemicArea)) { //люди, которых задело
+            let x = players[key].x,
+               y = players[key].y;
+            delete players[key];
+            socket.emit('turningIntoZombie', { x: x, y: y }); //превращаются в зомби
+         }
       }
+   }
+   catch(error){
+      if (errorName in players)
+         throw error;
+      else
+         console.log("Player disconnected in collisionWithEpidemicArea");
    }
 }
 
