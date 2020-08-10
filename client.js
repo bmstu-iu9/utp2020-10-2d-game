@@ -19,7 +19,9 @@ let socket = io(),
     mouseMove = false, //перемещалась ли мышь
     mousePressed = false, //нажата ли кнопка мыши
     bulletWidth = 10, //длина модельки пули
-    bulletHeight = 10; //ширина модельки пули
+    bulletHeight = 10, //ширина модельки пули
+    speedOfCough = 5, //скорость полёта кашля
+    speedOfBullet = 10; //скорость полёта пули
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
@@ -94,25 +96,25 @@ socket.on('render', function (players, pills) {
             socket.emit('newProjectile', {
                 x: players[socket.id].x + 80,
                 y: players[socket.id].y + 65,
-                width: coughWidth,
-                height: coughHeight,
+                projectileWidth: coughWidth,
+                projectileHeight: coughHeight,
                 mouseX: mouseX,
                 mouseY: mouseY,
                 mouseMove: mouseMove,
                 type: 'cough',
-                projectileSpeed: 15
+                projectileSpeed: speedOfCough
             })
     } else if (mousePressed)
         socket.emit('newProjectile', {
             x: players[socket.id].x + 80,
             y: players[socket.id].y + 65,
-            width: bulletWidth,
-            height: bulletHeight,
+            projectileWidth: bulletWidth,
+            projectileHeight: bulletHeight,
             mouseX: mouseX,
             mouseY: mouseY,
             mouseMove: mouseMove,
             type: 'bullet',
-            projectileSpeed: 30
+            projectileSpeed: speedOfBullet
         })
     drawProjectiles(players);
     drawPlayers(players);
@@ -196,7 +198,7 @@ function drawPlayers(players) {
 //рисуем лекарство в рандомной точке
 function drawPills(pills) {
     for (let i in pills){
-        context.drawImage(imgs['medicinedrawn.svg'], pills[i].x, pills[i].y);
+        context.drawImage(imgs['medicinedrawn.svg'], pills[i].x, pills[i].y,50,50);
     }
 }
 //при смерти человека вызывается это событие

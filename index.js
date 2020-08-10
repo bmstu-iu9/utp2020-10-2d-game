@@ -7,15 +7,47 @@ const express = require('express'),
 let players = {},
     pills = {},
     screenWidth,
-    screenHeight;
-class Player {
+    screenHeight,
+    pillWidth = 50,
+    pillHeight = 50,
+    healthOfPill = 0.10;
+//используется как родительский класс для объектов типа player, projectile и т.д. для упрощения определения столкновений
+class Rect {
+   constructor(x,y,width,height) {
+      this.x = x;
+      this.y = y;
+      this.w = width;
+      this.h = height;
+   }
+   leftUp() {
+      return new Point(this.x,this.y);
+   }
+   rightUp() {
+      return new Point(this.x + this.w , this.y);
+   }
+   leftDown() {
+      return new Point(this.x,this.y + this.h);
+   }
+   rightDown() {
+      return new Point(this.x + this.w ,  this.y + this.h);
+   }
+   //проверка лежит ли точка point в прямоугольнике
+   hasPoint(point) {
+      return point.x >= this.leftUp().x && point.x <= this.rightUp().x && point.y >= this.leftUp().y && point.y <= this.rightDown().y;
+   }
+   //проверка пересекается ли прямоугольник this с rect
+   intersect(rect) {
+      return this.hasPoint(rect.leftUp()) ||
+          this.hasPoint(rect.rightUp()) ||
+          this.hasPoint(rect.leftDown()) ||
+          this.hasPoint(rect.rightDown());
+   }
+}
+class Player extends Rect{
    constructor(role, name, w, h, playerWidth, playerHeight) {
+      super(0,0,playerWidth,playerHeight);
       this.name = name;
       this.role = role;
-      this.x = 0;
-      this.y = 0;
-      this.playerWidth = playerWidth;
-      this.playerHeight = playerHeight;
       this.projectiles = [];
       this.health = 1.00;
       if (role === 'Human') {
@@ -34,12 +66,6 @@ class Player {
       screenHeight = h;
       screenWidth = w;
    }
-   isTouchedToPill(x, y) {
-      return !(x > this.x + 90 ||
-          x + 30 < this.x ||
-          y > this.y + 90 ||
-          y + 30 < y);
-   }
    shoot() {
       if (this.role === 'Zombie') {
          return true;
@@ -57,8 +83,8 @@ class Player {
          return false;
       else return this.countOfBulletInWeapon === 0;
    }
-   increaseHealth() {
-      this.health += 0.10;
+   increaseHealth(health) {
+      this.health += health;
       if (this.health > 1.00)
          this.health = 1.00;
    }
@@ -69,12 +95,9 @@ class Player {
    }
 }
 //класс снаряда
-class Projectile {
-   constructor(x,y,projectileWidth,projectileHeight,mouseX,mouseY,mouseMove,type,projectileSpeed,damage) {
-      this.x = x;
-      this.y = y;
-      this.projectileWidth = projectileWidth;
-      this.projectileHeight = projectileHeight;
+class Projectile extends Rect{
+   constructor(x, y, projectileWidth, projectileHeight, mouseX, mouseY, mouseMove, type, projectileSpeed, damage) {
+      super(x,y,projectileWidth,projectileHeight);
       this.mouseX = mouseX; //координаты мышки в момент выпуска сняряда
       this.mouseY = mouseY; //используяются для определения траектории полёта снаряда
       this.mouseMove = mouseMove;
@@ -82,36 +105,14 @@ class Projectile {
       this.projectileSpeed = projectileSpeed; //скорость снаряда
       this.damage = damage; //урон от попадание этим снарядом
    }
-}
-class Rect {
-   constructor(x,y,width,height) {
-      this.x = x;
-      this.y = y;
-      this.width = width;
-      this.height = height;
-   }
-   leftUp() {
-      return new Point(this.x,this.y);
-   }
-   rightUp() {
-      return new Point(this.x + this.width , this.y);
-   }
-   leftDown() {
-      return new Point(this.x,this.y + this.height);
-   }
-   rightDown() {
-      return new Point(this.x + this.width ,  this.y + this.height);
-   }
-   //проверка лежит ли точка point в прямоугольнике
-   hasPoint(point) {
-      return point.x >= this.leftUp().x && point.x <= this.rightUp().x && point.y >= this.leftUp().y && point.y <= this.rightDown().y;
-   }
-   //проверка пересекается ли прямоугольник this с rect
-   intersect(rect) {
-      return this.hasPoint(rect.leftUp()) ||
-          this.hasPoint(rect.rightUp()) ||
-          this.hasPoint(rect.leftDown()) ||
-          this.hasPoint(rect.rightDown());
+   //заменяет свойства this,с именами из массива fields, одноимёнными свойствами из props(если в props их нет, то оствялет то, что было в this)
+   cloneWith(props) {
+      const fields = ['x', 'y', 'w', 'h', 'mouseX', 'mouseY', 'mouseMove', 'type', 'projectileSpeed', 'damage'],
+          res = new Projectile();
+      for (let field in fields) {
+         res[fields[field]] = (props[fields[field]] == undefined) ? this[fields[field]] : props[fields[field]];
+      }
+      return res;
    }
 }
 //класс точка с координатами в прямоугольной декартовой системе на плоскости
@@ -122,10 +123,10 @@ class Point {
    }
 }
 //класс лекарства
-class Pill {
-   constructor(w, h) {
-      this.x = w * (Math.random() - 90 / w);
-      this.y = h * (Math.random() - 90 / h);
+class Pill extends Rect{
+   constructor(w, h,pillWidth,pillHeight,health) {
+      super(w * (Math.random() - 90 / w),h * (Math.random() - 90 / h),pillWidth,pillHeight);
+      this.health = health;
    }
 }
 //поиск имени среди уже существующих на сервере
@@ -134,17 +135,6 @@ function findName(name) {
       if (players[key].name === name)
          return 1;
    return 0;
-}
-//проверяет какие таблетки подобрал игрок
-function checkGatheredPills() {
-   for (let i in players) {
-      for (let j in pills) {
-         if (players[i].isTouchedToPill(pills[j].x, pills[j].y)) {
-            delete pills[j];
-            players[i].increaseHealth();
-         }
-      }
-   }
 }
 //нахождение расстояние между 2 точками в прямоугольной декартовой системе на плоскости
 function findDist(fP,sP) {
@@ -166,8 +156,8 @@ function moveProjectile(socket) {
          let points = findPoint(projectile.x, projectile.y, projectile.mouseX, projectile.mouseY, dist*dist),
              fP = points.firstPoint,
              sP = points.secondPoint,
-             fDist = findDist(new Point(player.x + player.playerWidth / 2, player.y + player.playerHeight / 2), fP),
-             sDist = findDist(new Point(player.x + player.playerWidth / 2, player.y + player.playerHeight / 2), sP);
+             fDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), fP),
+             sDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), sP);
          if (fDist > sDist)
             if (fDist < player.projectileFlightDistance) {
                players[socket.id].projectiles[i].x = fP.x;
@@ -205,36 +195,36 @@ io.on('connection', socket => {
             console.log('a new player ' + player.name + ' is ' + player.role);
             socket.emit('PlayTheGame', players);
             timerOfPills = setInterval(function () {
-               let p = new Pill(width, height);
+               let p = new Pill(width, height, pillWidth, pillHeight, healthOfPill);
                pills[p.x + '#' + p.y] = p;
             }, 30000);
             timerOfRender = setInterval(function () {
-               checkGatheredPills();
+               collisionWithPills();
                moveProjectile(socket);
                collisionWithProjectile();
                socket.emit('render', players, pills);
-            }, 100);
+            }, 20);
          } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
       }
    });
    socket.on('moveDown', function () {
       if (players[socket.id].y + 120 < screenHeight) {
-         players[socket.id].y += 5;
+         players[socket.id].y += 2;
       }
    });
    socket.on('moveLeft', function () {
       if (players[socket.id].x > 0) {
-         players[socket.id].x -= 5;
+         players[socket.id].x -= 2;
       }
    });
    socket.on('moveUp', function () {
       if (players[socket.id].y > 0) {
-         players[socket.id].y -= 5;
+         players[socket.id].y -= 2;
       }
    });
    socket.on('moveRight', function () {
       if (players[socket.id].x + 90 < screenWidth) {
-         players[socket.id].x += 5;
+         players[socket.id].x += 2;
       }
    });
    socket.on('newProjectile', function (projectile) {
@@ -249,23 +239,33 @@ io.on('connection', socket => {
       } else {
          players[socket.id].shoot();
          if (!projectile.mouseMove) {
-            players[socket.id].projectiles.unshift
-            (new Projectile(projectile.x, projectile.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed, players[socket.id].projectileDamage));
+            let pr = new Projectile();
+            players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({damage: players[socket.id].projectileDamage}));
          } else {
             let player = players[socket.id],
-                points = findPoint(player.x + player.playerWidth / 2,
-                    player.y + player.playerHeight / 2,
+                points = findPoint(player.x + player.w / 2,
+                    player.y + player.h / 2,
                     projectile.mouseX,
                     projectile.mouseY,
-                    (player.playerHeight * player.playerHeight + player.playerWidth * player.playerWidth) / 4),
+                    (player.h * player.h + player.w * player.w) / 4),
                 fP = points.firstPoint,
                 sP = points.secondPoint;
             if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
-                > findDist(new Point(projectile.mouseX, projectile.mouseY), sP))
-               players[socket.id].projectiles.unshift
-               (new Projectile(sP.x, sP.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed, player.projectileDamage));
-            else players[socket.id].projectiles.unshift
-            (new Projectile(fP.x, fP.y, projectile.width, projectile.height, projectile.mouseX, projectile.mouseY, projectile.mouseMove, projectile.type, projectile.projectileSpeed, player.projectileDamage));
+                > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
+               let pr = new Projectile();
+               players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
+                  x: sP.x,
+                  y: sP.y,
+                  damage: player.projectileDamage
+               }));
+            } else {
+               let pr = new Projectile();
+               players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
+                  x: fP.x,
+                  y: fP.y,
+                  damage: player.projectileDamage
+               }));
+            }
          }
       }
    });
@@ -279,18 +279,20 @@ io.on('connection', socket => {
       if (socket.id in players) {
          console.log("Player " + players[socket.id].name + " disconnect");
          delete players[socket.id];
+         clearInterval(timerOfPills);
+         clearInterval(timerOfRender);
+
       } else console.log("Player (no name) disconnect");
    });
+
    //просчитываем получение урона игроком player от снарядов других игроков
    function collisionWithProjectile() {
       let player = players[socket.id];
       for (let key in players) {
          if (socket.id in players && key in players && key !== socket.id && players[key].role !== player.role) {
             for (let i = 0; i < players[key].projectiles.length; i++) {
-               let projectile = players[key].projectiles[i],
-                   playerHitbox = new Rect(player.x, player.y, player.playerWidth, player.playerHeight),
-                   projectileHitbox = new Rect(projectile.x, projectile.y, projectile.projectileWidth, projectile.projectileHeight);
-               if (playerHitbox.intersect(projectileHitbox)) {
+               let projectile = players[key].projectiles[i];
+               if (player.intersect(projectile)) {
                   console.log("player - " + players[key].name + " hits player - " + players[socket.id].name);
                   players[socket.id].decreaseHealth(players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
                   players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
@@ -312,6 +314,16 @@ io.on('connection', socket => {
             }
          }
       }
+   }
+
+   //проверяет какие таблетки подобрал игрок
+   function collisionWithPills() {
+      let player = players[socket.id];
+      for (let i in pills)
+         if (player.intersect(pills[i])) {
+            players[socket.id].increaseHealth(pills[i].health);
+            delete pills[i];
+         }
    }
 });
 
