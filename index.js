@@ -1,5 +1,4 @@
 'use strict'
-
 const express = require('express'),
    app = express(),
    http = require('http').createServer(app),
@@ -95,14 +94,12 @@ class Player extends Rect{
          this.health = 0;
    }
 }
-
 //класс снаряда
 class Projectile extends Rect{
    constructor(x, y, projectileWidth, projectileHeight, mouseX, mouseY, mouseMove, type, projectileSpeed, damage) {
       super(x,y,projectileWidth,projectileHeight);
       this.mouseX = mouseX; //координаты мышки в момент выпуска сняряда
       this.mouseY = mouseY; //используяются для определения траектории полёта снаряда
-
       this.mouseMove = mouseMove;
       this.type = type;
       this.projectileSpeed = projectileSpeed; //скорость снаряда
@@ -118,7 +115,7 @@ class Projectile extends Rect{
       return res;
    }
 }
-//класс точка с координатами в прямоугольной декартовой системе на плоскости\
+//класс точка с координатами в прямоугольной декартовой системе на плоскости
 class Point {
    constructor(x,y) {
       this.x = x;
@@ -132,7 +129,6 @@ class Pill extends Rect{
       this.health = health;
    }
 }
-
 //поиск имени среди уже существующих на сервере
 function findName(name) {
    for (let key in players)
@@ -213,22 +209,22 @@ io.on('connection', socket => {
    });
    socket.on('moveDown', function () {
       if (players[socket.id].y + 120 < screenHeight) {
-         players[socket.id].y += 5;
+         players[socket.id].y += 2;
       }
    });
    socket.on('moveLeft', function () {
       if (players[socket.id].x > 0) {
-         players[socket.id].x -= 5;
+         players[socket.id].x -= 2;
       }
    });
    socket.on('moveUp', function () {
       if (players[socket.id].y > 0) {
-         players[socket.id].y -= 5;
+         players[socket.id].y -= 2;
       }
    });
    socket.on('moveRight', function () {
       if (players[socket.id].x + 90 < screenWidth) {
-         players[socket.id].x += 5;
+         players[socket.id].x += 2;
       }
    });
    socket.on('newProjectile', function (projectile) {

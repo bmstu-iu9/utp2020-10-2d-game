@@ -75,10 +75,10 @@ function setPlayerName() {
     console.log('height : ', height)
     socket.emit('setPlayerName', { role: role, name: name }, width, height , playerWidth , playerHeight);
 }
-function addNewPlayer() {
-    role = 'Human';
-    document.body.innerHTML = '<div id = "nameError"></div><div id = "name"><input type = "text" id = "nameOfPlayer" placeholder = "  Enter your name">\
-          <button type = "button" id = "set" onclick = "setPlayerName() ">Go!</button></div>'
+function addNewPlayer(rl) {
+    role = rl;
+    document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
+          <button type = "button" name = "button" onclick = "setPlayerName()">Set name</button>'
 }
 //рисовка экрана пользователя
 socket.on('render', function (players, pills) {
