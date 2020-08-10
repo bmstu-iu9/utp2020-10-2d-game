@@ -454,7 +454,7 @@ io.on('connection', socket => {
    })
    socket.on('disconnect', () => {
       if (socket.id in players) {
-         if (player.role === 'Zombie')
+         if (players[socket.id].role === 'Zombie')
             zombieCount--;
          else
             humanCount--;
