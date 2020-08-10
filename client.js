@@ -14,12 +14,27 @@ let socket = io(),
     coughHeight = 10, //ширина снаряда кашля
     playerWidth = 90, //длина прямоугольника модельки человека
     playerHeight = 90, //ширина прямоугольника модельки человека
-    mouseX = 0,
-    mouseY = 0,
-    mouseMove = false;
+    mouseX = 0, //X кооордината положения мыши
+    mouseY = 0, //Y кооордината положения мыши
+    mouseMove = false, //перемещалась ли мышь
+    mousePressed = false, //нажата ли кнопка мыши
+    bulletWidth = 10, //длина модельки пули
+    bulletHeight = 10, //ширина модельки пули
+    speedOfCough = 5, //скорость полёта кашля
+    speedOfBullet = 10; //скорость полёта пули
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
+document.addEventListener("mousedown", mouseDownHandler, false);
+document.addEventListener("mouseup", mouseUpHandler, false);
+//детектит нажатие кнопки мыши
+function mouseDownHandler() {
+    mousePressed = true;
+}
+//детектит отпускание кнопки мыши
+function mouseUpHandler() {
+    mousePressed = false;
+}
 function mouseMoveHandler(event) {
     mouseMove = true;
     mouseX = event.clientX;
@@ -77,18 +92,31 @@ socket.on('render', function (players, pills) {
     if (downPressed)
         socket.emit('moveDown');
     if (role === "Zombie") {
-        if (spacePressed)
-            socket.emit('newCough', {
+        if (mousePressed)
+            socket.emit('newProjectile', {
                 x: players[socket.id].x + 80,
                 y: players[socket.id].y + 65,
-                width: coughWidth,
-                height: coughHeight,
-                mouseX : mouseX,
-                mouseY : mouseY,
-                mouseMove : mouseMove
+                projectileWidth: coughWidth,
+                projectileHeight: coughHeight,
+                mouseX: mouseX,
+                mouseY: mouseY,
+                mouseMove: mouseMove,
+                type: 'cough',
+                projectileSpeed: speedOfCough
             })
-    }
-    drawCough(players);
+    } else if (mousePressed)
+        socket.emit('newProjectile', {
+            x: players[socket.id].x + 80,
+            y: players[socket.id].y + 65,
+            projectileWidth: bulletWidth,
+            projectileHeight: bulletHeight,
+            mouseX: mouseX,
+            mouseY: mouseY,
+            mouseMove: mouseMove,
+            type: 'bullet',
+            projectileSpeed: speedOfBullet
+        })
+    drawProjectiles(players);
     drawPlayers(players);
     drawPills(pills);
 })
@@ -97,7 +125,8 @@ const IMG_NAMES = [
     'Zombie.svg', //Zombie
     'Human.svg', //Human
     'Virus.png',//моделька снарядов - кашля
-    'medicinedrawn.svg'
+    'medicinedrawn.svg',
+    'Bullet.png'
 ];
 const imgs = {};
 function downloadImage(imageName) {
@@ -113,16 +142,21 @@ function downloadImage(imageName) {
 }
 Promise.all(IMG_NAMES.map(downloadImage)).then(() => console.log('All images downloaded'));
 //рисуем снаряды - "кашель"
-function drawCough(players) {
-    console.log(players[socket.id].allCough.length);
+function drawProjectiles(players) {
     for (let key in players) {
-        console.log(players.length);
-        for (let i = 0; i < players[key].allCough.length; i++) {
+        for (let i = 0; i < players[key].projectiles.length; i++) {
             context.beginPath();
-            context.drawImage(imgs['Virus.png'], players[key].allCough[i].x, players[key].allCough[i].y, coughWidth, coughHeight);
-            context.fillStyle = "#dd00d9";
-            context.fill();
-            context.closePath();
+            if (players[key].projectiles[i].type === 'cough') {
+                context.drawImage(imgs['Virus.png'], players[key].projectiles[i].x, players[key].projectiles[i].y, coughWidth, coughHeight);
+                context.fillStyle = "#dd00d9";
+                context.fill();
+                context.closePath();
+            } else {
+                context.drawImage(imgs['Bullet.png'], players[key].projectiles[i].x, players[key].projectiles[i].y, bulletWidth, bulletHeight);
+                context.fillStyle = "#dd00d9";
+                context.fill();
+                context.closePath();
+            }
         }
     }
 }
@@ -164,9 +198,22 @@ function drawPlayers(players) {
 //рисуем лекарство в рандомной точке
 function drawPills(pills) {
     for (let i in pills){
-        context.drawImage(imgs['medicinedrawn.svg'], pills[i].x, pills[i].y);
+        context.drawImage(imgs['medicinedrawn.svg'], pills[i].x, pills[i].y,50,50);
     }
 }
+//при смерти человека вызывается это событие
+socket.on('turningIntoZombie' , function (coordinates) {
+    role = 'Zombie';
+    socket.emit('addNewZombie', {
+        name: name,
+        w: width,
+        h: height,
+        playerWidth: playerWidth,
+        playerHeight: playerHeight,
+        x: coordinates.x,
+        y: coordinates.y
+    });
+})
 socket.on('gameOver' , function () {
     document.body.innerHTML = '<div> <h1>GAME OVER</h1></div>'
 })
