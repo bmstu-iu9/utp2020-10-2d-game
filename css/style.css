@@ -5,27 +5,41 @@ html, body {
     overscroll-behavior: none;
   }
 
- 
+  #nameOfPlayer {
+    height: 40px;
+    width: 200px;
+    border-radius: 5px;
+  }
+
+  #set {
+    font-size: 30px;
+    border-radius: 10px;
+    color: black;
+    background: darkorange
+  }
+
+  #name {
+    top: 30%;
+    left: 40%;
+    position: fixed;
+  }
 
   #game-menu {
     top : 20%;
     left : 40%;
     position: fixed;
   }
-  #human {
-    border-radius: 12px;
-    font-size: 48px;
+  #Play {
+    border-radius: 10px;
+    font-size: 60px;
     color: black;
-    background: #eaaa3e;
+    background: #3eef1a
   }
-  #zombie {
-    border-radius: 12px;
-    font-size: 48px;
-    color: black;
-    background: #3eef1a;
-  }
-  #Choose-your-role {
-    font-family: Arial, Helvetica, Verdana, sans-serif; /* Гарнитура шрифта */
-    font-size: 48px; /* Размер текста */
+  #Welcome {
+    font-family: fantasy, Arial, Helvetica, Verdana, sans-serif; /* Гарнитура шрифта */
+    font-size: 40px; /* Размер текста */
     font-weight: bolder;
+    margin-left: -150px;
+    margin-bottom: 80px;
   }
+
