@@ -142,7 +142,7 @@ function findDist(fP,sP) {
 }
 //движение снарядов
 function moveProjectile(socket) {
-   let i = 0;
+   let i = 0,errorName = socket.id;
    try {
       while (i < players[socket.id].projectiles.length) {
          let projectile = players[socket.id].projectiles[i],
@@ -172,7 +172,9 @@ function moveProjectile(socket) {
          ++i;
       }
    } catch (error) {
-      console.log("NEW ERROR " + error.name + " \n" + error.message);
+      if (errorName in players)
+         throw new error;
+      else console.log("Player disconnected in moveProjectile");
    }
 }
 //находит пару точек (x,y), которые лежат на расстоянии sqrt(dist) от (x1,y1) и принадлежат прямой (x1,y1) (x2,y2)
@@ -187,7 +189,8 @@ function findPoint(x1,y1,x2,y2,dist) {
 }
 io.on('connection', socket => {
    let timerOfPills,
-       timerOfRender;
+       timerOfRender,
+       reload;
    console.log('user connected');
    socket.on('setPlayerName', function (player, width, height, playerWidth, playerHeight) {
       if (player.name.length === 0) { //пустое имя недопустимо
@@ -211,51 +214,64 @@ io.on('connection', socket => {
       }
    });
    socket.on('moveDown', function () {
+      let errorName = socket.id;
       try {
          if (players[socket.id].y + 120 < screenHeight) {
             players[socket.id].y += 2;
          }
       }
       catch (error) {
-         console.log("NEW ERROR " + error.name + " \n" + error.message);
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in moveDown");
       }
    });
    socket.on('moveLeft', function () {
+      let errorName = socket.id;
       try {
          if (players[socket.id].x > 0) {
             players[socket.id].x -= 2;
          }
       }
       catch (error) {
-         console.log("NEW ERROR " + error.name + " \n" + error.message);
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in moveLeft");
       }
    });
    socket.on('moveUp', function () {
+      let errorName = socket.id;
       try {
          if (players[socket.id].y > 0) {
             players[socket.id].y -= 2;
          }
       }
       catch (error) {
-         console.log("NEW ERROR " + error.name + " \n" + error.message);
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in moveUp")
       }
    });
    socket.on('moveRight', function () {
+      let errorName = socket.id;
       try {
          if (players[socket.id].x + 90 < screenWidth) {
             players[socket.id].x += 2;
          }
       }
       catch (error) {
-         console.log("NEW ERROR " + error.name + " \n" + error.message);
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in moveRight");
       }
    });
    socket.on('newProjectile', function (projectile) {
+      let errorName = socket.id;
       try {
          if (players[socket.id].isWeaponEmpty()) { //если патроны закончились
             if (!players[socket.id].reloading) { //если оружие не перезаряжается
                players[socket.id].reloading = true;
-               setTimeout(function () {
+               reload = setTimeout(function () {
                   players[socket.id].countOfBulletInWeapon = players[socket.id].weaponCapacity;
                   players[socket.id].reloading = false;
                }, 5000);
@@ -293,10 +309,12 @@ io.on('connection', socket => {
             }
          }
       } catch (error) {
-         console.log("NEW ERROR " + error.name + " \n" + error.message);
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in newProjectile");
       }
    });
-   //добавлянм нового игрока  - зомби, событие происходит когда был убит человек
+   //добавлям нового игрока  - зомби, событие происходит когда был убит человек
    socket.on('addNewZombie', function (player) {
       players[socket.id] = new Player('Zombie', player.name, player.w, player.h, player.playerWidth, player.playerHeight);
       players[socket.id].x = player.x;
@@ -308,48 +326,62 @@ io.on('connection', socket => {
          delete players[socket.id];
          clearInterval(timerOfPills);
          clearInterval(timerOfRender);
-
+         clearTimeout(reload);
       } else console.log("Player (no name) disconnect");
    });
 
    //просчитываем получение урона игроком player от снарядов других игроков
    function collisionWithProjectile() {
+      let errorName;
       try {
          let player = players[socket.id];
          for (let key in players) {
-            if (key !== socket.id && players[key].role !== player.role) {
-               for (let i = 0; i < players[key].projectiles.length; i++) {
-                  let projectile = players[key].projectiles[i];
-                  if (player.intersect(projectile)) {
-                     // console.log("player - " + players[key].name + " hits player - " + players[socket.id].name);
-                     players[socket.id].decreaseHealth(players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
-                     players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
-                     if (players[socket.id].health === 0) {
-                        if (player.role === 'Zombie') {
-                           clearInterval(timerOfPills); //завершаем создание лекарства от этого пользователя
-                           clearInterval(timerOfRender); //завершаем рендер этого игрока
-                           delete players[socket.id]; //удаляем его из списка игроков
-                           socket.emit('gameOver');
-                           return;
-                        } else {
-                           let x = players[socket.id].x,
-                               y = players[socket.id].y;
-                           delete players[socket.id]; //удаляем его из списка игроков
-                           socket.emit('turningIntoZombie', {x: x, y: y});
+            errorName = key;
+            try {
+               if (key !== socket.id && players[key].role !== player.role) {
+                  for (let i = 0; i < players[key].projectiles.length; i++) {
+                     let projectile = players[key].projectiles[i];
+                     if (player.intersect(projectile)) {
+                        // console.log("player - " + players[key].name + " hits player - " + players[socket.id].name);
+                        players[socket.id].decreaseHealth(players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
+                        players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
+                        if (players[socket.id].health === 0) {
+                           if (player.role === 'Zombie') {
+                              clearInterval(timerOfPills); //завершаем создание лекарства от этого пользователя
+                              clearInterval(timerOfRender); //завершаем рендер этого игрока
+                              delete players[socket.id]; //удаляем его из списка игроков
+                              socket.emit('gameOver');
+                              return;
+                           } else {
+                              let x = players[socket.id].x,
+                                  y = players[socket.id].y;
+                              delete players[socket.id]; //удаляем его из списка игроков
+                              socket.emit('turningIntoZombie', {x: x, y: y});
+                           }
                         }
                      }
                   }
                }
             }
+            catch (error) {
+               if (errorName in players) {
+                  errorName = socket.id;
+                  throw new error;
+               }
+               else console.log("Player disconnected in collisionWithProjectile");
+            }
          }
       }
       catch (error) {
-         console.log("NEW ERROR " + error.name + " \n" + error.message);
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in collisionWithProjectile");
       }
    }
 
    //проверяет какие таблетки подобрал игрок
    function collisionWithPills() {
+      let errorName = socket.id;
       try {
          let player = players[socket.id];
          for (let i in pills)
@@ -359,7 +391,9 @@ io.on('connection', socket => {
             }
       }
       catch (error) {
-         console.log("NEW ERROR " + error.name + " \n" + error.message);
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in collisionWithPills");
       }
    }
 });
