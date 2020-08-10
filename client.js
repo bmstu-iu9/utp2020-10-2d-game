@@ -1,3 +1,5 @@
+'use strict'
+
 let socket = io(),
     name, //имя игрока
     role, //роль игрока(zombie или human)
@@ -73,7 +75,7 @@ function setPlayerName() {
     width = document.documentElement.clientWidth; // ширина клиентской части окна браузера
     height = document.documentElement.clientHeight; // высота клиентской части окна браузера
     console.log('height : ', height)
-    socket.emit('setPlayerName', { role: role, name: name }, width, height , playerWidth , playerHeight);
+    socket.emit('setPlayerName', { role: role, name: name }, width, height, playerWidth, playerHeight);
 }
 function addNewPlayer(rl) {
     role = rl;
@@ -81,7 +83,7 @@ function addNewPlayer(rl) {
           <button type = "button" name = "button" onclick = "setPlayerName()">Set name</button>'
 }
 //рисовка экрана пользователя
-socket.on('render', function (players, pills) {
+socket.on('render', function (players, pills, epidemicArea) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     if (leftPressed)
         socket.emit('moveLeft');
@@ -119,6 +121,7 @@ socket.on('render', function (players, pills) {
     drawProjectiles(players);
     drawPlayers(players);
     drawPills(pills);
+    drawEpidemicArea(epidemicArea);
 })
 //скачиваем все нужные изображения в объект imgs для быстрого доступа
 const IMG_NAMES = [
@@ -194,15 +197,38 @@ function drawPlayers(players) {
         //x += dx;
     }
 }
-
+//рисуем область вспышки эпидемии
+function drawEpidemicArea(area) {
+    /*let start = Date.now();
+    let timer = setInterval(function () {
+        //время с момента начала анимации
+        let timePassed = Date.now() - start;
+        if (timePassed >= 3000) {
+            clearInterval(timer);
+            return;
+        }
+        context.beginPath();
+        context.arc(area.o.x, area.o.y, area.radius, 0, Math.PI * 2, true);
+        context.fillStyle(rgb(4, 4, 4, 0.25));
+        context.fill();
+    })*/
+    if (area.marker) {
+        area.radius = (Date.now() - area.start) * 0.15;
+        console.log('drawing epidemic area');
+        context.beginPath();
+        context.arc(area.o.x, area.o.y, area.radius, 0, Math.PI * 2, true);
+        context.fillStyle = 'rgb(46, 139, 87, 0.25)';
+        context.fill();
+    }
+}
 //рисуем лекарство в рандомной точке
 function drawPills(pills) {
-    for (let i in pills){
-        context.drawImage(imgs['medicinedrawn.svg'], pills[i].x, pills[i].y,50,50);
+    for (let i in pills) {
+        context.drawImage(imgs['medicinedrawn.svg'], pills[i].x, pills[i].y, 50, 50);
     }
 }
 //при смерти человека вызывается это событие
-socket.on('turningIntoZombie' , function (coordinates) {
+socket.on('turningIntoZombie', function (coordinates) {
     role = 'Zombie';
     socket.emit('addNewZombie', {
         name: name,
@@ -214,7 +240,7 @@ socket.on('turningIntoZombie' , function (coordinates) {
         y: coordinates.y
     });
 })
-socket.on('gameOver' , function () {
+socket.on('gameOver', function () {
     document.body.innerHTML = '<div> <h1>GAME OVER</h1></div>'
 })
 socket.on('usersExists', function (data) {//событие происходящие если выбран ник, который уже занят

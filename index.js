@@ -11,7 +11,7 @@ let players = {},
    pills = {},
    screenWidth,
    screenHeight,
-   outbreakRadius = 300,
+   outbreakRadius = 125,
    pillWidth = 50,
    pillHeight = 50,
    healthOfPill = 0.10;
@@ -60,6 +60,9 @@ class Circle {
    constructor(o, r) {
       this.o = o;
       this.radius = r;
+      this.marker = false;
+      this.coordinateFixed = false;
+      this.start = Date.now();
    }
    //проверка пересекает ли отрезок окружность this
    intersect(x1, y1, x2, y2) {
@@ -179,6 +182,8 @@ class Pill extends Rect {
    }
 }
 
+let epidemicArea = new Circle(new Point(0, 0), 0);
+
 //поиск имени среди уже существующих на сервере
 function findName(name) {
    for (let key in players)
@@ -192,12 +197,12 @@ function findDist(fP, sP) {
 }
 //движение снарядов
 function moveProjectile(socket) {
-   let i = 0,errorName = socket.id;
+   let i = 0, errorName = socket.id;
    try {
       while (i < players[socket.id].projectiles.length) {
          let projectile = players[socket.id].projectiles[i],
-             player = players[socket.id],
-             dist = projectile.projectileSpeed;
+            player = players[socket.id],
+            dist = projectile.projectileSpeed;
          if (!projectile.mouseMove) {
             if (players[socket.id].x + 200 < players[socket.id].projectiles[i].x + dist) {
                players[socket.id].projectiles.splice(i, 1);
@@ -205,10 +210,10 @@ function moveProjectile(socket) {
             } else players[socket.id].projectiles[i].x += dist;
          } else {
             let points = findPoint(projectile.x, projectile.y, projectile.mouseX, projectile.mouseY, dist * dist),
-                fP = points.firstPoint,
-                sP = points.secondPoint,
-                fDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), fP),
-                sDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), sP);
+               fP = points.firstPoint,
+               sP = points.secondPoint,
+               fDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), fP),
+               sDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), sP);
             if (fDist > sDist)
                if (fDist < player.projectileFlightDistance) {
                   players[socket.id].projectiles[i].x = fP.x;
@@ -243,20 +248,46 @@ function findPoint(x1, y1, x2, y2, dist) {
 
 //проверка, что людей становится слишком много
 function demographicImbalance() {
-   return ((humanCount > zombieCount) && (humanCount - zombieCount > 2));
+   return ((humanCount > zombieCount) && (humanCount - zombieCount > 0));
 }
 
 //возвращает точку с координатами около рандомного игрока, являющегося человеком
 function randomHuman() {
    let keys = Object.keys(players);
-   let curPlayer = players[keys[Math.floor(Math.random() * keys.length)]];
-   while (curPlayer.role !== 'Human')
-      curPlayer = players[keys[Math.floor(Math.random() * keys.length)]];
-   return new Point(Math.round(curPlayer.x - 50), Math.round(curPlayer.y - 50));
+   let curPlayer = players[keys[Math.floor(Math.random() * (keys.length - 1))]];
+   let errorName = keys[Math.floor(Math.random() * (keys.length - 1))];
+   try {
+      while (curPlayer.role !== 'Human')
+         curPlayer = players[keys[Math.floor(Math.random() * keys.length)]];
+      return new Point(Math.round(curPlayer.x - 50), Math.round(curPlayer.y - 50));
+   }
+   catch (error) {
+      if (errorName in players)
+         throw error;
+      else
+         console.log("Player disconnected in randomHuman");
+   }
+
 }
 //вспышка эпидемии случается рядом со случайным человеком
-function outbreak(center, socket) {
-   let epidemicArea = new Circle(center, outbreakRadius);
+function outbreak() {
+   if (demographicImbalance()) {
+      console.log('we need more zombie! Zombie: ' + zombieCount + ' Human: ' + humanCount);
+      let c = randomHuman();
+      epidemicArea = new Circle(c, outbreakRadius);
+      epidemicArea.coordinateFixed = true;
+      setTimeout(function () {
+         epidemicArea.marker = true;
+         epidemicArea.start = Date.now();
+         setTimeout(function () {
+            epidemicArea.marker = false;
+            epidemicArea.coordinateFixed = false;
+         }, 1000);
+      }, 3000);
+   }
+}
+
+function collisionWithEpidemicArea(socket) {
    for (let key in players) {
       if (players[key].role === 'Human' &&
          players[key].intersectCircle(epidemicArea)) { //люди, которых задело
@@ -268,18 +299,10 @@ function outbreak(center, socket) {
    }
 }
 
-function balance(socket) {
-   if (demographicImbalance()) {
-      console.log('we need more zombie! Zombie: ' + zombieCount + ' Human: ' + humanCount);
-      let c = randomHuman();
-      setTimeout(function () { outbreak(c, socket) }, 5000); //оставляем возможность выбранному игроку выбраться из зоны поражения
-   }
-}
-
 io.on('connection', socket => {
    let timerOfPills,
-       timerOfRender,
-       reload;
+      timerOfRender,
+      reload;
    console.log('user connected');
    socket.on('setPlayerName', function (player, width, height, playerWidth, playerHeight) {
       if (player.name.length === 0) { //пустое имя недопустимо
@@ -301,9 +324,12 @@ io.on('connection', socket => {
                collisionWithPills();
                moveProjectile(socket);
                collisionWithProjectile();
-               balance(socket);
+               if (!epidemicArea.coordinateFixed)
+                  outbreak();
+               else if (epidemicArea.marker)
+                  collisionWithEpidemicArea(socket);
 
-               socket.emit('render', players, pills);
+               socket.emit('render', players, pills, epidemicArea);
             }, 20);
          } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
       }
@@ -375,18 +401,18 @@ io.on('connection', socket => {
             players[socket.id].shoot();
             if (!projectile.mouseMove) {
                let pr = new Projectile();
-               players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({damage: players[socket.id].projectileDamage}));
+               players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({ damage: players[socket.id].projectileDamage }));
             } else {
                let player = players[socket.id],
-                   points = findPoint(player.x + player.w / 2,
-                       player.y + player.h / 2,
-                       projectile.mouseX,
-                       projectile.mouseY,
-                       (player.h * player.h + player.w * player.w) / 4),
-                   fP = points.firstPoint,
-                   sP = points.secondPoint;
+                  points = findPoint(player.x + player.w / 2,
+                     player.y + player.h / 2,
+                     projectile.mouseX,
+                     projectile.mouseY,
+                     (player.h * player.h + player.w * player.w) / 4),
+                  fP = points.firstPoint,
+                  sP = points.secondPoint;
                if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
-                   > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
+                  > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
                   let pr = new Projectile();
                   players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
                      x: sP.x,
@@ -420,9 +446,9 @@ io.on('connection', socket => {
    socket.on('disconnect', () => {
       if (socket.id in players) {
          if (player.role === 'Zombie')
-               zombieCount--;
-            else
-               humanCount--;
+            zombieCount--;
+         else
+            humanCount--;
          console.log("Player " + players[socket.id].name + " disconnect");
          delete players[socket.id];
          clearInterval(timerOfPills);
@@ -455,9 +481,9 @@ io.on('connection', socket => {
                               return;
                            } else {
                               let x = players[socket.id].x,
-                                  y = players[socket.id].y;
+                                 y = players[socket.id].y;
                               delete players[socket.id]; //удаляем его из списка игроков
-                              socket.emit('turningIntoZombie', {x: x, y: y});
+                              socket.emit('turningIntoZombie', { x: x, y: y });
                            }
                         }
                      }
