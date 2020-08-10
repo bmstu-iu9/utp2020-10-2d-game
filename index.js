@@ -6,11 +6,13 @@ const express = require('express'),
    io = require('socket.io')(http),
    fs = require('fs');
 let players = {},
+   humanCount = 0,
+   zombieCount = 0,
    pills = {},
    screenWidth,
    screenHeight,
-   outbreakRadius = 300;
-pillWidth = 50,
+   outbreakRadius = 300,
+   pillWidth = 50,
    pillHeight = 50,
    healthOfPill = 0.10;
 //используется как родительский класс для объектов типа player, projectile и т.д. для упрощения определения столкновений
@@ -236,19 +238,19 @@ function findPoint(x1, y1, x2, y2, dist) {
 
 //проверка, что людей становится слишком много
 function demographicImbalance() {
-   return humanCount > zombieCount && humanCount - zombieCount > 2;
+   return ((humanCount > zombieCount) && (humanCount - zombieCount > 2));
 }
 
 //возвращает точку с координатами около рандомного игрока, являющегося человеком
 function randomHuman() {
    let keys = Object.keys(players);
-   let curPlayer = players[keys[Math.round(keys.length * Math.random())]];
+   let curPlayer = players[keys[Math.floor(Math.random() * keys.length)]];
    while (curPlayer.role !== 'Human')
-      curPlayer = players[keys[Math.round(keys.length * Math.random())]];
+      curPlayer = players[keys[Math.floor(Math.random() * keys.length)]];
    return new Point(Math.round(curPlayer.x - 50), Math.round(curPlayer.y - 50));
 }
 //вспышка эпидемии случается рядом со случайным человеком
-function outbreak(center) {
+function outbreak(center, socket) {
    let epidemicArea = new Circle(center, outbreakRadius);
    for (let key in players) {
       if (players[key].role === 'Human' &&
@@ -261,10 +263,11 @@ function outbreak(center) {
    }
 }
 
-function balance() {
-   if (demographicImbalance){
+function balance(socket) {
+   if (demographicImbalance()) {
+      console.log('we need more zombie! Zombie: ' + zombieCount + ' Human: ' + humanCount);
       let c = randomHuman();
-      setTimeout(outbreak(c), 5000); //оставляем возможность выбранному игроку выбраться из зоны поражения
+      setTimeout(function () { outbreak(c, socket) }, 5000); //оставляем возможность выбранному игроку выбраться из зоны поражения
    }
 }
 
@@ -279,6 +282,10 @@ io.on('connection', socket => {
          if (findName(player.name) === 0) { //проверяем есть ли игок с таким ником
             players[socket.id] = new Player(player.role, player.name, width, height, playerWidth, playerHeight);
             console.log('a new player ' + player.name + ' is ' + player.role);
+            if (player.role === 'Zombie')
+               zombieCount++;
+            else
+               humanCount++;
             socket.emit('PlayTheGame', players);
             timerOfPills = setInterval(function () {
                let p = new Pill(width, height, pillWidth, pillHeight, healthOfPill);
@@ -288,7 +295,7 @@ io.on('connection', socket => {
                collisionWithPills();
                moveProjectile(socket);
                collisionWithProjectile();
-               balance();
+               balance(socket);
 
                socket.emit('render', players, pills);
             }, 20);
@@ -362,9 +369,15 @@ io.on('connection', socket => {
       players[socket.id] = new Player('Zombie', player.name, player.w, player.h, player.playerWidth, player.playerHeight);
       players[socket.id].x = player.x;
       players[socket.id].y = player.y;
+      humanCount--;
+      zombieCount++;
    })
    socket.on('disconnect', () => {
       if (socket.id in players) {
+         if (player.role === 'Zombie')
+               zombieCount--;
+            else
+               humanCount--;
          console.log("Player " + players[socket.id].name + " disconnect");
          delete players[socket.id];
          clearInterval(timerOfPills);
