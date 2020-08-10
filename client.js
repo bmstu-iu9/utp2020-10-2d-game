@@ -62,7 +62,7 @@ function setPlayerName() {
 }
 function addNewPlayer() {
     role = 'Human';
-    document.body.innerHTML = '<div id = "name"><input type = "text" id = "nameOfPlayer" placeholder = "  Enter your name">\
+    document.body.innerHTML = '<div id = "nameError"></div><div id = "name"><input type = "text" id = "nameOfPlayer" placeholder = "  Enter your name">\
           <button type = "button" id = "set" onclick = "setPlayerName() ">Go!</button></div>'
 }
 //рисовка экрана пользователя
