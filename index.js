@@ -9,7 +9,8 @@ const express = require('express'),
 let players = {},
    humanCount = 0,
    zombieCount = 0,
-   pills = {},
+	pills = {},
+	notifications = [],
    screenWidth,
    screenHeight,
    pillWidth = 50,
@@ -316,7 +317,8 @@ function collisionWithEpidemicArea(socket) {
    try {
       let key = socket.id;
       if (players[key].role === 'Human' &&
-         players[key].intersectCircle(epidemicArea)) { //люди, которых задело
+			players[key].intersectCircle(epidemicArea)) { //люди, которых задело
+			notifications.push(players[key].name + ' got to the infected area. He is zombie now')
          let x = players[key].x,
             y = players[key].y;
          delete players[key];
@@ -324,7 +326,7 @@ function collisionWithEpidemicArea(socket) {
       }
    } catch (error) {
       if (errorName in players)
-         throw new error;
+         throw error;
       else
          console.log("Player disconnected in collisionWithEpidemicArea");
    }
@@ -341,7 +343,8 @@ io.on('connection', socket => {
       } else {
          if (findName(player.name) === 0) { //проверяем есть ли игок с таким ником
             players[socket.id] = new Player(player.role, player.name, width, height, playerWidth, playerHeight);
-            console.log('a new player ' + player.name + ' is ' + player.role);
+				console.log('a new player ' + player.name + ' is ' + player.role);
+				notifications.push('A new player is ' + player.name);
             if (player.role === 'Zombie')
                zombieCount++;
             else
@@ -354,8 +357,13 @@ io.on('connection', socket => {
             timerOfRender = setInterval(function () {
                collisionWithPills();
                moveProjectile(socket);
-               collisionWithProjectile();
-               socket.emit('render', players, pills, epidemicArea);
+					collisionWithProjectile();
+					if (notifications.length > 4){ //отображаются последние 4 уведомления
+						while (notifications.length != 4)
+							notifications.shift();
+					}
+
+               socket.emit('render', players, pills, epidemicArea, notifications);
                if (!epidemicArea.coordinateFixed)
                   outbreak();
                else if (epidemicArea.marker)
@@ -482,7 +490,8 @@ io.on('connection', socket => {
             zombieCount--;
          else
             humanCount--;
-         console.log("Player " + players[socket.id].name + " disconnect");
+			console.log("Player " + players[socket.id].name + " disconnect");
+			notifications.push(players[socket.id].name + ' left the game:(');
          delete players[socket.id];
          clearInterval(timerOfPills);
          clearInterval(timerOfRender);
@@ -508,13 +517,15 @@ io.on('connection', socket => {
                         if (players[socket.id].health === 0) {
                            if (player.role === 'Zombie') {
                               clearInterval(timerOfPills); //завершаем создание лекарства от этого пользователя
-                              clearInterval(timerOfRender); //завершаем рендер этого игрока
+										clearInterval(timerOfRender); //завершаем рендер этого игрока
+										notifications.push(player.name + ' has died. Completely. RIP');
                               delete players[socket.id]; //удаляем его из списка игроков
                               socket.emit('gameOver');
                               return;
                            } else {
                               let x = players[socket.id].x,
-                                 y = players[socket.id].y;
+											y = players[socket.id].y;
+										notifications.push(players[socket.id] + ' was infected by Zombie comunity. He is zombie now too')
                               delete players[socket.id]; //удаляем его из списка игроков
                               socket.emit('turningIntoZombie', { x: x, y: y });
                            }
@@ -565,7 +576,7 @@ app.get('/', function (req, res) {
 //читаем все js файлы
 app.get(/.js$/, function (req, res) {
 	let filePath = path.join(__dirname, req.url);
-	console.log(filePath + ' is readed');
+	console.log(filePath + ' was read');
    fs.readFile(filePath, (err, code) => {
       res.writeHead(200, { 'Content-Type': 'text/javascript' });
       res.end(code);
