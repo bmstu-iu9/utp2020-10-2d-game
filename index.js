@@ -1,20 +1,20 @@
 'use strict'
 
 const express = require('express'),
-   app = express(),
-   http = require('http').createServer(app),
-   io = require('socket.io')(http),
-   fs = require('fs');
+    app = express(),
+    http = require('http').createServer(app),
+    io = require('socket.io')(http),
+    fs = require('fs');
 let players = {},
-   humanCount = 0,
-   zombieCount = 0,
-   pills = {},
-   screenWidth,
-   screenHeight,
-   outbreakRadius = 125,
-   pillWidth = 50,
-   pillHeight = 50,
-   healthOfPill = 0.10;
+    humanCount = 0,
+    zombieCount = 0,
+    pills = {},
+    screenWidth,
+    screenHeight,
+    outbreakRadius = 125,
+    pillWidth = 50,
+    pillHeight = 50,
+    healthOfPill = 0.10;
 //используется как родительский класс для объектов типа player, projectile и т.д. для упрощения определения столкновений
 class Rect {
    constructor(x, y, width, height) {
@@ -42,17 +42,17 @@ class Rect {
    //проверка пересекается ли прямоугольник this с rect
    intersect(rect) {
       return this.hasPoint(rect.leftUp()) ||
-         this.hasPoint(rect.rightUp()) ||
-         this.hasPoint(rect.leftDown()) ||
-         this.hasPoint(rect.rightDown());
+          this.hasPoint(rect.rightUp()) ||
+          this.hasPoint(rect.leftDown()) ||
+          this.hasPoint(rect.rightDown());
    }
    //проверка пересекается ли прямоугольник this с кругом
    intersectCircle(circle) {
       return circle.hasPoint(this.x, this.y) ||
-         circle.intersect(this.x, this.y, this.leftDown.x, this.leftDown.y) ||
-         circle.intersect(this.leftDown.x, this.leftDown.y, this.rightDown.x, this.rightDown.y) ||
-         circle.intersect(this.rightDown.x, this.rightDown.y, this.rightUp.x, this.rightUp.y) ||
-         circle.intersect(this.rightUp.x, this.rightUp.y, this.x, this.y);
+          circle.intersect(this.x, this.y, this.leftDown.x, this.leftDown.y) ||
+          circle.intersect(this.leftDown.x, this.leftDown.y, this.rightDown.x, this.rightDown.y) ||
+          circle.intersect(this.rightDown.x, this.rightDown.y, this.rightUp.x, this.rightUp.y) ||
+          circle.intersect(this.rightUp.x, this.rightUp.y, this.x, this.y);
    }
 }
 
@@ -60,29 +60,29 @@ class Circle {
    constructor(o, r) {
       this.o = o;
       this.radius = r;
-      this.marker = false;
-      this.coordinateFixed = false;
+      this.marker = false; //отвечате за то, нужно ли отрисовывать облако эпидемии
+      this.coordinateFixed = false; //зафисксированы ли координаты для будущего рисования
       this.start = Date.now();
    }
    //проверка пересекает ли отрезок окружность this
    intersect(x1, y1, x2, y2) {
       let a = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1),
-         b = - 2 * ((x1 - this.o.x) * (x2 - x1) + (y1 - this.o.y) * (y2 - y1)),
-         c = (x1 - this.o.x) * (x1 - this.o.x) +
-            (y1 - this.o.y) * (y1 - this.o.y) -
-            this.radius * this.radius,
-         t1 = (- b + Math.sqrt(b * b - 4 * a * c)) / (2 * a),
-         t2 = (- b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+          b = - 2 * ((x1 - this.o.x) * (x2 - x1) + (y1 - this.o.y) * (y2 - y1)),
+          c = (x1 - this.o.x) * (x1 - this.o.x) +
+              (y1 - this.o.y) * (y1 - this.o.y) -
+              this.radius * this.radius,
+          t1 = (- b + Math.sqrt(b * b - 4 * a * c)) / (2 * a),
+          t2 = (- b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
 
       let curX = x1 + t1 * (x2 - x1);
 
       if ((x1 <= x2 && curX <= x2 && curX >= x1) ||
-         (x1 > x2 && curX <= x1 && curX >= x2))
+          (x1 > x2 && curX <= x1 && curX >= x2))
          return true;
       else {
          curX = x1 + t2 * (x2 - x1);
          if ((x1 <= x2 && curX <= x2 && curX >= x1) ||
-            (x1 > x2 && curX <= x1 && curX >= x2))
+             (x1 > x2 && curX <= x1 && curX >= x2))
             return true;
       }
       return false;
@@ -90,7 +90,7 @@ class Circle {
    //проверка находится ли точка внутри окружности this
    hasPoint(x, y) {
       return (this.o.x - x) * (this.o.x - x) +
-         (this.o.y - y) * (this.o.y - y) <= this.radius * this.radius;
+          (this.o.y - y) * (this.o.y - y) <= this.radius * this.radius;
    }
 }
 class Player extends Rect {
@@ -157,10 +157,11 @@ class Projectile extends Rect {
       this.projectileSpeed = projectileSpeed; //скорость снаряда
       this.damage = damage; //урон от попадание этим снарядом
    }
+
    //заменяет свойства this,с именами из массива fields, одноимёнными свойствами из props(если в props их нет, то оствялет то, что было в this)
    cloneWith(props) {
       const fields = ['x', 'y', 'w', 'h', 'mouseX', 'mouseY', 'mouseMove', 'type', 'projectileSpeed', 'damage'],
-         res = new Projectile();
+          res = new Projectile();
       for (let field in fields) {
          res[fields[field]] = (props[fields[field]] == undefined) ? this[fields[field]] : props[fields[field]];
       }
@@ -201,8 +202,8 @@ function moveProjectile(socket) {
    try {
       while (i < players[socket.id].projectiles.length) {
          let projectile = players[socket.id].projectiles[i],
-            player = players[socket.id],
-            dist = projectile.projectileSpeed;
+             player = players[socket.id],
+             dist = projectile.projectileSpeed;
          if (!projectile.mouseMove) {
             if (players[socket.id].x + 200 < players[socket.id].projectiles[i].x + dist) {
                players[socket.id].projectiles.splice(i, 1);
@@ -210,10 +211,10 @@ function moveProjectile(socket) {
             } else players[socket.id].projectiles[i].x += dist;
          } else {
             let points = findPoint(projectile.x, projectile.y, projectile.mouseX, projectile.mouseY, dist * dist),
-               fP = points.firstPoint,
-               sP = points.secondPoint,
-               fDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), fP),
-               sDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), sP);
+                fP = points.firstPoint,
+                sP = points.secondPoint,
+                fDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), fP),
+                sDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), sP);
             if (fDist > sDist)
                if (fDist < player.projectileFlightDistance) {
                   players[socket.id].projectiles[i].x = fP.x;
@@ -236,10 +237,10 @@ function moveProjectile(socket) {
 //находит пару точек (x,y), которые лежат на расстоянии sqrt(dist) от (x1,y1) и принадлежат прямой (x1,y1) (x2,y2)
 function findPoint(x1, y1, x2, y2, dist) {
    let modulYMinusY1 = Math.sqrt(dist * (y2 - y1) * (y2 - y1) / ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))),
-      firstY = modulYMinusY1 + y1,
-      firstX = (firstY - y1) * (x2 - x1) / (y2 - y1) + x1,
-      secondY = y1 - modulYMinusY1,
-      secondX = (secondY - y1) * (x2 - x1) / (y2 - y1) + x1;
+       firstY = modulYMinusY1 + y1,
+       firstX = (firstY - y1) * (x2 - x1) / (y2 - y1) + x1,
+       secondY = y1 - modulYMinusY1,
+       secondX = (secondY - y1) * (x2 - x1) / (y2 - y1) + x1;
    return {
       firstPoint: new Point(Math.round(firstX), Math.round(firstY)),
       secondPoint: new Point(Math.round(secondX), Math.round(secondY))
@@ -248,20 +249,19 @@ function findPoint(x1, y1, x2, y2, dist) {
 
 //проверка, что людей становится слишком много
 function demographicImbalance() {
-   return ((humanCount > zombieCount) && (humanCount - zombieCount > 0));
+   return humanCount > zombieCount + 1;
 }
 
 //возвращает точку с координатами около рандомного игрока, являющегося человеком
 function randomHuman() {
-   let keys = Object.keys(players);
-   let curPlayer = players[keys[Math.floor(Math.random() * (keys.length - 1))]];
-   let errorName = keys[Math.floor(Math.random() * (keys.length - 1))];
+   let keys = Object.keys(players),
+       curPlayer = players[keys[Math.floor(Math.random() * (keys.length - 1))]],
+       errorName = keys[Math.floor(Math.random() * (keys.length - 1))];
    try {
       while (curPlayer.role !== 'Human')
          curPlayer = players[keys[Math.floor(Math.random() * keys.length)]];
       return new Point(Math.round(curPlayer.x - 50), Math.round(curPlayer.y - 50));
-   }
-   catch (error) {
+   } catch (error) {
       if (errorName in players)
          throw error;
       else
@@ -289,20 +289,18 @@ function outbreak() {
 
 function collisionWithEpidemicArea(socket) {
    let errorName = socket.id;
-   try{
-      for (let key in players) {
-         if (players[key].role === 'Human' &&
-            players[key].intersectCircle(epidemicArea)) { //люди, которых задело
-            let x = players[key].x,
-               y = players[key].y;
-            delete players[key];
-            socket.emit('turningIntoZombie', { x: x, y: y }); //превращаются в зомби
-         }
+   try {
+      let key = socket.id;
+      if (players[key].role === 'Human' &&
+          players[key].intersectCircle(epidemicArea)) { //люди, которых задело
+         let x = players[key].x,
+             y = players[key].y;
+         delete players[key];
+         socket.emit('turningIntoZombie', {x: x, y: y}); //превращаются в зомби
       }
-   }
-   catch(error){
+   } catch (error) {
       if (errorName in players)
-         throw error;
+         throw new error;
       else
          console.log("Player disconnected in collisionWithEpidemicArea");
    }
@@ -310,8 +308,8 @@ function collisionWithEpidemicArea(socket) {
 
 io.on('connection', socket => {
    let timerOfPills,
-      timerOfRender,
-      reload;
+       timerOfRender,
+       reload;
    console.log('user connected');
    socket.on('setPlayerName', function (player, width, height, playerWidth, playerHeight) {
       if (player.name.length === 0) { //пустое имя недопустимо
@@ -413,15 +411,15 @@ io.on('connection', socket => {
                players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({ damage: players[socket.id].projectileDamage }));
             } else {
                let player = players[socket.id],
-                  points = findPoint(player.x + player.w / 2,
-                     player.y + player.h / 2,
-                     projectile.mouseX,
-                     projectile.mouseY,
-                     (player.h * player.h + player.w * player.w) / 4),
-                  fP = points.firstPoint,
-                  sP = points.secondPoint;
+                   points = findPoint(player.x + player.w / 2,
+                       player.y + player.h / 2,
+                       projectile.mouseX,
+                       projectile.mouseY,
+                       (player.h * player.h + player.w * player.w) / 4),
+                   fP = points.firstPoint,
+                   sP = points.secondPoint;
                if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
-                  > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
+                   > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
                   let pr = new Projectile();
                   players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
                      x: sP.x,
@@ -490,7 +488,7 @@ io.on('connection', socket => {
                               return;
                            } else {
                               let x = players[socket.id].x,
-                                 y = players[socket.id].y;
+                                  y = players[socket.id].y;
                               delete players[socket.id]; //удаляем его из списка игроков
                               socket.emit('turningIntoZombie', { x: x, y: y });
                            }
