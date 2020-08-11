@@ -1,6 +1,7 @@
 'use strict'
 
 const express = require('express'),
+	path = require('path'),
    app = express(),
    http = require('http').createServer(app),
    io = require('socket.io')(http),
@@ -560,8 +561,12 @@ io.on('connection', socket => {
 app.get('/', function (req, res) {
    res.sendfile('index.html');
 });
-app.get('/client.js', function (req, res) {
-   fs.readFile('client.js', (err, code) => {
+
+//читаем все js файлы
+app.get(/.js$/, function (req, res) {
+	let filePath = path.join(__dirname, req.url);
+	console.log(filePath + ' is readed');
+   fs.readFile(filePath, (err, code) => {
       res.writeHead(200, { 'Content-Type': 'text/javascript' });
       res.end(code);
    })

@@ -199,19 +199,6 @@ function drawPlayers(players) {
 }
 //рисуем область вспышки эпидемии
 function drawEpidemicArea(area) {
-    /*let start = Date.now();
-    let timer = setInterval(function () {
-        //время с момента начала анимации
-        let timePassed = Date.now() - start;
-        if (timePassed >= 3000) {
-            clearInterval(timer);
-            return;
-        }
-        context.beginPath();
-        context.arc(area.o.x, area.o.y, area.radius, 0, Math.PI * 2, true);
-        context.fillStyle(rgb(4, 4, 4, 0.25));
-        context.fill();
-    })*/
     if (area.marker) {
         socket.emit('increaseEpidemicRadius', area);
         console.log('drawing epidemic area');
