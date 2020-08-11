@@ -110,6 +110,10 @@ class Epidemic extends Circle {
       this.coordinateFixed = false; //зафисксированы ли координаты для будущего рисования
       this.start = Date.now();
    }
+
+   increaseRadius(){
+      this.radius = (Date.now() - this.start) * 0.15
+   }
 }
 class Player extends Rect {
    constructor(role, name, w, h, playerWidth, playerHeight) {
@@ -278,7 +282,7 @@ function randomHuman() {
    try {
       while (curPlayer.role !== 'Human')
          curPlayer = players[keys[Math.floor(Math.random() * keys.length)]];
-      return new Point(Math.round(curPlayer.x - 50), Math.round(curPlayer.y - 50));
+      return new Point(Math.abs(curPlayer.x - 15), Math.abs(curPlayer.y - 15));
    } catch (error) {
       if (errorName in players)
          throw error;
@@ -300,12 +304,13 @@ function outbreak() {
          setTimeout(function () {
             epidemicArea.marker = false;
             epidemicArea.coordinateFixed = false;
-         }, 1000);
+         }, 1500);
       }, 2000);
    }
 }
 
 function collisionWithEpidemicArea(socket) {
+   console.log('epidemic radius : ' + epidemicArea.radius);
    let errorName = socket.id;
    try {
       let key = socket.id;
@@ -358,6 +363,9 @@ io.on('connection', socket => {
          } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
       }
    });
+   socket.on('increaseEpidemicRadius', function(){
+      epidemicArea.increaseRadius();
+   })
    socket.on('moveDown', function () {
       let errorName = socket.id;
       try {

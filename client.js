@@ -213,7 +213,7 @@ function drawEpidemicArea(area) {
         context.fill();
     })*/
     if (area.marker) {
-        area.radius = (Date.now() - area.start) * 0.15;
+        socket.emit('increaseEpidemicRadius', area);
         console.log('drawing epidemic area');
         context.beginPath();
         context.arc(area.o.x, area.o.y, area.radius, 0, Math.PI * 2, true);
