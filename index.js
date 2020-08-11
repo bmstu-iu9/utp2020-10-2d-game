@@ -6,11 +6,12 @@ const express = require('express'),
    io = require('socket.io')(http),
    fs = require('fs');
 let players = {},
+   humanCount = 0,
+   zombieCount = 0,
    pills = {},
    screenWidth,
    screenHeight,
-   outbreakRadius = 300;
-pillWidth = 50,
+   pillWidth = 50,
    pillHeight = 50,
    healthOfPill = 0.10;
 //используется как родительский класс для объектов типа player, projectile и т.д. для упрощения определения столкновений
@@ -54,6 +55,7 @@ class Rect {
    }
 }
 
+//класс для круговых объектов, используется как родительский
 class Circle {
    constructor(o, r) {
       this.o = o;
@@ -61,8 +63,19 @@ class Circle {
    }
    //проверка пересекает ли отрезок окружность this
    intersect(x1, y1, x2, y2) {
-      let a = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1),
-         b = - 2 * ((x1 - this.o.x) * (x2 - x1) + (y1 - this.o.y) * (y2 - y1)),
+      //отрезок параллелен одной из сторон экрана
+      let s1 = findDist(new Point(x1, y1), new Point(this.o.x, this.o.y)),
+         s2 = findDist(new Point(x2, y2), new Point(this.o.x, this.o.y));
+      if (s1 <= this.radius || s2 <= this.radius)
+         return true;
+      else if ((x1 == x2 && x1 - this.o.x <= this.radius) ||
+         (y1 = y2 && y1 - this.o.x <= this.radius))
+         return true;
+      return false;
+
+      //общий случай для отрезков, непараллельным осям координат
+      /*let a = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1),
+         b = 2 * ((x1 - this.o.x) * (x2 - x1) + (y1 - this.o.y) * (y2 - y1)),
          c = (x1 - this.o.x) * (x1 - this.o.x) +
             (y1 - this.o.y) * (y1 - this.o.y) -
             this.radius * this.radius,
@@ -80,12 +93,26 @@ class Circle {
             (x1 > x2 && curX <= x1 && curX >= x2))
             return true;
       }
-      return false;
+      return false;*/
    }
    //проверка находится ли точка внутри окружности this
    hasPoint(x, y) {
       return (this.o.x - x) * (this.o.x - x) +
          (this.o.y - y) * (this.o.y - y) <= this.radius * this.radius;
+   }
+}
+
+//класс для вспышки эпидемии
+class Epidemic extends Circle {
+   constructor(o, r) {
+      super(o, r);
+      this.marker = false; //отвечате за то, нужно ли отрисовывать облако эпидемии
+      this.coordinateFixed = false; //зафисксированы ли координаты для будущего рисования
+      this.start = Date.now();
+   }
+
+   increaseRadius(){
+      this.radius = (Date.now() - this.start) * 0.15
    }
 }
 class Player extends Rect {
@@ -152,6 +179,7 @@ class Projectile extends Rect {
       this.projectileSpeed = projectileSpeed; //скорость снаряда
       this.damage = damage; //урон от попадание этим снарядом
    }
+
    //заменяет свойства this,с именами из массива fields, одноимёнными свойствами из props(если в props их нет, то оствялет то, что было в this)
    cloneWith(props) {
       const fields = ['x', 'y', 'w', 'h', 'mouseX', 'mouseY', 'mouseMove', 'type', 'projectileSpeed', 'damage'],
@@ -177,6 +205,8 @@ class Pill extends Rect {
    }
 }
 
+let epidemicArea = new Circle(new Point(0, 0), 0);
+
 //поиск имени среди уже существующих на сервере
 function findName(name) {
    for (let key in players)
@@ -188,36 +218,41 @@ function findName(name) {
 function findDist(fP, sP) {
    return Math.round(Math.sqrt((sP.x - fP.x) * (sP.x - fP.x) + (sP.y - fP.y) * (sP.y - fP.y)));
 }
-//движение снарядов - кашля
+//движение снарядов
 function moveProjectile(socket) {
-   let i = 0;
-   while (socket.id in players && i < players[socket.id].projectiles.length) {
-      let projectile = players[socket.id].projectiles[i],
-         player = players[socket.id],
-         dist = projectile.projectileSpeed;
-      if (!projectile.mouseMove) {
-         if (players[socket.id].x + 200 < players[socket.id].projectiles[i].x + dist) {
-            players[socket.id].projectiles.splice(i, 1);
-            --i;
-         } else players[socket.id].projectiles[i].x += dist;
-      } else {
-         let points = findPoint(projectile.x, projectile.y, projectile.mouseX, projectile.mouseY, dist * dist),
-            fP = points.firstPoint,
-            sP = points.secondPoint,
-            fDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), fP),
-            sDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), sP);
-         if (fDist > sDist)
-            if (fDist < player.projectileFlightDistance) {
-               players[socket.id].projectiles[i].x = fP.x;
-               players[socket.id].projectiles[i].y = fP.y;
-            } else players[socket.id].projectiles.splice(i, 1);
-         else
-            if (sDist < player.projectileFlightDistance) {
+   let i = 0, errorName = socket.id;
+   try {
+      while (i < players[socket.id].projectiles.length) {
+         let projectile = players[socket.id].projectiles[i],
+            player = players[socket.id],
+            dist = projectile.projectileSpeed;
+         if (!projectile.mouseMove) {
+            if (players[socket.id].x + 200 < players[socket.id].projectiles[i].x + dist) {
+               players[socket.id].projectiles.splice(i, 1);
+               --i;
+            } else players[socket.id].projectiles[i].x += dist;
+         } else {
+            let points = findPoint(projectile.x, projectile.y, projectile.mouseX, projectile.mouseY, dist * dist),
+               fP = points.firstPoint,
+               sP = points.secondPoint,
+               fDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), fP),
+               sDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), sP);
+            if (fDist > sDist)
+               if (fDist < player.projectileFlightDistance) {
+                  players[socket.id].projectiles[i].x = fP.x;
+                  players[socket.id].projectiles[i].y = fP.y;
+               } else players[socket.id].projectiles.splice(i, 1);
+            else if (sDist < player.projectileFlightDistance) {
                players[socket.id].projectiles[i].x = sP.x;
                players[socket.id].projectiles[i].y = sP.y;
             } else players[socket.id].projectiles.splice(i, 1);
+         }
+         ++i;
       }
-      ++i;
+   } catch (error) {
+      if (errorName in players)
+         throw new error;
+      else console.log("Player disconnected in moveProjectile");
    }
 }
 
@@ -236,21 +271,49 @@ function findPoint(x1, y1, x2, y2, dist) {
 
 //проверка, что людей становится слишком много
 function demographicImbalance() {
-   return humanCount > zombieCount && humanCount - zombieCount > 2;
+   return humanCount > zombieCount;
 }
 
 //возвращает точку с координатами около рандомного игрока, являющегося человеком
 function randomHuman() {
-   let keys = Object.keys(players);
-   let curPlayer = players[keys[Math.round(keys.length * Math.random())]];
-   while (curPlayer.role !== 'Human')
-      curPlayer = players[keys[Math.round(keys.length * Math.random())]];
-   return new Point(Math.round(curPlayer.x - 50), Math.round(curPlayer.y - 50));
+   let keys = Object.keys(players),
+      curPlayer = players[keys[Math.floor(Math.random() * (keys.length - 1))]],
+      errorName = keys[Math.floor(Math.random() * (keys.length - 1))];
+   try {
+      while (curPlayer.role !== 'Human')
+         curPlayer = players[keys[Math.floor(Math.random() * keys.length)]];
+      return new Point(Math.abs(curPlayer.x - 15), Math.abs(curPlayer.y - 15));
+   } catch (error) {
+      if (errorName in players)
+         throw error;
+      else
+         console.log("Player disconnected in randomHuman");
+   }
+
 }
 //вспышка эпидемии случается рядом со случайным человеком
-function outbreak(center) {
-   let epidemicArea = new Circle(center, outbreakRadius);
-   for (let key in players) {
+function outbreak() {
+   if (demographicImbalance()) {
+      console.log('we need more zombie! Zombie: ' + zombieCount + ' Human: ' + humanCount);
+      let c = randomHuman();
+      epidemicArea = new Epidemic(c, 0);
+      epidemicArea.coordinateFixed = true;
+      setTimeout(function () {
+         epidemicArea.marker = true;
+         epidemicArea.start = Date.now();
+         setTimeout(function () {
+            epidemicArea.marker = false;
+            epidemicArea.coordinateFixed = false;
+         }, 1500);
+      }, 2000);
+   }
+}
+
+function collisionWithEpidemicArea(socket) {
+   console.log('epidemic radius : ' + epidemicArea.radius);
+   let errorName = socket.id;
+   try {
+      let key = socket.id;
       if (players[key].role === 'Human' &&
          players[key].intersectCircle(epidemicArea)) { //люди, которых задело
          let x = players[key].x,
@@ -258,19 +321,18 @@ function outbreak(center) {
          delete players[key];
          socket.emit('turningIntoZombie', { x: x, y: y }); //превращаются в зомби
       }
-   }
-}
-
-function balance() {
-   if (demographicImbalance){
-      let c = randomHuman();
-      setTimeout(outbreak(c), 5000); //оставляем возможность выбранному игроку выбраться из зоны поражения
+   } catch (error) {
+      if (errorName in players)
+         throw new error;
+      else
+         console.log("Player disconnected in collisionWithEpidemicArea");
    }
 }
 
 io.on('connection', socket => {
    let timerOfPills,
-      timerOfRender;
+      timerOfRender,
+      reload;
    console.log('user connected');
    socket.on('setPlayerName', function (player, width, height, playerWidth, playerHeight) {
       if (player.name.length === 0) { //пустое имя недопустимо
@@ -279,6 +341,10 @@ io.on('connection', socket => {
          if (findName(player.name) === 0) { //проверяем есть ли игок с таким ником
             players[socket.id] = new Player(player.role, player.name, width, height, playerWidth, playerHeight);
             console.log('a new player ' + player.name + ' is ' + player.role);
+            if (player.role === 'Zombie')
+               zombieCount++;
+            else
+               humanCount++;
             socket.emit('PlayTheGame', players);
             timerOfPills = setInterval(function () {
                let p = new Pill(width, height, pillWidth, pillHeight, healthOfPill);
@@ -288,130 +354,206 @@ io.on('connection', socket => {
                collisionWithPills();
                moveProjectile(socket);
                collisionWithProjectile();
-               balance();
-
-               socket.emit('render', players, pills);
+               socket.emit('render', players, pills, epidemicArea);
+               if (!epidemicArea.coordinateFixed)
+                  outbreak();
+               else if (epidemicArea.marker)
+                  collisionWithEpidemicArea(socket);
             }, 20);
          } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
       }
    });
+   socket.on('increaseEpidemicRadius', function(){
+      epidemicArea.increaseRadius();
+   })
    socket.on('moveDown', function () {
-      if (players[socket.id].y + 120 < screenHeight) {
-         players[socket.id].y += 5;
+      let errorName = socket.id;
+      try {
+         if (players[socket.id].y + 120 < screenHeight) {
+            players[socket.id].y += 2;
+         }
+      }
+      catch (error) {
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in moveDown");
       }
    });
    socket.on('moveLeft', function () {
-      if (players[socket.id].x > 0) {
-         players[socket.id].x -= 5;
+      let errorName = socket.id;
+      try {
+         if (players[socket.id].x > 0) {
+            players[socket.id].x -= 2;
+         }
+      }
+      catch (error) {
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in moveLeft");
       }
    });
    socket.on('moveUp', function () {
-      if (players[socket.id].y > 0) {
-         players[socket.id].y -= 5;
+      let errorName = socket.id;
+      try {
+         if (players[socket.id].y > 0) {
+            players[socket.id].y -= 2;
+         }
+      }
+      catch (error) {
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in moveUp")
       }
    });
    socket.on('moveRight', function () {
-      if (players[socket.id].x + 90 < screenWidth) {
-         players[socket.id].x += 5;
+      let errorName = socket.id;
+      try {
+         if (players[socket.id].x + 90 < screenWidth) {
+            players[socket.id].x += 2;
+         }
+      }
+      catch (error) {
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in moveRight");
       }
    });
    socket.on('newProjectile', function (projectile) {
-      if (players[socket.id].isWeaponEmpty()) { //если патроны закончились
-         if (!players[socket.id].reloading) { //если оружие не перезаряжается
-            players[socket.id].reloading = true;
-            setTimeout(function () {
-               players[socket.id].countOfBulletInWeapon = players[socket.id].weaponCapacity;
-               players[socket.id].reloading = false;
-            }, 5000);
-         }
-      } else {
-         players[socket.id].shoot();
-         if (!projectile.mouseMove) {
-            let pr = new Projectile();
-            players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({ damage: players[socket.id].projectileDamage }));
+      let errorName = socket.id;
+      try {
+         if (players[socket.id].isWeaponEmpty()) { //если патроны закончились
+            if (!players[socket.id].reloading) { //если оружие не перезаряжается
+               players[socket.id].reloading = true;
+               reload = setTimeout(function () {
+                  players[socket.id].countOfBulletInWeapon = players[socket.id].weaponCapacity;
+                  players[socket.id].reloading = false;
+               }, 5000);
+            }
          } else {
-            let player = players[socket.id],
-               points = findPoint(player.x + player.w / 2,
-                  player.y + player.h / 2,
-                  projectile.mouseX,
-                  projectile.mouseY,
-                  (player.h * player.h + player.w * player.w) / 4),
-               fP = points.firstPoint,
-               sP = points.secondPoint;
-            if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
-               > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
+            players[socket.id].shoot();
+            if (!projectile.mouseMove) {
                let pr = new Projectile();
-               players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
-                  x: sP.x,
-                  y: sP.y,
-                  damage: player.projectileDamage
-               }));
+               players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({ damage: players[socket.id].projectileDamage }));
             } else {
-               let pr = new Projectile();
-               players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
-                  x: fP.x,
-                  y: fP.y,
-                  damage: player.projectileDamage
-               }));
+               let player = players[socket.id],
+                  points = findPoint(player.x + player.w / 2,
+                     player.y + player.h / 2,
+                     projectile.mouseX,
+                     projectile.mouseY,
+                     (player.h * player.h + player.w * player.w) / 4),
+                  fP = points.firstPoint,
+                  sP = points.secondPoint;
+               if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
+                  > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
+                  let pr = new Projectile();
+                  players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
+                     x: sP.x,
+                     y: sP.y,
+                     damage: player.projectileDamage
+                  }));
+               } else {
+                  let pr = new Projectile();
+                  players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
+                     x: fP.x,
+                     y: fP.y,
+                     damage: player.projectileDamage
+                  }));
+               }
             }
          }
+      } catch (error) {
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in newProjectile");
       }
    });
-   //добавлянм нового игрока  - зомби, событие происходит когда был убит человек
+   //добавлям нового игрока  - зомби, событие происходит когда был убит человек
    socket.on('addNewZombie', function (player) {
       players[socket.id] = new Player('Zombie', player.name, player.w, player.h, player.playerWidth, player.playerHeight);
       players[socket.id].x = player.x;
       players[socket.id].y = player.y;
+      humanCount--;
+      zombieCount++;
    })
    socket.on('disconnect', () => {
       if (socket.id in players) {
+         if (players[socket.id].role === 'Zombie')
+            zombieCount--;
+         else
+            humanCount--;
          console.log("Player " + players[socket.id].name + " disconnect");
          delete players[socket.id];
          clearInterval(timerOfPills);
          clearInterval(timerOfRender);
-
+         clearTimeout(reload);
       } else console.log("Player (no name) disconnect");
    });
 
    //просчитываем получение урона игроком player от снарядов других игроков
    function collisionWithProjectile() {
-      let player = players[socket.id];
-      for (let key in players) {
-         if (socket.id in players && key in players && key !== socket.id && players[key].role !== player.role) {
-            for (let i = 0; i < players[key].projectiles.length; i++) {
-               let projectile = players[key].projectiles[i];
-               if (player.intersect(projectile)) {
-                  console.log("player - " + players[key].name + " hits player - " + players[socket.id].name);
-                  players[socket.id].decreaseHealth(players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
-                  players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
-                  if (players[socket.id].health === 0) {
-                     if (player.role === 'Zombie') {
-                        clearInterval(timerOfPills); //завершаем создание лекарства от этого пользователя
-                        clearInterval(timerOfRender); //завершаем рендер этого игрока
-                        delete players[socket.id]; //удаляем его из списка игроков
-                        socket.emit('gameOver');
-                        return;
-                     } else {
-                        let x = players[socket.id].x,
-                           y = players[socket.id].y;
-                        delete players[socket.id]; //удаляем его из списка игроков
-                        socket.emit('turningIntoZombie', { x: x, y: y });
+      let errorName;
+      try {
+         let player = players[socket.id];
+         for (let key in players) {
+            errorName = key;
+            try {
+               if (key !== socket.id && players[key].role !== player.role) {
+                  for (let i = 0; i < players[key].projectiles.length; i++) {
+                     let projectile = players[key].projectiles[i];
+                     if (player.intersect(projectile)) {
+                        // console.log("player - " + players[key].name + " hits player - " + players[socket.id].name);
+                        players[socket.id].decreaseHealth(players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
+                        players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
+                        if (players[socket.id].health === 0) {
+                           if (player.role === 'Zombie') {
+                              clearInterval(timerOfPills); //завершаем создание лекарства от этого пользователя
+                              clearInterval(timerOfRender); //завершаем рендер этого игрока
+                              delete players[socket.id]; //удаляем его из списка игроков
+                              socket.emit('gameOver');
+                              return;
+                           } else {
+                              let x = players[socket.id].x,
+                                 y = players[socket.id].y;
+                              delete players[socket.id]; //удаляем его из списка игроков
+                              socket.emit('turningIntoZombie', { x: x, y: y });
+                           }
+                        }
                      }
                   }
                }
             }
+            catch (error) {
+               if (errorName in players) {
+                  errorName = socket.id;
+                  throw new error;
+               }
+               else console.log("Player disconnected in collisionWithProjectile");
+            }
          }
+      }
+      catch (error) {
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in collisionWithProjectile");
       }
    }
 
    //проверяет какие таблетки подобрал игрок
    function collisionWithPills() {
-      let player = players[socket.id];
-      for (let i in pills)
-         if (player.intersect(pills[i])) {
-            players[socket.id].increaseHealth(pills[i].health);
-            delete pills[i];
-         }
+      let errorName = socket.id;
+      try {
+         let player = players[socket.id];
+         for (let i in pills)
+            if (player.intersect(pills[i])) {
+               players[socket.id].increaseHealth(pills[i].health);
+               delete pills[i];
+            }
+      }
+      catch (error) {
+         if (errorName in players)
+            throw new error;
+         else console.log("Player disconnected in collisionWithPills");
+      }
    }
 });
 
