@@ -229,7 +229,7 @@ function drawNotificationsBoard(notifications) {
 	y += 20;
 	context.font = '15px Arial';
 	context.fillStyle = '#000000';
-	for (let i = 0; i < notifications.length; i++){
+	for (let i = 0; i < notifications.length; i++) {
 		context.fillText(notifications[i], x, y, notificationsBoardWidth - 40);
 		y += 20;
 	}
