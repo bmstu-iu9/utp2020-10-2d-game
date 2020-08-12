@@ -433,6 +433,7 @@ io.on('connection', socket => {
             if (players[socket.id].isWeaponEmpty()) { //если патроны закончились
                 if (!players[socket.id].reloading) { //если оружие не перезаряжается
                     players[socket.id].reloading = true;
+                    notifications.push(players[socket.id] + ' is reloading his gun');
                     reload = setTimeout(function () {
                         players[socket.id].countOfBulletInWeapon = players[socket.id].weaponCapacity;
                         players[socket.id].reloading = false;
