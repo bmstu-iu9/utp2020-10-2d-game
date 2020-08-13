@@ -433,8 +433,9 @@ io.on('connection', socket => {
             if (players[socket.id].isWeaponEmpty()) { //если патроны закончились
                 if (!players[socket.id].reloading) { //если оружие не перезаряжается
                     players[socket.id].reloading = true;
-                    notifications.push(players[socket.id] + ' is reloading his gun');
+                    notifications.push(players[socket.id].name + ' is reloading his gun');
                     reload = setTimeout(function () {
+                        notifications.push(players[socket.id].name + ' has realoded the gun');
                         players[socket.id].countOfBulletInWeapon = players[socket.id].weaponCapacity;
                         players[socket.id].reloading = false;
                     }, 5000);
@@ -526,7 +527,7 @@ io.on('connection', socket => {
                                     } else {
                                         let x = players[socket.id].x,
                                             y = players[socket.id].y;
-                                        notifications.push(players[socket.id] + ' was infected by Zombie comunity. He is zombie now too')
+                                        notifications.push(players[socket.id].name + ' was infected by Zombie comunity. He is zombie now too')
                                         delete players[socket.id]; //удаляем его из списка игроков
                                         socket.emit('turningIntoZombie', { x: x, y: y });
                                     }
