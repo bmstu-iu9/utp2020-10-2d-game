@@ -17,11 +17,7 @@ let players = {},
     humanCount = 0,
     zombieCount = 0,
     pills = {},
-    pillWidth = 50,
-    pillHeight = 50,
-    healthOfPill = 0.10,
     epidemicArea = new Epidemic(new Point(0, 0), 0);
-
 
 //поиск имени среди уже существующих на сервере
 function findName(name) {
@@ -163,7 +159,7 @@ io.on('connection', socket => {
                     humanCount++;
                 socket.emit('PlayTheGame', players);
                 timerOfPills = setInterval(function () {
-                    let p = new Pill(width, height, pillWidth, pillHeight, healthOfPill);
+                    let p = new Pill(width, height, Constants.PLAYER_WIDTH, Constants.PILL_HEIGHT, Constants.HEALTH_OF_PILL);
                     pills[p.x + '#' + p.y] = p;
                 }, 30000);
                 timerOfRender = setInterval(function () {
@@ -365,7 +361,7 @@ app.get('/client.js', function (req, res) {
         res.writeHead(200, { 'Content-Type': 'text/javascript' });
         res.end(code);
     })
-})
+});
 app.use('/css', express.static(`${__dirname}/css`));
 
 http.listen(3000, function () {

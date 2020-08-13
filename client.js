@@ -1,5 +1,5 @@
 'use strict'
-
+const Constants = require('./Constants.js');
 let socket = io(),
     name, //имя игрока
     role, //роль игрока(zombie или human)
@@ -12,18 +12,10 @@ let socket = io(),
     downPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения вниз(s или стреловка вниз), true - нажата, false - не нажата
     upPressed = false,//проверяет нажата ли хотя бы 1 из кнопок движения вверх(w или стреловка вверх), true - нажата, false - не нажата
     spacePressed = false,//проверяет нажат ли пробел , true - нажат, false - не нажат
-    coughWidth = 10, //длина снаряда кашя
-    coughHeight = 10, //ширина снаряда кашля
-    playerWidth = 90, //длина прямоугольника модельки человека
-    playerHeight = 90, //ширина прямоугольника модельки человека
     mouseX = 0, //X кооордината положения мыши
     mouseY = 0, //Y кооордината положения мыши
     mouseMove = false, //перемещалась ли мышь
-    mousePressed = false, //нажата ли кнопка мыши
-    bulletWidth = 10, //длина модельки пули
-    bulletHeight = 10, //ширина модельки пули
-    speedOfCough = 5, //скорость полёта кашля
-    speedOfBullet = 10; //скорость полёта пули
+    mousePressed = false; //нажата ли кнопка мыши
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
@@ -75,7 +67,7 @@ function setPlayerName() {
     width = document.documentElement.clientWidth; // ширина клиентской части окна браузера
     height = document.documentElement.clientHeight; // высота клиентской части окна браузера
     console.log('height : ', height)
-    socket.emit('setPlayerName', { role: role, name: name }, width, height, playerWidth, playerHeight);
+    socket.emit('setPlayerName', { role: role, name: name }, width, height, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
 }
 function addNewPlayer(rl) {
     role = rl;
@@ -98,25 +90,25 @@ socket.on('render', function (players, pills, epidemicArea) {
             socket.emit('newProjectile', {
                 x: players[socket.id].x + 80,
                 y: players[socket.id].y + 65,
-                projectileWidth: coughWidth,
-                projectileHeight: coughHeight,
+                projectileWidth: Constants.COUGH_WIDTH,
+                projectileHeight: Constants.COUGH_HEIGHT,
                 mouseX: mouseX,
                 mouseY: mouseY,
                 mouseMove: mouseMove,
                 type: 'cough',
-                projectileSpeed: speedOfCough
+                projectileSpeed: Constants.SPEED_OF_COUGH
             })
     } else if (mousePressed)
         socket.emit('newProjectile', {
             x: players[socket.id].x + 80,
             y: players[socket.id].y + 65,
-            projectileWidth: bulletWidth,
-            projectileHeight: bulletHeight,
+            projectileWidth: Constants.BULLET_WIDTH,
+            projectileHeight: Constants.BULLET_HEIGHT,
             mouseX: mouseX,
             mouseY: mouseY,
             mouseMove: mouseMove,
             type: 'bullet',
-            projectileSpeed: speedOfBullet
+            projectileSpeed: Constants.SPEED_OF_BULLET
         })
     drawProjectiles(players);
     drawPlayers(players);
@@ -149,13 +141,15 @@ function drawProjectiles(players) {
     for (let key in players) {
         for (let i = 0; i < players[key].projectiles.length; i++) {
             context.beginPath();
+            let px = players[key].projectiles[i].x,
+                py = players[key].projectiles[i].y;
             if (players[key].projectiles[i].type === 'cough') {
-                context.drawImage(imgs['Virus.png'], players[key].projectiles[i].x, players[key].projectiles[i].y, coughWidth, coughHeight);
+                context.drawImage(imgs['Virus.png'], px, py, Constants.COUGH_WIDTH, Constants.COUGH_HEIGHT);
                 context.fillStyle = "#dd00d9";
                 context.fill();
                 context.closePath();
             } else {
-                context.drawImage(imgs['Bullet.png'], players[key].projectiles[i].x, players[key].projectiles[i].y, bulletWidth, bulletHeight);
+                context.drawImage(imgs['Bullet.png'], px, py, Constants.BULLET_WIDTH, Constants.BULLET_HEIGHT);
                 context.fillStyle = "#dd00d9";
                 context.fill();
                 context.closePath();
@@ -188,10 +182,10 @@ function drawPlayers(players) {
         context.fillRect(x + 1 + 88 * players[key].health, y + 1, 88 * (1 - players[key].health), 6);
         y += dy;
         if (players[key].role === 'Human') {
-            context.drawImage(imgs['Human.svg'], x, y, playerWidth, playerHeight);
+            context.drawImage(imgs['Human.svg'], x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
         }
         else {
-            context.drawImage(imgs['Zombie.svg'], x, y, playerWidth, playerHeight);
+            context.drawImage(imgs['Zombie.svg'], x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
         }
         y -= 2 * dy;
         //x += dx;
@@ -234,8 +228,8 @@ socket.on('turningIntoZombie', function (coordinates) {
         name: name,
         w: width,
         h: height,
-        playerWidth: playerWidth,
-        playerHeight: playerHeight,
+        playerWidth: Constants.PLAYER_WIDTH,
+        playerHeight: Constants.PLAYER_HEIGHT,
         x: coordinates.x,
         y: coordinates.y
     });
