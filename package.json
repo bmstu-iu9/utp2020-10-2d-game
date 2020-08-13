@@ -2,7 +2,7 @@
   "name": "utp2020-10-2d-game",
   "version": "1.0.0",
   "description": "многопользовательская 2д игра",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
