@@ -147,13 +147,15 @@ function drawProjectiles(players) {
     for (let key in players) {
         for (let i = 0; i < players[key].projectiles.length; i++) {
             context.beginPath();
+            let ppx = players[key].projectiles[i].x,
+                ppy = players[key].projectiles[i].y;
             if (players[key].projectiles[i].type === 'cough') {
-                context.drawImage(imgs['Virus.png'], players[key].projectiles[i].x, players[key].projectiles[i].y, coughWidth, coughHeight);
+                context.drawImage(imgs['Virus.png'], ppx, ppy, coughWidth, coughHeight);
                 context.fillStyle = "#dd00d9";
                 context.fill();
                 context.closePath();
             } else {
-                context.drawImage(imgs['Bullet.png'], players[key].projectiles[i].x, players[key].projectiles[i].y, bulletWidth, bulletHeight);
+                context.drawImage(imgs['Bullet.png'], ppx, ppy, bulletWidth, bulletHeight);
                 context.fillStyle = "#dd00d9";
                 context.fill();
                 context.closePath();
@@ -165,8 +167,7 @@ function drawProjectiles(players) {
 function drawPlayers(players) {
     context.font = "12px Arial";
     context.fillStyle = "#0095DD";
-    let dy = 15,
-        dx = 100;
+    let dy = 15;
     for (let key in players) {
         let x = players[key].x,
             y = players[key].y + 12,
@@ -192,24 +193,10 @@ function drawPlayers(players) {
             context.drawImage(imgs['Zombie.svg'], x, y, playerWidth, playerHeight);
         }
         y -= 2 * dy;
-        //x += dx;
     }
 }
 //рисуем область вспышки эпидемии
 function drawEpidemicArea(area) {
-    /*let start = Date.now();
-    let timer = setInterval(function () {
-        //время с момента начала анимации
-        let timePassed = Date.now() - start;
-        if (timePassed >= 3000) {
-            clearInterval(timer);
-            return;
-        }
-        context.beginPath();
-        context.arc(area.o.x, area.o.y, area.radius, 0, Math.PI * 2, true);
-        context.fillStyle(rgb(4, 4, 4, 0.25));
-        context.fill();
-    })*/
     if (area.marker) {
         socket.emit('increaseEpidemicRadius', area);
         console.log('drawing epidemic area');

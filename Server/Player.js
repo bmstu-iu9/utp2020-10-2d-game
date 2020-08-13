@@ -35,7 +35,7 @@ class Player extends Rect {
             } else return false;
         }
     }
-
+    //проаерка на наличие патронов для стрельбы
     isWeaponEmpty() {
         if (this.role === 'Zombie')
             return false;
@@ -85,11 +85,12 @@ class Player extends Rect {
     getY() {
         return this.y;
     }
+
     //двигает все снаряды этого игрока
     moveProjectiles() {
         for (let i = 0; i < this.projectiles.length; i++) {
             this.projectiles[i].move();
-            if (this.projectiles[i].flewAway()) {
+            if (this.projectiles[i].flewAway()) { //удаляем, если снаряд вылетел за свою зону поражения
                 this.projectiles.splice(i, 1)
             }
         }

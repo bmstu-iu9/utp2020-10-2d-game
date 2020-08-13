@@ -39,7 +39,7 @@ class Projectile extends Rect {
         }
         return res;
     }
-
+    //перемещение снаряда по изначальной траектории(прямой startPoint и (mouseX,mouseY)
     move() {
         if (!this.mouseMove) {
             this.x += this.projectileSpeed;
