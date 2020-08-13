@@ -21,7 +21,7 @@ npm install
 
 3. Запустите сервер приложения
 ```
-node index.js
+node server.js
 ```
 
 4. Откройте в браузере страницу [localhost:3000](https://localhost:3000)
