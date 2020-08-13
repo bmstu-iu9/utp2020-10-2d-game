@@ -3,10 +3,14 @@ let Rect = require('./Rect.js');
 class Player extends Rect {
     constructor(role, name, w, h, playerWidth, playerHeight) {
         super(0, 0, playerWidth, playerHeight);
+        this.screenWidth = w;
+        this.screenHeight = h;
         this.name = name;
         this.role = role;
         this.projectiles = [];
         this.health = 1.00;
+        this.dx = 3;
+        this.dy = 3;
         if (role === 'Human') {
             this.typeOfWeapon = 'pistol'; //тип оружия
             this.countOfBulletInWeapon = 5; //текущее количесьтво пуль в оружии
@@ -51,19 +55,27 @@ class Player extends Rect {
     }
 
     moveDown() {
-        this.y += 3;
+        if (this.y + 120 < this.screenHeight) {
+            this.y += this.dy;
+        }
     }
 
     moveUp() {
-        this.y -= 3;
+        if (this.y > 0) {
+            this.y -= this.dy;
+        }
     }
 
     moveLeft() {
-        this.x -= 3;
+        if (this.x > 0) {
+            this.x -= this.dx;
+        }
     }
 
     moveRight() {
-        this.x += 3;
+        if (this.x + 90 < this.screenWidth) {
+            this.x += this.dx;
+        }
     }
 
     getX() {
