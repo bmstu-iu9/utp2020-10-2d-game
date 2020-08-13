@@ -2,17 +2,6 @@ const Rect = require('./Rect.js');
 const Point = require('./Point.js');
 const Constants = require('../Constants.js');
 //класс снаряда
-function findPoint(x1, y1, x2, y2, dist) {
-    let modulYMinusY1 = Math.sqrt(dist * (y2 - y1) * (y2 - y1) / ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))),
-        firstY = modulYMinusY1 + y1,
-        firstX = (firstY - y1) * (x2 - x1) / (y2 - y1) + x1,
-        secondY = y1 - modulYMinusY1,
-        secondX = (secondY - y1) * (x2 - x1) / (y2 - y1) + x1;
-    return {
-        firstPoint: new Point(Math.round(firstX), Math.round(firstY)),
-        secondPoint: new Point(Math.round(secondX), Math.round(secondY))
-    };
-}
 class Projectile extends Rect {
     constructor(x, y, projectileWidth, projectileHeight, mouseX, mouseY, mouseMove, type, projectileSpeed, damage) {
         super(x, y, projectileWidth, projectileHeight);
@@ -22,8 +11,7 @@ class Projectile extends Rect {
         this.type = type;
         if (type === 'cough') {
             this.flightDistance = Constants.COUGH_FLIGHT_DISTANCE;
-        }
-        else {
+        } else {
             this.flightDistance = Constants.BULLET_FLIGHT_DISTANCE;
         }
         this.projectileSpeed = projectileSpeed; //скорость снаряда
@@ -39,6 +27,7 @@ class Projectile extends Rect {
         }
         return res;
     }
+
     //перемещение снаряда по изначальной траектории(прямой startPoint и (mouseX,mouseY)
     move() {
         if (!this.mouseMove) {
@@ -58,6 +47,7 @@ class Projectile extends Rect {
             }
         }
     }
+
     //проверка улетел ли снаряд на свой радиус поражения
     flewAway() {
         return this.startPoint.findDist(new Point(this.x, this.y)) > this.flightDistance;
