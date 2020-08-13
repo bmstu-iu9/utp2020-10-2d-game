@@ -49,5 +49,29 @@ class Player extends Rect {
         if (this.health < 0)
             this.health = 0;
     }
+
+    moveDown() {
+        this.y += 3;
+    }
+
+    moveUp() {
+        this.y -= 3;
+    }
+
+    moveLeft() {
+        this.x -= 3;
+    }
+
+    moveRight() {
+        this.x += 3;
+    }
+
+    getX() {
+        return this.x;
+    }
+
+    getY() {
+        return this.y;
+    }
 }
 module.exports = Player;

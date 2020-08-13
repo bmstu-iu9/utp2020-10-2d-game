@@ -157,6 +157,8 @@ io.on('connection', socket => {
         } else {
             if (findName(player.name) === 0) { //проверяем есть ли игок с таким ником
                 players[socket.id] = new Player(player.role, player.name, width, height, playerWidth, playerHeight);
+                screenHeight = height;
+                screenWidth = width;
                 console.log('a new player ' + player.name + ' is ' + player.role);
                 if (player.role === 'Zombie')
                     zombieCount++;
@@ -180,14 +182,14 @@ io.on('connection', socket => {
             } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
         }
     });
-    socket.on('increaseEpidemicRadius', function(){
+    socket.on('increaseEpidemicRadius', function () {
         epidemicArea.increaseRadius();
     })
     socket.on('moveDown', function () {
         let errorName = socket.id;
         try {
-            if (players[socket.id].y + 120 < screenHeight) {
-                players[socket.id].y += 2;
+            if (players[socket.id].getY() + 120 < screenHeight) {
+                players[socket.id].moveDown();
             }
         }
         catch (error) {
@@ -199,8 +201,8 @@ io.on('connection', socket => {
     socket.on('moveLeft', function () {
         let errorName = socket.id;
         try {
-            if (players[socket.id].x > 0) {
-                players[socket.id].x -= 2;
+            if (players[socket.id].getX() > 0) {
+                players[socket.id].moveLeft();
             }
         }
         catch (error) {
@@ -213,7 +215,7 @@ io.on('connection', socket => {
         let errorName = socket.id;
         try {
             if (players[socket.id].y > 0) {
-                players[socket.id].y -= 2;
+                players[socket.id].moveUp();
             }
         }
         catch (error) {
@@ -226,7 +228,7 @@ io.on('connection', socket => {
         let errorName = socket.id;
         try {
             if (players[socket.id].x + 90 < screenWidth) {
-                players[socket.id].x += 2;
+                players[socket.id].moveRight();
             }
         }
         catch (error) {
