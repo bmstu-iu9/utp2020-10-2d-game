@@ -26,10 +26,6 @@ function findName(name) {
             return 1;
     return 0;
 }
-//нахождение расстояние между 2 точками в прямоугольной декартовой системе на плоскости
-function findDist(fP, sP) {
-    return Math.round(Math.sqrt((sP.x - fP.x) * (sP.x - fP.x) + (sP.y - fP.y) * (sP.y - fP.y)));
-}
 //находит пару точек (x,y), которые лежат на расстоянии sqrt(dist) от (x1,y1) и принадлежат прямой (x1,y1) (x2,y2)
 function findPoint(x1, y1, x2, y2, dist) {
     let modulYMinusY1 = Math.sqrt(dist * (y2 - y1) * (y2 - y1) / ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))),
@@ -125,14 +121,21 @@ io.on('connection', socket => {
                     pills[p.x + '#' + p.y] = p;
                 }, 30000);
                 timerOfRender = setInterval(function () {
-                    collisionWithPills();
-                    players[socket.id].moveProjectiles();
-                    collisionWithProjectile();
-                    socket.emit('render', players, pills, epidemicArea);
-                    if (!epidemicArea.coordinateFixed)
-                        outbreak();
-                    else if (epidemicArea.marker)
-                        collisionWithEpidemicArea(socket);
+                    try {
+                        collisionWithPills();
+                        players[socket.id].moveProjectiles();
+                        collisionWithProjectile();
+                        socket.emit('render', players, pills, epidemicArea);
+                        if (!epidemicArea.coordinateFixed)
+                            outbreak();
+                        else if (epidemicArea.marker)
+                            collisionWithEpidemicArea(socket);
+                    }
+                    catch (error) {
+                        if (socket.id in players)
+                            throw new error;
+                        else console.log("disconnect")
+                    }
                 }, 20);
             } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
         }
@@ -208,8 +211,8 @@ io.on('connection', socket => {
                             (player.h * player.h + player.w * player.w) / 4),
                         fP = points.firstPoint,
                         sP = points.secondPoint;
-                    if (findDist(new Point(projectile.mouseX, projectile.mouseY), fP)
-                        > findDist(new Point(projectile.mouseX, projectile.mouseY), sP)) {
+                    if (new Point(projectile.mouseX, projectile.mouseY).findDist(fP)
+                        > new Point(projectile.mouseX, projectile.mouseY).findDist(sP)) {
                         let pr = new Projectile();
                         players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
                             x: sP.x,

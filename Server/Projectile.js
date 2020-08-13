@@ -13,9 +13,6 @@ function findPoint(x1, y1, x2, y2, dist) {
         secondPoint: new Point(Math.round(secondX), Math.round(secondY))
     };
 }
-function findDist(fP, sP) {
-    return Math.round(Math.sqrt((sP.x - fP.x) * (sP.x - fP.x) + (sP.y - fP.y) * (sP.y - fP.y)));
-}
 class Projectile extends Rect {
     constructor(x, y, projectileWidth, projectileHeight, mouseX, mouseY, mouseMove, type, projectileSpeed, damage) {
         super(x, y, projectileWidth, projectileHeight);
@@ -50,8 +47,8 @@ class Projectile extends Rect {
             let points = findPoint(this.x, this.y, this.mouseX, this.mouseY, Math.pow(this.projectileSpeed, 2)),
                 fP = points.firstPoint,
                 sP = points.secondPoint,
-                fDist = findDist(this.startPoint, fP),
-                sDist = findDist(this.startPoint, sP);
+                fDist = this.startPoint.findDist(fP),
+                sDist = this.startPoint.findDist(sP);
             if (fDist > sDist) {
                 this.x = fP.x;
                 this.y = fP.y;
@@ -61,9 +58,9 @@ class Projectile extends Rect {
             }
         }
     }
-
+    //проверка улетел ли снаряд на свой радиус поражения
     flewAway() {
-        return findDist(this.startPoint, new Point(this.x, this.y)) > this.flightDistance;
+        return this.startPoint.findDist(new Point(this.x, this.y)) > this.flightDistance;
     }
 }
 module.exports = Projectile;

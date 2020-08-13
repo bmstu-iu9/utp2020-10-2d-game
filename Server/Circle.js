@@ -1,8 +1,5 @@
 let Point = require('./Point.js');
 //класс для круговых объектов, используется как родительский
-function findDist(fP, sP) {
-    return Math.round(Math.sqrt((sP.x - fP.x) * (sP.x - fP.x) + (sP.y - fP.y) * (sP.y - fP.y)));
-}
 class Circle {
     constructor(o, r) {
         this.o = o;
@@ -12,11 +9,11 @@ class Circle {
     //проверка пересекает ли отрезок окружность this
     intersect(x1, y1, x2, y2) {
         //отрезок параллелен одной из сторон экрана
-        let s1 = findDist(new Point(x1, y1), new Point(this.o.x, this.o.y)),
-            s2 = findDist(new Point(x2, y2), new Point(this.o.x, this.o.y));
+        let s1 = new Point(x1, y1).findDist(new Point(this.o.x, this.o.y)),
+            s2 = new Point(x2, y2).findDist(new Point(this.o.x, this.o.y));
         if (s1 <= this.radius || s2 <= this.radius)
             return true;
-        else if ((x1 == x2 && x1 - this.o.x <= this.radius) ||
+        else if ((x1 === x2 && x1 - this.o.x <= this.radius) ||
             (y1 = y2 && y1 - this.o.x <= this.radius))
             return true;
         return false;
