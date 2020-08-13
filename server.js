@@ -26,18 +26,6 @@ function findName(name) {
             return 1;
     return 0;
 }
-//находит пару точек (x,y), которые лежат на расстоянии sqrt(dist) от (x1,y1) и принадлежат прямой (x1,y1) (x2,y2)
-function findPoint(x1, y1, x2, y2, dist) {
-    let modulYMinusY1 = Math.sqrt(dist * (y2 - y1) * (y2 - y1) / ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))),
-        firstY = modulYMinusY1 + y1,
-        firstX = (firstY - y1) * (x2 - x1) / (y2 - y1) + x1,
-        secondY = y1 - modulYMinusY1,
-        secondX = (secondY - y1) * (x2 - x1) / (y2 - y1) + x1;
-    return {
-        firstPoint: new Point(Math.round(firstX), Math.round(firstY)),
-        secondPoint: new Point(Math.round(secondX), Math.round(secondY))
-    };
-}
 
 //проверка, что людей становится слишком много
 function demographicImbalance() {
@@ -204,10 +192,8 @@ io.on('connection', socket => {
                     }));
                 } else {
                     let player = players[socket.id],
-                        points = findPoint(player.x + player.w / 2,
-                            player.y + player.h / 2,
-                            projectile.mouseX,
-                            projectile.mouseY,
+                        points = new Point(player.x + player.w / 2, player.y + player.h / 2).findPoint(
+                            new Point(projectile.mouseX, projectile.mouseY),
                             (player.h * player.h + player.w * player.w) / 4),
                         fP = points.firstPoint,
                         sP = points.secondPoint;
