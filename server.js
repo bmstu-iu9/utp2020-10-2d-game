@@ -35,30 +35,7 @@ function moveProjectile(socket) {
     let i = 0, errorName = socket.id;
     try {
         while (i < players[socket.id].projectiles.length) {
-            let projectile = players[socket.id].projectiles[i],
-                player = players[socket.id],
-                dist = projectile.projectileSpeed;
-            if (!projectile.mouseMove) {
-                if (players[socket.id].x + 200 < players[socket.id].projectiles[i].x + dist) {
-                    players[socket.id].projectiles.splice(i, 1);
-                    --i;
-                } else players[socket.id].projectiles[i].x += dist;
-            } else {
-                let points = findPoint(projectile.x, projectile.y, projectile.mouseX, projectile.mouseY, dist * dist),
-                    fP = points.firstPoint,
-                    sP = points.secondPoint,
-                    fDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), fP),
-                    sDist = findDist(new Point(player.x + player.w / 2, player.y + player.h / 2), sP);
-                if (fDist > sDist)
-                    if (fDist < player.projectileFlightDistance) {
-                        players[socket.id].projectiles[i].x = fP.x;
-                        players[socket.id].projectiles[i].y = fP.y;
-                    } else players[socket.id].projectiles.splice(i, 1);
-                else if (sDist < player.projectileFlightDistance) {
-                    players[socket.id].projectiles[i].x = sP.x;
-                    players[socket.id].projectiles[i].y = sP.y;
-                } else players[socket.id].projectiles.splice(i, 1);
-            }
+            players[socket.id].projectiles[i].move();
             ++i;
         }
     } catch (error) {
@@ -233,7 +210,10 @@ io.on('connection', socket => {
                 players[socket.id].shoot();
                 if (!projectile.mouseMove) {
                     let pr = new Projectile();
-                    players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({damage: players[socket.id].projectileDamage}));
+                    players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
+                        damage: players[socket.id].projectileDamage,
+                        startPoint: new Point(player.x + Constants.PILL_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2)
+                    }));
                 } else {
                     let player = players[socket.id],
                         points = findPoint(player.x + player.w / 2,
@@ -249,14 +229,16 @@ io.on('connection', socket => {
                         players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
                             x: sP.x,
                             y: sP.y,
-                            damage: player.projectileDamage
+                            damage: player.projectileDamage,
+                            startPoint: new Point(player.x + Constants.PILL_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2)
                         }));
                     } else {
                         let pr = new Projectile();
                         players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
                             x: fP.x,
                             y: fP.y,
-                            damage: player.projectileDamage
+                            damage: player.projectileDamage,
+                            startPoint: new Point(player.x + Constants.PILL_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2)
                         }));
                     }
                 }
