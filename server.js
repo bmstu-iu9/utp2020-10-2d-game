@@ -11,7 +11,8 @@ const express = require('express'),
     Epidemic = require('./Server/Epidemic.js'),
     Point = require('./Server/Point.js'),
     Pill = require('./Server/Pill.js'),
-    Projectile = require('./Server/Projectile.js');
+    Projectile = require('./Server/Projectile.js'),
+    Constants = require('./Constants.js');
 let players = {},
     humanCount = 0,
     zombieCount = 0,
@@ -236,7 +237,7 @@ io.on('connection', socket => {
                 players[socket.id].shoot();
                 if (!projectile.mouseMove) {
                     let pr = new Projectile();
-                    players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({ damage: players[socket.id].projectileDamage }));
+                    players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({damage: players[socket.id].projectileDamage}));
                 } else {
                     let player = players[socket.id],
                         points = findPoint(player.x + player.w / 2,
@@ -318,23 +319,20 @@ io.on('connection', socket => {
                                         let x = players[socket.id].x,
                                             y = players[socket.id].y;
                                         delete players[socket.id]; //удаляем его из списка игроков
-                                        socket.emit('turningIntoZombie', { x: x, y: y });
+                                        socket.emit('turningIntoZombie', {x: x, y: y});
                                     }
                                 }
                             }
                         }
                     }
-                }
-                catch (error) {
+                } catch (error) {
                     if (errorName in players) {
                         errorName = socket.id;
                         throw new error;
-                    }
-                    else console.log("Player disconnected in collisionWithProjectile");
+                    } else console.log("Player disconnected in collisionWithProjectile");
                 }
             }
-        }
-        catch (error) {
+        } catch (error) {
             if (errorName in players)
                 throw new error;
             else console.log("Player disconnected in collisionWithProjectile");
@@ -351,8 +349,7 @@ io.on('connection', socket => {
                     players[socket.id].increaseHealth(pills[i].health);
                     delete pills[i];
                 }
-        }
-        catch (error) {
+        } catch (error) {
             if (errorName in players)
                 throw new error;
             else console.log("Player disconnected in collisionWithPills");

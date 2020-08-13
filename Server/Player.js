@@ -1,4 +1,5 @@
-let Rect = require('./Rect.js');
+const Rect = require('./Rect.js');
+const Constants = require('../Constants')
 //класс игрока
 class Player extends Rect {
     constructor(role, name, w, h, playerWidth, playerHeight) {
@@ -8,7 +9,6 @@ class Player extends Rect {
         this.name = name;
         this.role = role;
         this.projectiles = [];
-        this.health = 1.00;
         this.dx = 3;
         this.dy = 3;
         if (role === 'Human') {
@@ -18,7 +18,9 @@ class Player extends Rect {
             this.reloading = false; //показывает находится ли оружие в процессе перезарядки
             this.projectileDamage = 0.10; //урон от пули из оружие игрока
             this.projectileFlightDistance = 400; //дальность полёта пули из оружия игрока
+            this.health = Constants.HUMAN_MAX_HEALTH;
         } else {
+            this.health = Constants.ZOMBIE_MAX_HEALTH;
             this.projectileDamage = 0.05;  //урон от пули из оружие игрока
             this.typeOfWeapon = 'cough'; //тип оружия
             this.projectileFlightDistance = 200; //дальность полёта пули из оружия игрока
@@ -85,5 +87,6 @@ class Player extends Rect {
     getY() {
         return this.y;
     }
+
 }
 module.exports = Player;
