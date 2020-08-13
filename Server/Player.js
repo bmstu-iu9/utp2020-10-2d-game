@@ -17,13 +17,11 @@ class Player extends Rect {
             this.weaponCapacity = 5; //максимальная ёмкость в обойме
             this.reloading = false; //показывает находится ли оружие в процессе перезарядки
             this.projectileDamage = 0.10; //урон от пули из оружие игрока
-            this.projectileFlightDistance = 400; //дальность полёта пули из оружия игрока
             this.health = Constants.HUMAN_MAX_HEALTH;
         } else {
             this.health = Constants.ZOMBIE_MAX_HEALTH;
             this.projectileDamage = 0.05;  //урон от пули из оружие игрока
             this.typeOfWeapon = 'cough'; //тип оружия
-            this.projectileFlightDistance = 200; //дальность полёта пули из оружия игрока
         }
     }
 
@@ -86,6 +84,15 @@ class Player extends Rect {
 
     getY() {
         return this.y;
+    }
+    //двигает все снаряды этого игрока
+    moveProjectiles() {
+        for (let i = 0; i < this.projectiles.length; i++) {
+            this.projectiles[i].move();
+            if (this.projectiles[i].flewAway()) {
+                this.projectiles.splice(i, 1)
+            }
+        }
     }
 
 }

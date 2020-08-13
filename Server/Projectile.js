@@ -23,6 +23,12 @@ class Projectile extends Rect {
         this.mouseY = mouseY; //используяются для определения траектории полёта снаряда
         this.mouseMove = mouseMove;
         this.type = type;
+        if (type === 'cough') {
+            this.flightDistance = Constants.COUGH_FLIGHT_DISTANCE;
+        }
+        else {
+            this.flightDistance = Constants.BULLET_FLIGHT_DISTANCE;
+        }
         this.projectileSpeed = projectileSpeed; //скорость снаряда
         this.damage = damage; //урон от попадание этим снарядом
     }
@@ -46,17 +52,18 @@ class Projectile extends Rect {
                 sP = points.secondPoint,
                 fDist = findDist(this.startPoint, fP),
                 sDist = findDist(this.startPoint, sP);
-            console.log("fP: " + fP.x + " " + fP.y + "; sP: " + sP.x + " " + sP.y + "\n");
             if (fDist > sDist) {
-                console.log("FP")
                 this.x = fP.x;
                 this.y = fP.y;
             } else {
-                console.log("SP");
                 this.x = sP.x;
                 this.y = sP.y;
             }
         }
+    }
+
+    flewAway() {
+        return findDist(this.startPoint, new Point(this.x, this.y)) > this.flightDistance;
     }
 }
 module.exports = Projectile;

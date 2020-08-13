@@ -30,21 +30,6 @@ function findName(name) {
 function findDist(fP, sP) {
     return Math.round(Math.sqrt((sP.x - fP.x) * (sP.x - fP.x) + (sP.y - fP.y) * (sP.y - fP.y)));
 }
-//движение снарядов
-function moveProjectile(socket) {
-    let i = 0, errorName = socket.id;
-    try {
-        while (i < players[socket.id].projectiles.length) {
-            players[socket.id].projectiles[i].move();
-            ++i;
-        }
-    } catch (error) {
-        if (errorName in players)
-            throw new error;
-        else console.log("Player disconnected in moveProjectile");
-    }
-}
-
 //находит пару точек (x,y), которые лежат на расстоянии sqrt(dist) от (x1,y1) и принадлежат прямой (x1,y1) (x2,y2)
 function findPoint(x1, y1, x2, y2, dist) {
     let modulYMinusY1 = Math.sqrt(dist * (y2 - y1) * (y2 - y1) / ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))),
@@ -141,7 +126,7 @@ io.on('connection', socket => {
                 }, 30000);
                 timerOfRender = setInterval(function () {
                     collisionWithPills();
-                    moveProjectile(socket);
+                    players[socket.id].moveProjectiles();
                     collisionWithProjectile();
                     socket.emit('render', players, pills, epidemicArea);
                     if (!epidemicArea.coordinateFixed)
@@ -212,7 +197,7 @@ io.on('connection', socket => {
                     let pr = new Projectile();
                     players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
                         damage: players[socket.id].projectileDamage,
-                        startPoint: new Point(player.x + Constants.PILL_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2)
+                        startPoint: new Point(players[socket.id].x + Constants.PLAYER_WIDTH / 2, players[socket.id].y + Constants.PLAYER_HEIGHT / 2)
                     }));
                 } else {
                     let player = players[socket.id],
@@ -238,7 +223,7 @@ io.on('connection', socket => {
                             x: fP.x,
                             y: fP.y,
                             damage: player.projectileDamage,
-                            startPoint: new Point(player.x + Constants.PILL_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2)
+                            startPoint: new Point(player.x + Constants.PLAYER_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2)
                         }));
                     }
                 }
