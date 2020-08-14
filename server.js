@@ -192,7 +192,7 @@ io.on('connection', socket => {
                     }));
                 } else {
                     let player = players[socket.id],
-                        points = new Point(player.x + player.w / 2, player.y + player.h / 2).findPoint(
+                        points = (new Point(player.x + player.w / 2, player.y + player.h / 2)).findPoints(
                             new Point(projectile.mouseX, projectile.mouseY),
                             (player.h * player.h + player.w * player.w) / 4),
                         fP = points.firstPoint,

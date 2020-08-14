@@ -9,12 +9,16 @@ class Point {
         return Math.round(Math.sqrt((sP.x - this.x) * (sP.x - this.x) + (sP.y - this.y) * (sP.y - this.y)));
     }
     //находит пару точек (x,y), которые лежат на расстоянии sqrt(dist) от this и принадлежат прямой this p
-    findPoint(p, dist) {
-        let modulYMinusY1 = Math.sqrt(dist * (p.y - this.y) * (p.y - this.y) / ((p.x - this.x) * (p.x - this.x) + (p.x - this.y) * (p.y - this.y))),
-            firstY = modulYMinusY1 + this.y,
-            firstX = (firstY - this.y) * (p.x - this.x) / (p.y - this.y) + this.x,
-            secondY = this.y - modulYMinusY1,
-            secondX = (secondY - this.y) * (p.x - this.x) / (p.y - this.y) + this.x;
+    findPoints(p, dist) {
+        const x1 = this.x,
+            y1 = this.y,
+            x2 = p.x,
+            y2 = p.y;
+        let modulYMinusY1 = Math.sqrt(dist * (y2 - y1) * (y2 - y1) / ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))),
+            firstY = modulYMinusY1 + y1,
+            firstX = (firstY - y1) * (x2 - x1) / (y2 - y1) + x1,
+            secondY = y1 - modulYMinusY1,
+            secondX = (secondY - y1) * (x2 - x1) / (y2 - y1) + x1;
         return {
             firstPoint: new Point(Math.round(firstX), Math.round(firstY)),
             secondPoint: new Point(Math.round(secondX), Math.round(secondY))

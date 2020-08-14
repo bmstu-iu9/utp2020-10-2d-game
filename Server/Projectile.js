@@ -33,7 +33,7 @@ class Projectile extends Rect {
         if (!this.mouseMove) {
             this.x += this.projectileSpeed;
         } else {
-            let points = new Point(this.x, this.y).findPoint(new Point(this.mouseX, this.mouseY), Math.pow(this.projectileSpeed, 2)),
+            let points = (new Point(this.x, this.y)).findPoints(new Point(this.mouseX, this.mouseY), Math.pow(this.projectileSpeed, 2)),
                 fP = points.firstPoint,
                 sP = points.secondPoint,
                 fDist = this.startPoint.findDist(fP),
