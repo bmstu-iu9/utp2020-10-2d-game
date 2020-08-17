@@ -22,6 +22,6 @@ module.exports = Object.freeze({
         'Bullet.png' //пуля
     ],
     STATE_UPDATE: 'update',
-    PLAYER_ACTION: 'playerAction';
-
+    PLAYER_ACTION: 'playerAction',
+    PLAY: 'playTheGame'
 })

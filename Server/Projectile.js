@@ -9,6 +9,7 @@ class Projectile extends Rect {
         this.mouseY = mouseY; //используяются для определения траектории полёта снаряда
         this.mouseMove = mouseMove;
         this.type = type;
+        this.exist = true;
         if (type === 'cough') {
             this.flightDistance = Constants.COUGH_FLIGHT_DISTANCE;
         } else {
@@ -51,6 +52,11 @@ class Projectile extends Rect {
     //проверка улетел ли снаряд на свой радиус поражения
     flewAway() {
         return this.startPoint.findDist(new Point(this.x, this.y)) > this.flightDistance;
+    }
+
+    //существует ли снаряд
+    isExist() {
+        return this.exist;
     }
 }
 module.exports = Projectile;

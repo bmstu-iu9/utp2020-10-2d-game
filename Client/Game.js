@@ -39,17 +39,16 @@ class Game {
             });
         }
         Promise.all(Constants.IMG_NAMES.map(downloadImage)).then(() => console.log('All images downloaded'));
-        this.render.loadImgs(imgs);
+        this.render.loadImgs(this.imgs);
     }
 
     start(context) {
-        let cutTime = Date.now();
-        this.dt = curTime - this.lastUpdateTime;
-        this.lastUpdateTime = cutTime;
+        this.dt = Date.now() - this.lastUpdateTime;
+        this.lastUpdateTime = Date.now();
 
         this.update();
-        this.getState();
-        this.render(context);
+        this.socket.on(Constants.STATE_UPDATE, this.getState.bind(this));
+        this.renderGame(context);
 
         this.animationFrameId =  window.requestAnimationFrame(this.start().bind(this));
     }
@@ -67,6 +66,7 @@ class Game {
         this.me = state.me;
         this.players = state.players;
         this.pills = state.pills;
+        this.area = state.area;
     }
 
     update(){
@@ -84,12 +84,12 @@ class Game {
         }
     }
 
-    render(context){
+    renderGame(context){
         this.render.clear(context);
         this.render.drawProjectiles(context, this.players);
         this.render.drawPlayers(context, this.players);
         this.render.drawPills(context, this.pills);
-        this.render.drawEpidemicArea(context, this.area);
+        //this.render.drawEpidemicArea(context, this.area);
     }
 }
 

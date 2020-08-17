@@ -1,5 +1,5 @@
 'use strict'
-const Constants = require('./Constants.js');
+
 let socket = io(),
     name, //имя игрока
     role, //роль игрока(zombie или human)
@@ -21,7 +21,9 @@ let socket = io(),
     mouseMove = false, //перемещалась ли мышь
     mousePressed = false, //нажата ли кнопка мыши
     bulletWidth = 10, //длина модельки пули
-    bulletHeight = 10; //ширина модельки пули
+    bulletHeight = 10, //ширина модельки пули
+    speedOfCough = 5, //скорость полёта кашля
+    speedOfBullet = 10; //скорость полёта пули
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
@@ -78,24 +80,87 @@ function setPlayerName() {
 function addNewPlayer(rl) {
     role = rl;
     document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
-          <button type = "button" id = "addNewPlayer">Set name</button>'
+          <button type = "button" name = "button" onclick = "setPlayerName()">Set name</button>'
 }
+<<<<<<< HEAD
 
 
+=======
+//рисовка экрана пользователя
+socket.on('render', function (players, pills, epidemicArea) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    if (leftPressed)
+        socket.emit('moveLeft');
+    if (rightPressed)
+        socket.emit('moveRight');
+    if (upPressed)
+        socket.emit('moveUp');
+    if (downPressed)
+        socket.emit('moveDown');
+    if (role === "Zombie") {
+        if (mousePressed)
+            socket.emit('newProjectile', {
+                x: players[socket.id].x + 80,
+                y: players[socket.id].y + 65,
+                projectileWidth: coughWidth,
+                projectileHeight: coughHeight,
+                mouseX: mouseX,
+                mouseY: mouseY,
+                mouseMove: mouseMove,
+                type: 'cough',
+                projectileSpeed: speedOfCough
+            })
+    } else if (mousePressed)
+        socket.emit('newProjectile', {
+            x: players[socket.id].x + 80,
+            y: players[socket.id].y + 65,
+            projectileWidth: bulletWidth,
+            projectileHeight: bulletHeight,
+            mouseX: mouseX,
+            mouseY: mouseY,
+            mouseMove: mouseMove,
+            type: 'bullet',
+            projectileSpeed: speedOfBullet
+        })
+    drawProjectiles(players);
+    drawPlayers(players);
+    drawPills(pills);
+    drawEpidemicArea(epidemicArea);
+})
+//скачиваем все нужные изображения в объект imgs для быстрого доступа
+const IMG_NAMES = [
+    'Zombie.svg', //Zombie
+    'Human.svg', //Human
+    'Virus.png',//моделька снарядов - кашля
+    'medicinedrawn.svg',
+    'Bullet.png'
+];
+const imgs = {};
+function downloadImage(imageName) {
+    return new Promise(resolve => {
+        const img = new Image();
+        img.src = `/css/${imageName}`;
+        img.onload = () => {
+            console.log(`Downloaded ${imageName}`);
+            imgs[imageName] = img;
+            resolve();
+        };
+    });
+}
+Promise.all(IMG_NAMES.map(downloadImage)).then(() => console.log('All images downloaded'));
+>>>>>>> f5caca7accd7c8effad56d07dde1aa418c0f1d20
 //рисуем снаряды - "кашель"
 function drawProjectiles(players) {
     for (let key in players) {
         for (let i = 0; i < players[key].projectiles.length; i++) {
             context.beginPath();
-            let ppx = players[key].projectiles[i].x,
-                ppy = players[key].projectiles[i].y;
             if (players[key].projectiles[i].type === 'cough') {
-                context.drawImage(imgs['Virus.png'], ppx, ppy, coughWidth, coughHeight);
+                context.drawImage(imgs['Virus.png'], players[key].projectiles[i].x, players[key].projectiles[i].y, coughWidth, coughHeight);
                 context.fillStyle = "#dd00d9";
                 context.fill();
                 context.closePath();
             } else {
-                context.drawImage(imgs['Bullet.png'], ppx, ppy, bulletWidth, bulletHeight);
+                context.drawImage(imgs['Bullet.png'], players[key].projectiles[i].x, players[key].projectiles[i].y, bulletWidth, bulletHeight);
                 context.fillStyle = "#dd00d9";
                 context.fill();
                 context.closePath();
@@ -107,7 +172,8 @@ function drawProjectiles(players) {
 function drawPlayers(players) {
     context.font = "12px Arial";
     context.fillStyle = "#0095DD";
-    let dy = 15;
+    let dy = 15,
+        dx = 100;
     for (let key in players) {
         let x = players[key].x,
             y = players[key].y + 12,
@@ -133,10 +199,24 @@ function drawPlayers(players) {
             context.drawImage(imgs['Zombie.svg'], x, y, playerWidth, playerHeight);
         }
         y -= 2 * dy;
+        //x += dx;
     }
 }
 //рисуем область вспышки эпидемии
 function drawEpidemicArea(area) {
+    /*let start = Date.now();
+    let timer = setInterval(function () {
+        //время с момента начала анимации
+        let timePassed = Date.now() - start;
+        if (timePassed >= 3000) {
+            clearInterval(timer);
+            return;
+        }
+        context.beginPath();
+        context.arc(area.o.x, area.o.y, area.radius, 0, Math.PI * 2, true);
+        context.fillStyle(rgb(4, 4, 4, 0.25));
+        context.fill();
+    })*/
     if (area.marker) {
         socket.emit('increaseEpidemicRadius', area);
         console.log('drawing epidemic area');
@@ -176,7 +256,7 @@ socket.on('invalidNickname', function (data) {//если ник некоррек
     console.log(data);
     document.getElementById('nameError').innerHTML = data;
 })
-socket.on('PlayTheGame', function (players) {
+socket.on('PlayTheGame', function () {
     document.body.innerHTML = '<canvas id = "game-canvas"></canvas>';
     canvas = document.getElementById('game-canvas');
     context = canvas.getContext('2d');
