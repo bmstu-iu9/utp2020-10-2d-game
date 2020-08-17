@@ -26,9 +26,12 @@ $(document).ready(() => {
             })
             socket.on(Constants.PLAY, function () {
                 document.body.innerHTML = '<canvas id = "game-canvas"></canvas>';
-                canvas = document.getElementById('game-canvas');
-                context = canvas.getContext('2d');
-                game.start(context);
+                const canvas = document.getElementById('game-canvas');
+                const context = canvas.getContext('2d');
+                game.start(canvas,context);
+                setTimeout(function () {
+                    game.stop()
+                },20000);
             })
         })
     }

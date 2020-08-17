@@ -14,7 +14,7 @@ class Render {
         this.imgs = Object.assign({}, imgs);
     }
 
-    clear(context) {
+    clear(canvas, context) {
         context.clearRect(0, 0, canvas.width, canvas.height);
     }
 
@@ -26,13 +26,13 @@ class Render {
                     ppy = players[key].projectiles[i].y;
                 if (players[key].projectiles[i].type === 'cough') {
                     context.drawImage(this.imgs['Virus.png'], ppx, ppy,
-                     Constants.COUGH_WIDTH, Constants.COUGH_HEIGHT);
+                        Constants.COUGH_WIDTH, Constants.COUGH_HEIGHT);
                     context.fillStyle = "#dd00d9";
                     context.fill();
                     context.closePath();
                 } else {
                     context.drawImage(this.imgs['Bullet.png'], ppx, ppy,
-                    Constants.BULLET_WIDTH, Constants.BULLET_HEIGHT);
+                        Constants.BULLET_WIDTH, Constants.BULLET_HEIGHT);
                     context.fillStyle = "#dd00d9";
                     context.fill();
                     context.closePath();
@@ -51,8 +51,7 @@ class Render {
                 text = context.measureText(players[key].name);
             if (text.width < 90) {
                 context.fillText(players[key].name, x + (90 - text.width) / 2, y, 90);
-            }
-            else {
+            } else {
                 context.fillText(players[key].name, x, y, 90);
             }
             y += dy;
@@ -65,11 +64,10 @@ class Render {
             y += dy;
             if (players[key].role === 'Human') {
                 context.drawImage(this.imgs['Human.svg'], x, y,
-                Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
-            }
-            else {
+                    Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+            } else {
                 context.drawImage(this.imgs['Zombie.svg'], x, y,
-                Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+                    Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
             }
             y -= 2 * dy;
         }
@@ -78,7 +76,7 @@ class Render {
     drawPills(context, pills) {
         for (let i in pills) {
             context.drawImage(this.imgs['medicinedrawn.svg'], pills[i].x, pills[i].y,
-            Constants.PILL_WIDTH, Constants.PILL_HEIGHT);
+                Constants.PILL_WIDTH, Constants.PILL_HEIGHT);
         }
     }
 

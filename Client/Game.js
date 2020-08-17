@@ -42,15 +42,15 @@ class Game {
         this.render.loadImgs(this.imgs);
     }
 
-    start(context) {
+    start(canvas,context) {
         this.dt = Date.now() - this.lastUpdateTime;
         this.lastUpdateTime = Date.now();
 
         this.update();
         this.socket.on(Constants.STATE_UPDATE, this.getState.bind(this));
-        this.renderGame(context);
+        this.renderGame(canvas,context);
 
-        this.animationFrameId =  window.requestAnimationFrame(this.start().bind(this));
+        this.animationFrameId =  window.requestAnimationFrame(this.start(canvas,context).bind(this));
     }
 
     stop(){
@@ -84,8 +84,8 @@ class Game {
         }
     }
 
-    renderGame(context){
-        this.render.clear(context);
+    renderGame(canvas,context){
+        this.render.clear(canvas,context);
         this.render.drawProjectiles(context, this.players);
         this.render.drawPlayers(context, this.players);
         this.render.drawPills(context, this.pills);
