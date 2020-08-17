@@ -11,6 +11,7 @@ class Player extends Rect {
         this.projectiles = [];
         this.dx = 3;
         this.dy = 3;
+        this.alive = true;
         if (role === 'Human') {
             this.typeOfWeapon = 'pistol'; //тип оружия
             this.countOfBulletInWeapon = 5; //текущее количесьтво пуль в оружии
@@ -35,6 +36,7 @@ class Player extends Rect {
             } else return false;
         }
     }
+
     //проаерка на наличие патронов для стрельбы
     isWeaponEmpty() {
         if (this.role === 'Zombie')
@@ -50,8 +52,10 @@ class Player extends Rect {
 
     decreaseHealth(damage) {
         this.health -= damage;
-        if (this.health < 0)
+        if (this.health < 0) {
+            this.alive = false;
             this.health = 0;
+        }
     }
 
     moveDown() {
@@ -94,6 +98,10 @@ class Player extends Rect {
                 this.projectiles.splice(i, 1)
             }
         }
+    }
+
+    isAlive() {
+        return this.alive;
     }
 
 }
