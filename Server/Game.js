@@ -1,11 +1,11 @@
-const Rect = require('./Server/Rect.js');
-const Player = require('./Server/Player.js');
-const Circle = require('./Server/Circle.js');
-const Epidemic = require('./Server/Epidemic.js');
-const Point = require('./Server/Point.js');
-const Pill = require('./Server/Pill.js');
-const Projectile = require('./Server/Projectile.js');
-const Constants = require('./Constants.js');
+const Rect = require('./Rect.js');
+const Player = require('./Player.js');
+const Circle = require('./Circle.js');
+const Epidemic = require('./Epidemic.js');
+const Point = require('./Point.js');
+const Pill = require('./Pill.js');
+const Projectile = require('./Projectile.js');
+const Constants = require('../Constants.js');
 class Game {
     constructor() {
         this.clients = new Map();
@@ -80,7 +80,7 @@ class Game {
 
     //просчитываем получение урона игроком player от снарядов других игроков
     collisionWithProjectile(id) {
-        let player = this.players[socket.id];
+        let player = this.players[id];
         for (let key in this.players) {
             if (key !== id && this.players[key].role !== player.role && this.players[key].isAlive()) {
                 for (let i = 0; i < this.players[key].projectiles.length; i++) {
@@ -91,15 +91,13 @@ class Game {
                         this.players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
                         if (this.players[id].health === 0) {
                             if (player.role === 'Zombie') {
-                                clearInterval(this.players[id].timerOfPills); //завершаем создание лекарства от этого пользователя
-                                clearInterval(this.players[id].timerOfRender); //завершаем рендер этого игрока
                                 delete this.players[id]; //удаляем его из списка игроков
                                 this.clients.get(id).socket.emit('gameOver');
                                 return;
                             } else {
-                                let x = this.players[socket.id].x,
-                                    y = this.players[socket.id].y;
-                                delete this.players[socket.id]; //удаляем его из списка игроков
+                                let x = this.players[id].x,
+                                    y = this.players[id].y;
+                                delete this.players[id]; //удаляем его из списка игроков
                                 this.clients.get(id).socket.emit('turningIntoZombie', {x: x, y: y});
                             }
                         }
@@ -133,7 +131,7 @@ class Game {
         }
         //удаляем убитых игроков
         for (let key in this.players) {
-            if (this.players[key].isAlive()) {
+            if (!this.players[key].isAlive()) {
                 if (this.players.role === 'Human')
                     --this.humanCount;
                 else --this.zombieCount;
@@ -142,9 +140,9 @@ class Game {
         }
         //удаляем уничтоженные снаряды
         for (let key in this.players) {
-            for (let k in this.players[key].projectiles) {
-                if (!this.players[key].projectiles[k].isExist())
-                    delete this.players[key].projectiles[k];
+            for (let i = 0; i < this.players[key].projectiles.length;i++) {
+                if (!this.players[key].projectiles[i].isExist())
+                    this.players[key].projectiles.splice(i, 1);
             }
         }
 
@@ -203,15 +201,17 @@ class Game {
                 this.players[key].moveProjectiles();
         }
     }
+
     //добавляет нового игрока
-    addPlayer(player,socket) {
+    addPlayer(player, socket) {
         this.players[socket.id] = player;
-        this.clients.set(socket.id,socket);
+        this.clients.set(socket.id, socket);
         if (player.role === 'Zombie')
             this.zombieCount++;
         else
             this.humanCount++;
     }
+
     //добавляет новую таблетку
     addPill() {
         let p = new Pill(599, 700, Constants.PILL_WIDTH, Constants.PILL_HEIGHT, Constants.HEALTH_OF_PILL);//переделать

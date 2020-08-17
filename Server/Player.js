@@ -95,7 +95,7 @@ class Player extends Rect {
         for (let i = 0; i < this.projectiles.length; i++) {
             this.projectiles[i].move();
             if (this.projectiles[i].flewAway()) { //удаляем, если снаряд вылетел за свою зону поражения
-                this.projectiles.splice(i, 1)
+                this.projectiles[i].exist = false;
             }
         }
     }

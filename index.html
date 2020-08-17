@@ -7,16 +7,17 @@
     <title>Game</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js">
+
+    </script>
 </head>
 
 <body>
-    <div id="game-menu">
-        <h1 id="Choose-your-role">Choose your role</h1>
-        <button type="button" id="human">HUMAN</button>
-        <button type="button" id="zombie">ZOMBIE</button>
-    </div>
-    <script src="dist/client.bundle.js">
-    </script>
+<div id="game-menu">
+    <h1 id="Choose-your-role">Choose your role</h1>
+    <button type="button" id="human" onclick="addNewPlayer('Human')">HUMAN</button>
+    <button id="zombie" id="zombie" onclick="addNewPlayer('Zombie')">ZOMBIE</button>
+</div>
 </body>
 
 </html>

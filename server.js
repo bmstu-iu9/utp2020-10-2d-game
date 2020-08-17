@@ -7,11 +7,7 @@ const Game = require('./Server/Game.js')
 const game = new Game();
 const FRAME_RATE = 1000 / 60;
 const Player = require('./Server/Player.js');
-app.get('/', function (req, res) {
-    res.sendfile('index.html');
-});
-app.use('/dist' , express.static(path.join(__dirname, '/dist')));
-app.use('/css', express.static(`${__dirname}/css`));
+const fs = require('fs');
 io.on('connection', socket => {
     console.log('user connected');
     socket.on('setPlayerName', function (player, width, height, playerWidth, playerHeight) {
@@ -19,9 +15,12 @@ io.on('connection', socket => {
             socket.emit('invalidNickname', 'nickname is invalid');
         } else {
             if (game.findName(player.name) === 0) { //проверяем есть ли игок с таким ником
+                socket.emit('PlayTheGame');
                 game.addPlayer(new Player(player.role, player.name, width, height, playerWidth, playerHeight) , socket);
-                console.log('a new player ' + player.name + ' is ' + player.role);
-                socket.emit('PlayTheGame', game.players);
+                setInterval(() => {
+                    socket.emit('render' , game.players,  game.pills , game.epidemicArea);
+                }, FRAME_RATE)
+                console.log('a new player ' + game.players[socket.id].name + ' is ' + player.role);
             } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
         }
     });
@@ -87,11 +86,24 @@ io.on('connection', socket => {
     });
 });
 setInterval(() => {
-    game.update()
+    game.update();
+    for(let key in game.clients)
+        game.clients.get(key).emit('render' , game.players, game.pills , game.epidemicArea);
 }, FRAME_RATE)
 setInterval(function () {
     game.addPill();
 }, 10000);
+app.get('/', function (req, res) {
+    res.sendfile('index.html');
+});
+app.use('/dist' , express.static(path.join(__dirname, '/dist')));
+app.use('/css', express.static(`${__dirname}/css`));
+app.get('/client.js', function (req, res) {
+    fs.readFile('client.js', (err, code) => {
+        res.writeHead(200, { 'Content-Type': 'text/javascript' });
+        res.end(code);
+    })
+})
 http.listen(3000, function () {
     console.log('listening on *:3000');
 });
