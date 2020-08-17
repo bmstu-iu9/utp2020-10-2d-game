@@ -37,54 +37,29 @@ io.on('connection', socket => {
     })
 
     socket.on(Constants.PLAYER_ACTION, function (state) {
-        let errorName = socket.id;
         if (state.down) {
-            try {
-                game.players[socket.id].moveDown();
-            } catch (error) {
-                if (errorName in players)
-                    throw new error;
-                else console.log("Player disconnected in moveDown");
-            }
+            game.players[socket.id].moveDown();
         }
         if (state.left) {
-            try {
-                game.players[socket.id].moveLeft();
-            } catch (error) {
-                if (errorName in players)
-                    throw new error;
-                else console.log("Player disconnected in moveLeft");
-            }
+            game.players[socket.id].moveLeft();
         }
         if (state.up) {
-            try {
-                game.players[socket.id].moveUp();
-            } catch (error) {
-                if (errorName in players)
-                    throw new error;
-                else console.log("Player disconnected in moveUp")
-            }
+            game.players[socket.id].moveUp();
         }
         if (state.right) {
-            try {
-                game.players[socket.id].moveRight();
-            } catch (error) {
-                if (errorName in players)
-                    throw new error;
-                else console.log("Player disconnected in moveRight");
-            }
+            game.players[socket.id].moveRight();
         }
-        if (mouse) {
+        if (state.mouse) {
             game.addProjectile(socket, {
-                x: players[socket.id].x + 80,
-                y: players[socket.id].y + 65,
-                projectileWidth: bulletWidth,
-                projectileHeight: bulletHeight,
-                mouseX: mouseX,
-                mouseY: mouseY,
-                mouseMove: mouseMove,
+                x: game.players[socket.id].x + 80,
+                y: game.players[socket.id].y + 65,
+                projectileWidth: Constants.BULLET_WIDTH,
+                projectileHeight: Constants.BULLET_HEIGHT,
+                mouseX: state.mouseX,
+                mouseY: state.mouseY,
+                mouseMove: state.mouseMove,
                 type: 'bullet',
-                projectileSpeed: speedOfBullet
+                projectileSpeed: Constants.SPEED_OF_BULLET
             });
         }
     })
