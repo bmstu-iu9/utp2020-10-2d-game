@@ -1,4 +1,4 @@
-module.exports = {
+module.exports = Object.freeze({
     ZOMBIE_MAX_HEALTH: 1.00,
     HUMAN_MAX_HEALTH: 1.00,
     SPEED_OF_COUGH: 5, //скорость полёта кашля
@@ -15,4 +15,4 @@ module.exports = {
     COUGH_FLIGHT_DISTANCE: 200, //дальность кашля
     BULLET_FLIGHT_DISTANCE: 400 //дальность кашля
 
-}
+})

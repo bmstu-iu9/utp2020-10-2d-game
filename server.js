@@ -12,7 +12,8 @@ const express = require('express'),
     Point = require('./Server/Point.js'),
     Pill = require('./Server/Pill.js'),
     Projectile = require('./Server/Projectile.js'),
-    Constants = require('./Constants.js');
+    Constants = require('./Constants.js'),
+    path = require('path');
 let players = {},
     humanCount = 0,
     zombieCount = 0,
@@ -312,14 +313,8 @@ io.on('connection', socket => {
 app.get('/', function (req, res) {
     res.sendfile('index.html');
 });
-app.get('/client.js', function (req, res) {
-    fs.readFile('client.js', (err, code) => {
-        res.writeHead(200, { 'Content-Type': 'text/javascript' });
-        res.end(code);
-    })
-});
+app.use('/dist' , express.static(path.join(__dirname, '/dist')));
 app.use('/css', express.static(`${__dirname}/css`));
-
 http.listen(3000, function () {
     console.log('listening on *:3000');
 });

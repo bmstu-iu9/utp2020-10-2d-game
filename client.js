@@ -1,5 +1,5 @@
 'use strict'
-
+const Constants = require('./Constants.js');
 let socket = io(),
     name, //имя игрока
     role, //роль игрока(zombie или human)
@@ -78,7 +78,7 @@ function setPlayerName() {
 function addNewPlayer(rl) {
     role = rl;
     document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
-          <button type = "button" name = "button" onclick = "setPlayerName()">Set name</button>'
+          <button type = "button" id = "addNewPlayer">Set name</button>'
 }
 //рисовка экрана пользователя
 socket.on('render', function (players, pills, epidemicArea) {
