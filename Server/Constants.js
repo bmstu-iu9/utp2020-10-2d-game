@@ -1,4 +1,4 @@
-module.exports = Object.freeze({
+module.exports = {
     ZOMBIE_MAX_HEALTH: 1.00,
     HUMAN_MAX_HEALTH: 1.00,
     SPEED_OF_COUGH: 5, //скорость полёта кашля
@@ -13,15 +13,6 @@ module.exports = Object.freeze({
     PILL_HEIGHT: 50, //ширина прямоугольника модельки лекарства
     HEALTH_OF_PILL: 0.10, //лечение от лекарства
     COUGH_FLIGHT_DISTANCE: 200, //дальность кашля
-    BULLET_FLIGHT_DISTANCE: 400, //дальность кашля
-    IMG_NAMES: [
-        'Zombie.svg', //Zombie
-        'Human.svg', //Human
-        'Virus.png',//моделька снарядов - кашля
-        'medicinedrawn.svg', //лекарство
-        'Bullet.png' //пуля
-    ],
-    STATE_UPDATE: 'update',
-    PLAYER_ACTION: 'playerAction';
+    BULLET_FLIGHT_DISTANCE: 400 //дальность кашля
 
-})
+}

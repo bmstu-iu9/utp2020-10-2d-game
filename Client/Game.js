@@ -1,0 +1,96 @@
+const Constants = require('../Constants.js'),
+    Render = require('./Render.js'),
+    Input = require('./Input.js');
+
+class Game {
+    constructor(render, input, socket) {
+        this.imgs = {};
+        this.render = render;
+        this.input = input;
+        this.socket = socket;
+
+        this.me = null;
+        this.players = {};
+        this.pills = {};
+        this.area = null;
+
+        this.animationFrameId = null;
+        this.lastUpdateTime = 0;
+        this.dt = 0;
+    }
+
+    static create(document, socket) {
+        const game = new Game(Render.create(),
+            Input.create(document),
+            socket);
+        return game;
+    }
+
+    downloadImages() {
+        let downloadImage = (imageName) => {
+            return new Promise(resolve => {
+                const img = new Image();
+                img.src = `/css/${imageName}`;
+                img.onload = () => {
+                    console.log(`Downloaded ${imageName}`);
+                    this.imgs[imageName] = img;
+                    resolve();
+                };
+            });
+        }
+        Promise.all(Constants.IMG_NAMES.map(downloadImage)).then(() => console.log('All images downloaded'));
+        this.render.loadImgs(imgs);
+    }
+
+    start(context) {
+        let cutTime = Date.now();
+        this.dt = curTime - this.lastUpdateTime;
+        this.lastUpdateTime = cutTime;
+
+        this.update();
+        this.getState();
+        this.render(context);
+
+        this.animationFrameId =  window.requestAnimationFrame(this.start().bind(this));
+    }
+
+    stop(){
+        window.cancelAnimationFrame(this.animationFrameId);
+    }
+
+    init(){
+        this.lastUpdateTime = Date.now();
+        this.socket.on(Constants.STATE_UPDATE, this.getState.bind(this));
+    }
+
+    getState(state){
+        this.me = state.me;
+        this.players = state.players;
+        this.pills = state.pills;
+    }
+
+    update(){
+        if (this.me) {
+            this.socket.emit(Constants.PLAYER_ACTION, {
+                up: this.input.upPressed,
+                down: this.input.downPressed,
+                left: this.input.leftPressed,
+                right: this.input.rightPressed,
+                mouse: this.input.mousePressed,
+                mouseX: this.input.mouseX,
+                mouseY : this.input.mouseY,
+                dt: this.dt
+            })
+        }
+    }
+
+    render(context){
+        this.render.clear(context);
+        this.render.drawProjectiles(context, this.players);
+        this.render.drawPlayers(context, this.players);
+        this.render.drawPills(context, this.pills);
+        this.render.drawEpidemicArea(context, this.area);
+    }
+}
+
+module.exports = Game;

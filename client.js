@@ -80,68 +80,8 @@ function addNewPlayer(rl) {
     document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
           <button type = "button" id = "addNewPlayer">Set name</button>'
 }
-//рисовка экрана пользователя
-socket.on('render', function (players, pills, epidemicArea) {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    if (leftPressed)
-        socket.emit('moveLeft');
-    if (rightPressed)
-        socket.emit('moveRight');
-    if (upPressed)
-        socket.emit('moveUp');
-    if (downPressed)
-        socket.emit('moveDown');
-    if (role === "Zombie") {
-        if (mousePressed)
-            socket.emit('newProjectile', {
-                x: players[socket.id].x + 80,
-                y: players[socket.id].y + 65,
-                projectileWidth: coughWidth,
-                projectileHeight: coughHeight,
-                mouseX: mouseX,
-                mouseY: mouseY,
-                mouseMove: mouseMove,
-                type: 'cough',
-                projectileSpeed: 5
-            })
-    } else if (mousePressed)
-        socket.emit('newProjectile', {
-            x: players[socket.id].x + 80,
-            y: players[socket.id].y + 65,
-            projectileWidth: bulletWidth,
-            projectileHeight: bulletHeight,
-            mouseX: mouseX,
-            mouseY: mouseY,
-            mouseMove: mouseMove,
-            type: 'bullet',
-            projectileSpeed: 10
-        })
-    drawProjectiles(players);
-    drawPlayers(players);
-    drawPills(pills);
-    drawEpidemicArea(epidemicArea);
-})
-//скачиваем все нужные изображения в объект imgs для быстрого доступа
-const IMG_NAMES = [
-    'Zombie.svg', //Zombie
-    'Human.svg', //Human
-    'Virus.png',//моделька снарядов - кашля
-    'medicinedrawn.svg',
-    'Bullet.png'
-];
-const imgs = {};
-function downloadImage(imageName) {
-    return new Promise(resolve => {
-        const img = new Image();
-        img.src = `/css/${imageName}`;
-        img.onload = () => {
-            console.log(`Downloaded ${imageName}`);
-            imgs[imageName] = img;
-            resolve();
-        };
-    });
-}
-Promise.all(IMG_NAMES.map(downloadImage)).then(() => console.log('All images downloaded'));
+
+
 //рисуем снаряды - "кашель"
 function drawProjectiles(players) {
     for (let key in players) {
