@@ -27,6 +27,8 @@ $(document).ready(() => {
             socket.on(Constants.PLAY, function () {
                 document.body.innerHTML = '<canvas id = "game-canvas"></canvas>';
                 const canvas = document.getElementById('game-canvas');
+                canvas.width = width;
+                canvas.height = height;
                 const context = canvas.getContext('2d');
                 const timer = setInterval(function(){
                     game.start(canvas,context);
