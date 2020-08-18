@@ -19,14 +19,6 @@ io.on('connection', socket => {
             if (game.findName(player.name) === 0) { //проверяем есть ли игок с таким ником
                 socket.emit(Constants.PLAY);
                 game.addPlayer(new Player(player.role, player.name, width, height, playerWidth, playerHeight), socket);
-                setInterval(() => {
-                    socket.emit(Constants.STATE_UPDATE, {
-                        me: player,
-                        players: game.players,
-                        pills: game.pills,
-                        area: game.epidemicArea
-                    });
-                }, Constants.FRAME_RATE);
                 console.log('a new player ' + game.players[socket.id].name + ' is ' + player.role);
             } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
         }
@@ -63,6 +55,7 @@ io.on('connection', socket => {
 });
 setInterval(() => {
     game.update();
+    game.sendState();
 }, Constants.FRAME_RATE)
 setInterval(function () {
     game.addPill();

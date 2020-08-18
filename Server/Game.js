@@ -94,12 +94,14 @@ class Game {
             }
         }
     }
+
     turningIntoZombie(id) {
         const player = this.players[id];
         this.players[id] = new Player('Zombie', player.name, player.screenWidth, player.screenHeight, player.w, player.h);
         --this.humanCount;
         ++this.zombieCount;
     }
+
     update() {
         //движение снарядов
         this.moveProjectiles();
@@ -168,12 +170,10 @@ class Game {
             if (!this.players[socket.id].reloading) { //если оружие не перезаряжается
                 this.players[socket.id].reloading = true;
                 this.players[socket.id].reloadingStart = Date.now();
+            } else if (Date.now() - this.players[socket.id].reloadingStart >= Constants.RELOAD_PISTOL) {
+                this.players[socket.id].countOfBulletInWeapon = this.players[socket.id].weaponCapacity;
+                this.players[socket.id].reloading = false;
             }
-            else
-                if (Date.now() - this.players[socket.id].reloadingStart >= Constants.RELOAD_PISTOL) {
-                    this.players[socket.id].countOfBulletInWeapon = this.players[socket.id].weaponCapacity;
-                    this.players[socket.id].reloading = false;
-                }
         } else {
             this.players[socket.id].shoot();
             if (!projectile.mouseMove) {
@@ -227,6 +227,18 @@ class Game {
     addPill() {
         let p = new Pill(599, 700, Constants.PILL_WIDTH, Constants.PILL_HEIGHT, Constants.HEALTH_OF_PILL);//переделать
         this.pills[p.x + '#' + p.y] = p;
+    }
+
+    sendState() {
+        this.clients.forEach((client, socketID) => {
+            const currentPlayer = this.players[socketID]
+            this.clients.get(socketID).emit(Constants.STATE_UPDATE, {
+                me: currentPlayer,
+                players: this.players,
+                pills: this.pills,
+                area: this.epidemicArea
+            })
+        })
     }
 }
 

@@ -15,7 +15,7 @@ $(document).ready(() => {
             const width = document.documentElement.clientWidth; // ширина клиентской части окна браузера
             const height = document.documentElement.clientHeight; // высота клиентской части окна браузера
             const name = $('#nameOfPlayer').val();
-            socket.emit('setPlayerName', { role: role, name: name }, width, height);
+            socket.emit('setPlayerName', {role: role, name: name}, width, height);
             socket.on('invalidNickname', function (data) {//если ник некорректный
                 console.log(data);
                 document.getElementById('nameError').innerHTML = data;
@@ -30,14 +30,14 @@ $(document).ready(() => {
                 canvas.width = width;
                 canvas.height = height;
                 const context = canvas.getContext('2d');
-                const timer = setInterval(function(){
-                    game.start(canvas,context);
+                const timer = setInterval(function () {
+                    game.start(canvas, context);
                 }, Constants.FRAME_RATE);
-                
+
                 setTimeout(function () {
                     clearInterval(timer);
                     //game.stop()
-                },200000);
+                }, 200000);
             })
         })
     }
