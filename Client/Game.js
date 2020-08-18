@@ -42,34 +42,34 @@ class Game {
         this.render.loadImgs(this.imgs);
     }
 
-    start(canvas,context) {
+    start(canvas, context) {
         this.dt = Date.now() - this.lastUpdateTime;
         this.lastUpdateTime = Date.now();
 
         this.update();
         this.socket.on(Constants.STATE_UPDATE, this.getState.bind(this));
-        this.renderGame(canvas,context);
+        this.renderGame(canvas, context);
 
-        this.animationFrameId =  window.requestAnimationFrame(this.start(canvas,context).bind(this));
+        //this.animationFrameId =  window.requestAnimationFrame(this.start(canvas,context).bind(this));
     }
 
-    stop(){
+    stop() {
         window.cancelAnimationFrame(this.animationFrameId);
     }
 
-    init(){
+    init() {
         this.lastUpdateTime = Date.now();
         this.socket.on(Constants.STATE_UPDATE, this.getState.bind(this));
     }
 
-    getState(state){
+    getState(state) {
         this.me = state.me;
         this.players = state.players;
         this.pills = state.pills;
         this.area = state.area;
     }
 
-    update(){
+    update() {
         if (this.me) {
             this.socket.emit(Constants.PLAYER_ACTION, {
                 up: this.input.upPressed,
@@ -78,14 +78,14 @@ class Game {
                 right: this.input.rightPressed,
                 mouse: this.input.mousePressed,
                 mouseX: this.input.mouseX,
-                mouseY : this.input.mouseY,
+                mouseY: this.input.mouseY,
                 dt: this.dt
             })
         }
     }
 
-    renderGame(canvas,context){
-        this.render.clear(canvas,context);
+    renderGame(canvas, context) {
+        this.render.clear(canvas, context);
         this.render.drawProjectiles(context, this.players);
         this.render.drawPlayers(context, this.players);
         this.render.drawPills(context, this.pills);

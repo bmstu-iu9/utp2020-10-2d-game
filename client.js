@@ -28,9 +28,13 @@ $(document).ready(() => {
                 document.body.innerHTML = '<canvas id = "game-canvas"></canvas>';
                 const canvas = document.getElementById('game-canvas');
                 const context = canvas.getContext('2d');
-                game.start(canvas,context);
+                const timer = setInterval(function(){
+                    game.start(canvas,context);
+                }, Constants.FRAME_RATE);
+                
                 setTimeout(function () {
-                    game.stop()
+                    clearInterval(timer);
+                    //game.stop()
                 },20000);
             })
         })

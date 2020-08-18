@@ -12,6 +12,7 @@ class Input {
     static create(document) {
         const input = new Input();
         input.applyEventHandlers(document)
+        return input;
 
     }
     //детектит нажатие клавишы
