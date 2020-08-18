@@ -1,10 +1,7 @@
-const Rect = require('./Rect.js');
 const Player = require('./Player.js');
-const Circle = require('./Circle.js');
 const Epidemic = require('./Epidemic.js');
 const Point = require('./Point.js');
 const Pill = require('./Pill.js');
-const Projectile = require('./Projectile.js')
 const Constants = require('../Constants.js');
 class Game {
     constructor() {
@@ -12,6 +9,8 @@ class Game {
         this.players = {};
         this.humanCount = 0;
         this.zombieCount = 0;
+        this.w = 0;
+        this.h = 0;
         this.pills = {};
         this.epidemicArea = new Epidemic(new Point(0, 0), 0);
     }
@@ -77,7 +76,7 @@ class Game {
                     let projectile = this.players[key].projectiles[i];
                     if (!projectile.isExist()) continue; //если снаряд уничтожен
                     if (player.intersect(projectile)) {
-                        this.players[id].decreaseHealth(this.players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
+                        this.players[id].decreaseHealth(this.players[key].projectiles[i].damage); //уменьшаем здоровье игрока, по которому попали
                         this.players[key].projectiles[i].exist = false;
                         if (this.players[id].health === 0) {
                             if (player.role === 'Zombie') {
@@ -182,7 +181,7 @@ class Game {
             if (!projectile.mouseMove) {
                 const startPoint = new Point(this.players[socket.id].x + Constants.PLAYER_WIDTH / 2,
                     this.players[socket.id].y + Constants.PLAYER_HEIGHT / 2);
-                this.players[socket.id].addProjectile(projectile, {startPoint: startPoint});
+                this.players[socket.id].addProjectile(projectile, { startPoint: startPoint });
             } else {
                 let player = this.players[socket.id],
                     points = (new Point(player.x + player.w / 2, player.y + player.h / 2)).findPoints(
@@ -190,8 +189,8 @@ class Game {
                         (player.h * player.h + player.w * player.w) / 4),
                     fP = points.firstPoint,
                     sP = points.secondPoint;
-                if (new Point(projectile.mouseX, projectile.mouseY).findDist(fP)
-                    > new Point(projectile.mouseX, projectile.mouseY).findDist(sP)) {
+                if (new Point(projectile.mouseX, projectile.mouseY).findDist(fP) >
+                    new Point(projectile.mouseX, projectile.mouseY).findDist(sP)) {
                     this.players[socket.id].addProjectile(projectile, {
                         x: sP.x,
                         y: sP.y,
@@ -218,6 +217,10 @@ class Game {
     //добавляет нового игрока
     addPlayer(player, socket) {
         this.players[socket.id] = new Player(player.role, player.name, player.width, player.height);
+        if (this.w === 0 || this.h === 0) {
+            this.w = player.width;
+            this.h = player.height;
+        }
         this.clients.set(socket.id, socket);
         if (player.role === 'Zombie')
             this.zombieCount++;
@@ -228,7 +231,7 @@ class Game {
 
     //добавляет новую таблетку
     addPill() {
-        let p = new Pill(599, 700, Constants.PILL_WIDTH, Constants.PILL_HEIGHT, Constants.HEALTH_OF_PILL);//переделать
+        let p = new Pill(this.w, this.h);
         this.pills[p.x + '#' + p.y] = p;
     }
 

@@ -23,6 +23,7 @@ class Game {
         const game = new Game(Render.create(),
             Input.create(document),
             socket);
+        game.init();
         return game;
     }
 
@@ -79,7 +80,7 @@ class Game {
                 mouse: this.input.mousePressed,
                 mouseX: this.input.mouseX,
                 mouseY: this.input.mouseY,
-                mouseMove : this.input.mouseMove,
+                mouseMove: this.input.mouseMove,
                 dt: this.dt
             })
         }
