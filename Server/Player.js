@@ -17,7 +17,7 @@ class Player extends Rect {
         this.alive = true;
         if (role === 'Human') {
             this.typeOfWeapon = 'pistol'; //тип оружия
-            this.countOfBulletInWeapon = 5; //текущее количесьтво пуль в оружии
+            this.countOfBulletInWeapon = 5; //текущее количество пуль в оружии
             this.weaponCapacity = 5; //максимальная ёмкость в обойме
             this.reloading = false; //показывает находится ли оружие в процессе перезарядки
             this.health = Constants.HUMAN_MAX_HEALTH;
@@ -98,7 +98,7 @@ class Player extends Rect {
     }
     addProjectile(projectile,dop) {
         let p = new Projectile();
-        this.projectiles.unshift(p.cloneWith(projectile).cloneWith(dop));
+        this.projectiles.unshift(p.cloneWith({}).cloneWith(projectile).cloneWith(dop));
     }
 }
 module.exports = Player;

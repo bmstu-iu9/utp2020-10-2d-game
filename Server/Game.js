@@ -64,7 +64,7 @@ class Game {
             let x = this.players[key].x,
                 y = this.players[key].y;
             delete this.players[key];
-            this.clients.get(id).emit('turningIntoZombie', { x: x, y: y }); //превращаются в зомби
+            this.clients.get(id).emit('turningIntoZombie', {x: x, y: y}); //превращаются в зомби
         }
     }
 
@@ -99,7 +99,7 @@ class Game {
                                 let x = this.players[id].x,
                                     y = this.players[id].y;
                                 delete this.players[id]; //удаляем его из списка игроков
-                                this.clients.get(id).socket.emit('turningIntoZombie', { x: x, y: y });
+                                this.clients.get(id).socket.emit('turningIntoZombie', {x: x, y: y});
                             }
                         }
                     }
@@ -133,7 +133,7 @@ class Game {
         //удаляем убитых игроков
         for (let key in this.players) {
             if (!this.players[key].isAlive()) {
-                if (this.players.role === 'Human')
+                if (this.players[key].role === 'Human')
                     --this.humanCount;
                 else --this.zombieCount;
                 delete this.players[key];
@@ -166,17 +166,19 @@ class Game {
         if (this.players[socket.id].isWeaponEmpty()) { //если патроны закончились
             if (!this.players[socket.id].reloading) { //если оружие не перезаряжается
                 this.players[socket.id].reloading = true;
-                this.players[socket.id].reload = setTimeout(function () {
+                this.players[socket.id].reloadingStart = Date.now();
+            }
+            else
+                if (Date.now() - this.players[socket.id].reloadingStart >= Constants.RELOAD_PISTOL) {
                     this.players[socket.id].countOfBulletInWeapon = this.players[socket.id].weaponCapacity;
                     this.players[socket.id].reloading = false;
-                }, Constants.RELOAD_PISTOL);
-            }
+                }
         } else {
             this.players[socket.id].shoot();
             if (!projectile.mouseMove) {
                 const startPoint = new Point(this.players[socket.id].x + Constants.PLAYER_WIDTH / 2,
                     this.players[socket.id].y + Constants.PLAYER_HEIGHT / 2);
-                this.players[socket.id].addProjectile(projectile,{startPoint : startPoint});
+                this.players[socket.id].addProjectile(projectile, {startPoint: startPoint});
             } else {
                 let player = this.players[socket.id],
                     points = (new Point(player.x + player.w / 2, player.y + player.h / 2)).findPoints(
@@ -186,13 +188,13 @@ class Game {
                     sP = points.secondPoint;
                 if (new Point(projectile.mouseX, projectile.mouseY).findDist(fP)
                     > new Point(projectile.mouseX, projectile.mouseY).findDist(sP)) {
-                    this.players[socket.id].addProjectile(projectile,{
+                    this.players[socket.id].addProjectile(projectile, {
                         x: sP.x,
                         y: sP.y,
                         startPoint: new Point(player.x + Constants.PILL_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2)
                     });
                 } else {
-                    this.players[socket.id].addProjectile(projectile,{
+                    this.players[socket.id].addProjectile(projectile, {
                         x: fP.x,
                         y: fP.y,
                         startPoint: new Point(player.x + Constants.PLAYER_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2)
@@ -217,6 +219,7 @@ class Game {
             this.zombieCount++;
         else
             this.humanCount++;
+        console.log(this.humanCount + " " + this.zombieCount);
     }
 
     //добавляет новую таблетку
