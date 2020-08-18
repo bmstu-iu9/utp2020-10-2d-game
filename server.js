@@ -5,7 +5,6 @@ const io = require('socket.io')(http);
 const path = require('path');
 const Game = require('./Server/Game.js')
 const game = new Game();
-const FRAME_RATE = 1000 / 60;
 const Player = require('./Server/Player.js');
 const fs = require('fs');
 const Constants = require('./Constants.js');
@@ -27,15 +26,11 @@ io.on('connection', socket => {
                         pills: game.pills,
                         area: game.epidemicArea
                     });
-                }, FRAME_RATE);
+                }, Constants.FRAME_RATE);
                 console.log('a new player ' + game.players[socket.id].name + ' is ' + player.role);
             } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
         }
     });
-    socket.on('increaseEpidemicRadius', function () {
-        game.epidemicArea.increaseRadius();
-    })
-
     socket.on(Constants.PLAYER_ACTION, function (state) {
         if (state.down) {
             game.players[socket.id].moveDown();
@@ -59,14 +54,6 @@ io.on('connection', socket => {
             });
         }
     })
-    //добавлям нового игрока  - зомби, событие происходит когда был убит человек
-    socket.on('addNewZombie', function (player) {
-        players[socket.id] = new Player('Zombie', player.name, player.w, player.h, player.playerWidth, player.playerHeight);
-        players[socket.id].x = player.x;
-        players[socket.id].y = player.y;
-        humanCount--;
-        zombieCount++;
-    })
     socket.on('disconnect', () => {
         if (socket.id in game.players) {
             console.log("Player " + game.players[socket.id].name + " disconnect");
@@ -76,7 +63,7 @@ io.on('connection', socket => {
 });
 setInterval(() => {
     game.update();
-}, FRAME_RATE)
+}, Constants.FRAME_RATE)
 setInterval(function () {
     game.addPill();
 }, 10000);

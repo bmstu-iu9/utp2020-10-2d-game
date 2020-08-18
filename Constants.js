@@ -28,5 +28,7 @@ module.exports = Object.freeze({
     TYPE_BULLET: 'bullet',
     TYPE_COUGH: 'cough',
     BULLET_DAMAGE: 0.10, //урон от пули
-    COUGH_DAMAGE: 0.05 //урон от кашля
+    COUGH_DAMAGE: 0.05, //урон от кашля
+    MAX_RADIUS_OF_EPIDEMIC_AREA: 100,
+    FRAME_RATE: 1000 / 60
 })

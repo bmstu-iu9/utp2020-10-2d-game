@@ -37,14 +37,8 @@ class Game {
             let c = this.randomHuman();
             this.epidemicArea = new Epidemic(c, 0);
             this.epidemicArea.coordinateFixed = true;
-            setTimeout(function () {
-                this.epidemicArea.marker = true;
-                this.epidemicArea.start = Date.now();
-                setTimeout(function () {
-                    this.epidemicArea.marker = false;
-                    this.epidemicArea.coordinateFixed = false;
-                }, 1500);
-            }, 2000);
+            this.epidemicArea.marker = true;
+            this.epidemicArea.start = Date.now();
         }
     }
 
@@ -57,14 +51,9 @@ class Game {
     }
 
     collisionWithEpidemicArea(id) {
-        console.log('epidemic radius : ' + this.epidemicArea.radius);
-        let key = id;
-        if (this.players[key].role === 'Human' &&
-            this.players[key].intersectCircle(this.epidemicArea)) { //люди, которых задело
-            let x = this.players[key].x,
-                y = this.players[key].y;
-            delete this.players[key];
-            this.clients.get(id).emit('turningIntoZombie', {x: x, y: y}); //превращаются в зомби
+        if (this.players[id].role === 'Human' &&
+            this.players[id].intersectCircle(this.epidemicArea)) { //люди, которых задело
+            this.turningIntoZombie(id)
         }
     }
 
@@ -107,7 +96,9 @@ class Game {
     }
     turningIntoZombie(id) {
         const player = this.players[id];
-        this.players[id] = new Player('Zombie', player.name, player.screenWidth, player.screenHeight, player.w, player.h)
+        this.players[id] = new Player('Zombie', player.name, player.screenWidth, player.screenHeight, player.w, player.h);
+        --this.humanCount;
+        ++this.zombieCount;
     }
     update() {
         //движение снарядов
@@ -117,12 +108,21 @@ class Game {
             if (this.players[key].isAlive())
                 this.collisionWithPills(key);
         }
+        if (!this.epidemicArea.coordinateFixed)
+            this.outbreak();
+        else if (this.epidemicArea.marker) {
+            if (this.epidemicArea.isTooBig()) {
+                this.epidemicArea.marker = false;
+                this.epidemicArea.coordinateFixed = false;
+            } else {
+                console.log("EPIDEMIC AREA RADIUS IS " + this.epidemicArea.radius)
+                this.epidemicArea.increaseRadius();
+            }
+        }
         //столкновение с epidemicArea
         for (let key in this.players) {
             if (this.players[key].isAlive()) {
-                if (!this.epidemicArea.coordinateFixed)
-                    this.outbreak();
-                else if (this.epidemicArea.marker)
+                if (this.epidemicArea.marker)
                     this.collisionWithEpidemicArea(key);
             }
         }

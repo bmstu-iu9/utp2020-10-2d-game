@@ -37,7 +37,7 @@ $(document).ready(() => {
                 setTimeout(function () {
                     clearInterval(timer);
                     //game.stop()
-                },20000);
+                },200000);
             })
         })
     }

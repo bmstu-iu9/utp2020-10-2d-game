@@ -90,7 +90,7 @@ class Game {
         this.render.drawProjectiles(context, this.players);
         this.render.drawPlayers(context, this.players);
         this.render.drawPills(context, this.pills);
-        //this.render.drawEpidemicArea(context, this.area);
+        this.render.drawEpidemicArea(context, this.area);
     }
 }
 

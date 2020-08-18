@@ -82,7 +82,6 @@ class Render {
 
     drawEpidemicArea(context, area) {
         if (area.marker) {
-            socket.emit('increaseEpidemicRadius', area);
             console.log('drawing epidemic area');
             context.beginPath();
             context.arc(area.o.x, area.o.y, area.radius, 0, Math.PI * 2, true);

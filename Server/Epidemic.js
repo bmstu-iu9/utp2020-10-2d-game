@@ -1,4 +1,5 @@
-let Circle = require('./Circle.js');
+const Circle = require('./Circle.js');
+const Constants = require('../Constants.js')
 //класс для вспышки эпидемии
 class Epidemic extends Circle {
     constructor(o, r) {
@@ -8,8 +9,11 @@ class Epidemic extends Circle {
         this.start = Date.now();
     }
 
-    increaseRadius(){
+    increaseRadius() {
         this.radius = (Date.now() - this.start) * 0.15
+    }
+    isTooBig() {
+        return this.radius > Constants.MAX_RADIUS_OF_EPIDEMIC_AREA;
     }
 }
 module.exports = Epidemic;
