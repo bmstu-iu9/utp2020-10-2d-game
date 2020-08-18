@@ -79,7 +79,7 @@ class Game {
         }
     }
 
-    //просчитываем получение урона игроком player от снарядов других игроков
+    //просчитываем получение урона игроком id от снарядов других игроков
     collisionWithProjectile(id) {
         let player = this.players[id];
         for (let key in this.players) {
@@ -89,17 +89,15 @@ class Game {
                     if (!projectile.isExist()) continue; //если снаряд уничтожен
                     if (player.intersect(projectile)) {
                         this.players[id].decreaseHealth(this.players[key].projectiles[i].damage);//уменьшаем здоровье игрока, по которому попали
-                        this.players[key].projectiles.splice(i, 1);//удалаяем снаряд который попал
+                        this.players[key].projectiles[i].exist = false;
                         if (this.players[id].health === 0) {
                             if (player.role === 'Zombie') {
-                                delete this.players[id]; //удаляем его из списка игроков
+                                this.players[id].alive = false; //удаляем его из списка игроков
                                 this.clients.get(id).socket.emit('gameOver');
                                 return;
                             } else {
-                                let x = this.players[id].x,
-                                    y = this.players[id].y;
-                                delete this.players[id]; //удаляем его из списка игроков
-                                this.clients.get(id).socket.emit('turningIntoZombie', {x: x, y: y});
+                                this.turningIntoZombie(id);
+                                return;
                             }
                         }
                     }
@@ -107,8 +105,13 @@ class Game {
             }
         }
     }
-
+    turningIntoZombie(id) {
+        const player = this.players[id];
+        this.players[id] = new Player('Zombie', player.name, player.screenWidth, player.screenHeight, player.w, player.h)
+    }
     update() {
+        //движение снарядов
+        this.moveProjectiles();
         //столкновение с таблетками
         for (let key in this.players) {
             if (this.players[key].isAlive())
@@ -123,8 +126,6 @@ class Game {
                     this.collisionWithEpidemicArea(key);
             }
         }
-        //движение снарядов
-        this.moveProjectiles();
         //столкновение игроков со снарядами
         for (let key in this.players) {
             if (this.players[key].isAlive())

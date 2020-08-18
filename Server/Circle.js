@@ -14,7 +14,7 @@ class Circle {
         if (s1 <= this.radius || s2 <= this.radius)
             return true;
         else if ((x1 === x2 && x1 - this.o.x <= this.radius) ||
-            (y1 = y2 && y1 - this.o.x <= this.radius))
+            (y1 === y2 && y1 - this.o.x <= this.radius))
             return true;
         return false;
     }
