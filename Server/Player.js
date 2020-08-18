@@ -7,6 +7,8 @@ class Player extends Rect {
         super(0, 0, playerWidth, playerHeight);
         this.screenWidth = w;
         this.screenHeight = h;
+        this.w = Constants.PLAYER_WIDTH;
+        this.h = Constants.PLAYER_HEIGHT;
         this.name = name;
         this.role = role;
         this.projectiles = [];
