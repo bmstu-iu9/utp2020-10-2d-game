@@ -12,6 +12,7 @@ $(document).ready(() => {
         document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
           <button type = "button" id = "addPlayer">Set name</button>'
         $('#addPlayer').click(() => {
+            let timer;
             const width = document.documentElement.clientWidth; // ширина клиентской части окна браузера
             const height = document.documentElement.clientHeight; // высота клиентской части окна браузера
             const name = $('#nameOfPlayer').val();
@@ -30,14 +31,13 @@ $(document).ready(() => {
                 canvas.width = width;
                 canvas.height = height;
                 const context = canvas.getContext('2d');
-                const timer = setInterval(function () {
+                timer = setInterval(function () {
                     game.start(canvas, context);
                 }, Constants.FRAME_RATE);
-
-                setTimeout(function () {
-                    clearInterval(timer);
-                    //game.stop()
-                }, 200000);
+            })
+            socket.on(Constants.GAME_OVER, function () {
+                clearInterval(timer);
+                document.body.innerHTML = '<div> <h1>GAME OVER</h1></div>';
             })
         })
     }

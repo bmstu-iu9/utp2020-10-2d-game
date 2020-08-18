@@ -35,5 +35,6 @@ module.exports = Object.freeze({
     INVALID_NICKNAME: 'invalidNickname',
     SET_PLAYER_NAME: 'setPlayerName',
     CONNECT: 'connection',
-    DISCONNECT: 'disconnect'
+    DISCONNECT: 'disconnect',
+    GAME_OVER: 'gameOver'
 })

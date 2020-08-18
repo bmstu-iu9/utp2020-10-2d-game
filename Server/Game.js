@@ -82,7 +82,7 @@ class Game {
                         if (this.players[id].health === 0) {
                             if (player.role === 'Zombie') {
                                 this.players[id].alive = false; //удаляем его из списка игроков
-                                this.clients.get(id).socket.emit('gameOver');
+                                this.clients.get(id).emit(Constants.GAME_OVER);
                                 return;
                             } else {
                                 this.turningIntoZombie(id);
@@ -142,6 +142,7 @@ class Game {
                     --this.humanCount;
                 else --this.zombieCount;
                 delete this.players[key];
+                delete this.clients[key];
             }
         }
         //удаляем уничтоженные снаряды
