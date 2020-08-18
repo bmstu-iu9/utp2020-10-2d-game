@@ -1,5 +1,6 @@
 const Rect = require('./Rect.js');
-const Constants = require('../Constants')
+const Constants = require('../Constants');
+const Projectile = require('./Projectile.js');
 //класс игрока
 class Player extends Rect {
     constructor(role, name, w, h, playerWidth, playerHeight) {
@@ -17,11 +18,9 @@ class Player extends Rect {
             this.countOfBulletInWeapon = 5; //текущее количесьтво пуль в оружии
             this.weaponCapacity = 5; //максимальная ёмкость в обойме
             this.reloading = false; //показывает находится ли оружие в процессе перезарядки
-            this.projectileDamage = 0.10; //урон от пули из оружие игрока
             this.health = Constants.HUMAN_MAX_HEALTH;
         } else {
             this.health = Constants.ZOMBIE_MAX_HEALTH;
-            this.projectileDamage = 0.05;  //урон от пули из оружие игрока
             this.typeOfWeapon = 'cough'; //тип оружия
         }
     }
@@ -82,14 +81,6 @@ class Player extends Rect {
         }
     }
 
-    getX() {
-        return this.x;
-    }
-
-    getY() {
-        return this.y;
-    }
-
     //двигает все снаряды этого игрока
     moveProjectiles() {
         for (let i = 0; i < this.projectiles.length; i++) {
@@ -103,6 +94,9 @@ class Player extends Rect {
     isAlive() {
         return this.alive;
     }
-
+    addProjectile(projectile,dop) {
+        let p = new Projectile();
+        this.projectiles.unshift(p.cloneWith(projectile).cloneWith(dop));
+    }
 }
 module.exports = Player;

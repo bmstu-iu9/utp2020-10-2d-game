@@ -26,5 +26,7 @@ module.exports = Object.freeze({
     PLAY: 'playTheGame',
     RELOAD_PISTOL : 5000, //длительность перезарядки пистолета
     TYPE_BULLET: 'bullet',
-    TYPE_COUGH: 'cough'
+    TYPE_COUGH: 'cough',
+    BULLET_DAMAGE: 0.10, //урон от пули
+    COUGH_DAMAGE: 0.5 //урон от кашля
 })

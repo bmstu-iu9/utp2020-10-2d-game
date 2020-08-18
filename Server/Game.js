@@ -4,7 +4,7 @@ const Circle = require('./Circle.js');
 const Epidemic = require('./Epidemic.js');
 const Point = require('./Point.js');
 const Pill = require('./Pill.js');
-const Projectile = require('./Projectile.js');
+const Projectile = require('./Projectile.js')
 const Constants = require('../Constants.js');
 class Game {
     constructor() {
@@ -154,11 +154,13 @@ class Game {
             projectile.projectileWidth = Constants.BULLET_WIDTH;
             projectile.type = Constants.TYPE_BULLET;
             projectile.projectileSpeed = Constants.SPEED_OF_BULLET;
+            projectile.damage = Constants.BULLET_DAMAGE;
         } else {
             projectile.projectileHeight = Constants.COUGH_HEIGHT;
             projectile.projectileWidth = Constants.COUGH_WIDTH;
             projectile.type = Constants.TYPE_COUGH;
             projectile.projectileSpeed = Constants.SPEED_OF_COUGH;
+            projectile.damage = Constants.COUGH_DAMAGE;
         }
         if (this.players[socket.id].isWeaponEmpty()) { //если патроны закончились
             if (!this.players[socket.id].reloading) { //если оружие не перезаряжается
@@ -171,12 +173,9 @@ class Game {
         } else {
             this.players[socket.id].shoot();
             if (!projectile.mouseMove) {
-                let pr = new Projectile();
-                this.players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
-                    damage: this.players[socket.id].projectileDamage,
-                    startPoint: new Point(this.players[socket.id].x + Constants.PLAYER_WIDTH / 2,
-                        this.players[socket.id].y + Constants.PLAYER_HEIGHT / 2)
-                }));
+                const startPoint = new Point(this.players[socket.id].x + Constants.PLAYER_WIDTH / 2,
+                    this.players[socket.id].y + Constants.PLAYER_HEIGHT / 2);
+                this.players[socket.id].addProjectile(projectile,{startPoint : startPoint});
             } else {
                 let player = this.players[socket.id],
                     points = (new Point(player.x + player.w / 2, player.y + player.h / 2)).findPoints(
@@ -186,21 +185,17 @@ class Game {
                     sP = points.secondPoint;
                 if (new Point(projectile.mouseX, projectile.mouseY).findDist(fP)
                     > new Point(projectile.mouseX, projectile.mouseY).findDist(sP)) {
-                    let pr = new Projectile();
-                    this.players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
+                    this.players[socket.id].addProjectile(projectile,{
                         x: sP.x,
                         y: sP.y,
-                        damage: player.projectileDamage,
                         startPoint: new Point(player.x + Constants.PILL_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2)
-                    }));
+                    });
                 } else {
-                    let pr = new Projectile();
-                    this.players[socket.id].projectiles.unshift(pr.cloneWith(projectile).cloneWith({
+                    this.players[socket.id].addProjectile(projectile,{
                         x: fP.x,
                         y: fP.y,
-                        damage: player.projectileDamage,
                         startPoint: new Point(player.x + Constants.PLAYER_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2)
-                    }));
+                    });
                 }
             }
         }

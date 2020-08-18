@@ -7,6 +7,7 @@ class Input {
         this.mousePressed = false;
         this.mouseX = 0;
         this.mouseY = 0;
+        this.mouseMove = false;
     }
 
     static create(document) {
