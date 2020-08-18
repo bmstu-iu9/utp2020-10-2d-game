@@ -64,18 +64,19 @@ class Game {
             let x = this.players[key].x,
                 y = this.players[key].y;
             delete this.players[key];
-            this.clients.get(id).emit('turningIntoZombie', {x: x, y: y}); //превращаются в зомби
+            this.clients.get(id).emit('turningIntoZombie', { x: x, y: y }); //превращаются в зомби
         }
     }
 
     //проверяет какие таблетки подобрал игрок
     collisionWithPills(id) {
         let player = this.players[id];
-        for (let i in this.pills)
+        for (let i in this.pills) {
             if (player.intersect(this.pills[i])) {
                 this.players[id].increaseHealth(this.pills[i].health);
                 delete this.pills[i];
             }
+        }
     }
 
     //просчитываем получение урона игроком player от снарядов других игроков
@@ -98,7 +99,7 @@ class Game {
                                 let x = this.players[id].x,
                                     y = this.players[id].y;
                                 delete this.players[id]; //удаляем его из списка игроков
-                                this.clients.get(id).socket.emit('turningIntoZombie', {x: x, y: y});
+                                this.clients.get(id).socket.emit('turningIntoZombie', { x: x, y: y });
                             }
                         }
                     }
