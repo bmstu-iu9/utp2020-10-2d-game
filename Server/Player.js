@@ -3,12 +3,10 @@ const Constants = require('../Constants');
 const Projectile = require('./Projectile.js');
 //класс игрока
 class Player extends Rect {
-    constructor(role, name, w, h, playerWidth, playerHeight) {
-        super(0, 0, playerWidth, playerHeight);
+    constructor(role, name, w, h) {
+        super(0, 0, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
         this.screenWidth = w;
         this.screenHeight = h;
-        this.w = Constants.PLAYER_WIDTH;
-        this.h = Constants.PLAYER_HEIGHT;
         this.name = name;
         this.role = role;
         this.projectiles = [];

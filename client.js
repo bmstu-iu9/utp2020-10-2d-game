@@ -15,12 +15,12 @@ $(document).ready(() => {
             const width = document.documentElement.clientWidth; // ширина клиентской части окна браузера
             const height = document.documentElement.clientHeight; // высота клиентской части окна браузера
             const name = $('#nameOfPlayer').val();
-            socket.emit('setPlayerName', {role: role, name: name}, width, height);
-            socket.on('invalidNickname', function (data) {//если ник некорректный
+            socket.emit(Constants.SET_PLAYER_NAME, {role: role, name: name, width: width, height: height});
+            socket.on(Constants.INVALID_NICKNAME, function (data) {//если ник некорректный
                 console.log(data);
                 document.getElementById('nameError').innerHTML = data;
             })
-            socket.on('usersExists', function (data) {//событие происходящие если выбран ник, который уже занят
+            socket.on(Constants.USER_EXISTS, function (data) {//событие происходящие если выбран ник, который уже занят
                 console.log(data);
                 document.getElementById('nameError').innerHTML = data;
             })

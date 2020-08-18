@@ -98,6 +98,8 @@ class Game {
     turningIntoZombie(id) {
         const player = this.players[id];
         this.players[id] = new Player('Zombie', player.name, player.screenWidth, player.screenHeight, player.w, player.h);
+        this.players[id].x = player.x;
+        this.players[id].y = player.y;
         --this.humanCount;
         ++this.zombieCount;
     }
@@ -214,7 +216,7 @@ class Game {
 
     //добавляет нового игрока
     addPlayer(player, socket) {
-        this.players[socket.id] = player;
+        this.players[socket.id] = new Player(player.role, player.name, player.width, player.height);
         this.clients.set(socket.id, socket);
         if (player.role === 'Zombie')
             this.zombieCount++;

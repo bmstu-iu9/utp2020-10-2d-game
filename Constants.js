@@ -24,11 +24,16 @@ module.exports = Object.freeze({
     STATE_UPDATE: 'update',
     PLAYER_ACTION: 'playerAction',
     PLAY: 'playTheGame',
-    RELOAD_PISTOL : 5000, //длительность перезарядки пистолета
+    RELOAD_PISTOL: 5000, //длительность перезарядки пистолета
     TYPE_BULLET: 'bullet',
     TYPE_COUGH: 'cough',
     BULLET_DAMAGE: 0.10, //урон от пули
     COUGH_DAMAGE: 0.05, //урон от кашля
     MAX_RADIUS_OF_EPIDEMIC_AREA: 100,
-    FRAME_RATE: 1000 / 60
+    FRAME_RATE: 1000 / 60,
+    USER_EXISTS: 'usersExists',
+    INVALID_NICKNAME: 'invalidNickname',
+    SET_PLAYER_NAME: 'setPlayerName',
+    CONNECT: 'connection',
+    DISCONNECT: 'disconnect'
 })

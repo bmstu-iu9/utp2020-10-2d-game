@@ -10,17 +10,17 @@ const fs = require('fs');
 const Constants = require('./Constants.js');
 
 
-io.on('connection', socket => {
+io.on(Constants.CONNECT, socket => {
     console.log('user connected');
-    socket.on('setPlayerName', function (player, width, height, playerWidth, playerHeight) {
+    socket.on(Constants.SET_PLAYER_NAME, function (player) {
         if (player.name.length === 0) { //пустое имя недопустимо
-            socket.emit('invalidNickname', 'nickname is invalid');
+            socket.emit(Constants.INVALID_NICKNAME, 'nickname is invalid');
         } else {
             if (game.findName(player.name) === 0) { //проверяем есть ли игок с таким ником
+                game.addPlayer(player, socket);
                 socket.emit(Constants.PLAY);
-                game.addPlayer(new Player(player.role, player.name, width, height, playerWidth, playerHeight), socket);
                 console.log('a new player ' + game.players[socket.id].name + ' is ' + player.role);
-            } else socket.emit('usersExists', player.name + ' username is taken! Try some other username.');
+            } else socket.emit(Constants.USER_EXISTS, player.name + ' username is taken! Try some other username.');
         }
     });
     socket.on(Constants.PLAYER_ACTION, function (state) {
@@ -46,7 +46,7 @@ io.on('connection', socket => {
             });
         }
     })
-    socket.on('disconnect', () => {
+    socket.on(Constants.DISCONNECT, () => {
         if (socket.id in game.players) {
             console.log("Player " + game.players[socket.id].name + " disconnect");
             game.players[socket.id].alive = false;
