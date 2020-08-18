@@ -23,5 +23,8 @@ module.exports = Object.freeze({
     ],
     STATE_UPDATE: 'update',
     PLAYER_ACTION: 'playerAction',
-    PLAY: 'playTheGame'
+    PLAY: 'playTheGame',
+    RELOAD_PISTOL : 5000, //длительность перезарядки пистолета
+    TYPE_BULLET: 'bullet',
+    TYPE_COUGH: 'cough'
 })

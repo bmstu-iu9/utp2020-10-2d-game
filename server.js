@@ -53,13 +53,9 @@ io.on('connection', socket => {
             game.addProjectile(socket, {
                 x: game.players[socket.id].x + 80,
                 y: game.players[socket.id].y + 65,
-                projectileWidth: Constants.BULLET_WIDTH,
-                projectileHeight: Constants.BULLET_HEIGHT,
                 mouseX: state.mouseX,
                 mouseY: state.mouseY,
                 mouseMove: state.mouseMove,
-                type: 'bullet',
-                projectileSpeed: Constants.SPEED_OF_BULLET
             });
         }
     })
@@ -73,7 +69,7 @@ io.on('connection', socket => {
     })
     socket.on('disconnect', () => {
         if (socket.id in game.players) {
-            console.log("Player " + players[socket.id].name + " disconnect");
+            console.log("Player " + game.players[socket.id].name + " disconnect");
             game.players[socket.id].alive = false;
         } else console.log("Player (no name) disconnect");
     });

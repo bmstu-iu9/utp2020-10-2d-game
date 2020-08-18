@@ -140,7 +140,7 @@ class Game {
         }
         //удаляем уничтоженные снаряды
         for (let key in this.players) {
-            for (let i = 0; i < this.players[key].projectiles.length;i++) {
+            for (let i = 0; i < this.players[key].projectiles.length; i++) {
                 if (!this.players[key].projectiles[i].isExist())
                     this.players[key].projectiles.splice(i, 1);
             }
@@ -149,13 +149,24 @@ class Game {
     }
 
     addProjectile(socket, projectile) {
+        if (this.players[socket.id].role === 'Human') {
+            projectile.projectileHeight = Constants.BULLET_HEIGHT;
+            projectile.projectileWidth = Constants.BULLET_WIDTH;
+            projectile.type = Constants.TYPE_BULLET;
+            projectile.projectileSpeed = Constants.SPEED_OF_BULLET;
+        } else {
+            projectile.projectileHeight = Constants.COUGH_HEIGHT;
+            projectile.projectileWidth = Constants.COUGH_WIDTH;
+            projectile.type = Constants.TYPE_COUGH;
+            projectile.projectileSpeed = Constants.SPEED_OF_COUGH;
+        }
         if (this.players[socket.id].isWeaponEmpty()) { //если патроны закончились
             if (!this.players[socket.id].reloading) { //если оружие не перезаряжается
                 this.players[socket.id].reloading = true;
                 this.players[socket.id].reload = setTimeout(function () {
                     this.players[socket.id].countOfBulletInWeapon = this.players[socket.id].weaponCapacity;
                     this.players[socket.id].reloading = false;
-                }, 5000);
+                }, Constants.RELOAD_PISTOL);
             }
         } else {
             this.players[socket.id].shoot();
