@@ -11,7 +11,7 @@ class Render {
     }
 
     loadImgs(imgs) {
-        this.imgs = Object.assign({}, imgs);
+        this.imgs = imgs;
     }
 
     clear(canvas, context) {
