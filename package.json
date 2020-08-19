@@ -2,7 +2,7 @@
   "name": "utp2020-10-2d-game",
   "version": "1.0.0",
   "description": "многопользовательская 2д игра",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,10 +18,13 @@
   "homepage": "https://github.com/bmstu-iu9/utp2020-10-2d-game#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "jquery": "^3.5.1",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "bufferutil": "^4.0.1",
-    "utf-8-validate": "^5.0.2"
+    "utf-8-validate": "^5.0.2",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
   }
 }
