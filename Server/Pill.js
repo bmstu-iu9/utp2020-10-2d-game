@@ -8,6 +8,11 @@ class Pill extends Rect {
             Constants.PILL_WIDTH,
             Constants.PILL_HEIGHT);
         this.health = Constants.HEALTH_OF_PILL;
+        this.exist = true;
+    }
+
+    isExist() {
+        return this.exist;
     }
 }
 module.exports = Pill;

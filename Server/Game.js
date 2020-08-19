@@ -11,7 +11,7 @@ class Game {
         this.zombieCount = 0;
         this.w = 0;
         this.h = 0;
-        this.pills = {};
+        this.pills = [];
         this.epidemicArea = new Epidemic(new Point(0, 0), 0);
     }
 
@@ -62,7 +62,7 @@ class Game {
         for (let i in this.pills) {
             if (player.intersect(this.pills[i])) {
                 this.players[id].increaseHealth(this.pills[i].health);
-                delete this.pills[i];
+                this.pills[i].exist = false;
             }
         }
     }
@@ -134,6 +134,13 @@ class Game {
             if (this.players[key].isAlive())
                 this.collisionWithProjectile(key);
         }
+        //удаляем уничтоженные снаряды
+        for (let key in this.players)
+            this.players[key].projectiles = this.players[key].projectiles.filter(
+                projectile => projectile.isExist())
+        //удаляем подобранные лекарства
+        this.pills = this.pills.filter(
+            pill => pill.isExist())
         //удаляем убитых игроков
         for (let key in this.players) {
             if (!this.players[key].isAlive()) {
@@ -142,13 +149,6 @@ class Game {
                 else --this.zombieCount;
                 delete this.players[key];
                 delete this.clients[key];
-            }
-        }
-        //удаляем уничтоженные снаряды
-        for (let key in this.players) {
-            for (let i = 0; i < this.players[key].projectiles.length; i++) {
-                if (!this.players[key].projectiles[i].isExist())
-                    this.players[key].projectiles.splice(i, 1);
             }
         }
 
@@ -231,8 +231,7 @@ class Game {
 
     //добавляет новую таблетку
     addPill() {
-        let p = new Pill(this.w, this.h);
-        this.pills[p.x + '#' + p.y] = p;
+        this.pills.unshift(new Pill(this.w, this.h));
     }
 
     sendState() {
