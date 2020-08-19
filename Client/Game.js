@@ -80,7 +80,6 @@ class Game {
                 mouse: this.input.mousePressed,
                 mouseX: this.input.mouseX,
                 mouseY: this.input.mouseY,
-                mouseMove: this.input.mouseMove,
                 dt: this.dt
             })
         }

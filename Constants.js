@@ -25,8 +25,8 @@ module.exports = Object.freeze({
     PLAYER_ACTION: 'playerAction',
     PLAY: 'playTheGame',
     RELOAD_PISTOL: 5000, //длительность перезарядки пистолета
-    TYPE_BULLET: 'bullet',
-    TYPE_COUGH: 'cough',
+    BULLET_TYPE: 'bullet',
+    COUGH_TYPE: 'cough',
     BULLET_DAMAGE: 0.10, //урон от пули
     COUGH_DAMAGE: 0.05, //урон от кашля
     MAX_RADIUS_OF_EPIDEMIC_AREA: 100,
@@ -36,5 +36,9 @@ module.exports = Object.freeze({
     SET_PLAYER_NAME: 'setPlayerName',
     CONNECT: 'connection',
     DISCONNECT: 'disconnect',
-    GAME_OVER: 'gameOver'
+    GAME_OVER: 'gameOver',
+    PROJECTILE_WIDTH: 10,
+    PROJECTILE_HEIGHT: 10,
+    ZOMBIE_TYPE: 'Zombie',
+    HUMAN_TYPE: 'Human'
 })

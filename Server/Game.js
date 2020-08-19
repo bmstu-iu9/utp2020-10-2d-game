@@ -155,19 +155,6 @@ class Game {
     }
 
     addProjectile(socket, projectile) {
-        if (this.players[socket.id].role === 'Human') {
-            projectile.projectileHeight = Constants.BULLET_HEIGHT;
-            projectile.projectileWidth = Constants.BULLET_WIDTH;
-            projectile.type = Constants.TYPE_BULLET;
-            projectile.projectileSpeed = Constants.SPEED_OF_BULLET;
-            projectile.damage = Constants.BULLET_DAMAGE;
-        } else {
-            projectile.projectileHeight = Constants.COUGH_HEIGHT;
-            projectile.projectileWidth = Constants.COUGH_WIDTH;
-            projectile.type = Constants.TYPE_COUGH;
-            projectile.projectileSpeed = Constants.SPEED_OF_COUGH;
-            projectile.damage = Constants.COUGH_DAMAGE;
-        }
         if (this.players[socket.id].isWeaponEmpty()) { //если патроны закончились
             if (!this.players[socket.id].reloading) { //если оружие не перезаряжается
                 this.players[socket.id].reloading = true;
@@ -177,33 +164,23 @@ class Game {
                 this.players[socket.id].reloading = false;
             }
         } else {
+            let p, startPoint
             this.players[socket.id].shoot();
-            if (!projectile.mouseMove) {
-                const startPoint = new Point(this.players[socket.id].x + Constants.PLAYER_WIDTH / 2,
-                    this.players[socket.id].y + Constants.PLAYER_HEIGHT / 2);
-                this.players[socket.id].addProjectile(projectile, { startPoint: startPoint });
+            let player = this.players[socket.id],
+                points = (new Point(player.x + player.w / 2, player.y + player.h / 2)).findPoints(
+                    new Point(projectile.mouseX, projectile.mouseY),
+                    (player.h * player.h + player.w * player.w) / 4),
+                fP = points.firstPoint,
+                sP = points.secondPoint;
+            if (new Point(projectile.mouseX, projectile.mouseY).findDist(fP) >
+                new Point(projectile.mouseX, projectile.mouseY).findDist(sP)) {
+                p = sP;
             } else {
-                let player = this.players[socket.id],
-                    points = (new Point(player.x + player.w / 2, player.y + player.h / 2)).findPoints(
-                        new Point(projectile.mouseX, projectile.mouseY),
-                        (player.h * player.h + player.w * player.w) / 4),
-                    fP = points.firstPoint,
-                    sP = points.secondPoint;
-                if (new Point(projectile.mouseX, projectile.mouseY).findDist(fP) >
-                    new Point(projectile.mouseX, projectile.mouseY).findDist(sP)) {
-                    this.players[socket.id].addProjectile(projectile, {
-                        x: sP.x,
-                        y: sP.y,
-                        startPoint: new Point(player.x + Constants.PILL_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2)
-                    });
-                } else {
-                    this.players[socket.id].addProjectile(projectile, {
-                        x: fP.x,
-                        y: fP.y,
-                        startPoint: new Point(player.x + Constants.PLAYER_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2)
-                    });
-                }
+                p = fP;
             }
+            startPoint = new Point(player.x + Constants.PILL_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2);
+            this.players[socket.id].addProjectile(p, startPoint, projectile.mouseX, projectile.mouseY)
+
         }
     }
 
@@ -222,7 +199,7 @@ class Game {
             this.h = player.height;
         }
         this.clients.set(socket.id, socket);
-        if (player.role === 'Zombie')
+        if (player.role === Constants.ZOMBIE_TYPE)
             this.zombieCount++;
         else
             this.humanCount++;

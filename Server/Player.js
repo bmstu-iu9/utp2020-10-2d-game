@@ -13,20 +13,18 @@ class Player extends Rect {
         this.dx = 3;
         this.dy = 3;
         this.alive = true;
-        if (role === 'Human') {
-            this.typeOfWeapon = 'pistol'; //тип оружия
+        if (role === Constants.HUMAN_TYPE) {
             this.countOfBulletInWeapon = 5; //текущее количество пуль в оружии
             this.weaponCapacity = 5; //максимальная ёмкость в обойме
             this.reloading = false; //показывает находится ли оружие в процессе перезарядки
             this.health = Constants.HUMAN_MAX_HEALTH;
         } else {
             this.health = Constants.ZOMBIE_MAX_HEALTH;
-            this.typeOfWeapon = 'cough'; //тип оружия
         }
     }
 
     shoot() {
-        if (this.role === 'Zombie') {
+        if (this.role === Constants.ZOMBIE_TYPE) {
             return true;
         } else {
             if (this.countOfBulletInWeapon > 0) {
@@ -38,7 +36,7 @@ class Player extends Rect {
 
     //проаерка на наличие патронов для стрельбы
     isWeaponEmpty() {
-        if (this.role === 'Zombie')
+        if (this.role === Constants.ZOMBIE_TYPE)
             return false;
         else return this.countOfBulletInWeapon === 0;
     }
@@ -94,9 +92,10 @@ class Player extends Rect {
     isAlive() {
         return this.alive;
     }
-    addProjectile(projectile,dop) {
-        let p = new Projectile();
-        this.projectiles.unshift(p.cloneWith({}).cloneWith(projectile).cloneWith(dop));
+    addProjectile(p,startPoint,mouseX,mouseY) {
+        if (this.role === Constants.ZOMBIE_TYPE)
+            this.projectiles.unshift(new Projectile(p.x,p.y,startPoint,mouseX,mouseY,Constants.COUGH_TYPE));
+        else this.projectiles.unshift(new Projectile(p.x,p.y,startPoint,mouseX,mouseY,Constants.BULLET_TYPE));
     }
 }
 module.exports = Player;
