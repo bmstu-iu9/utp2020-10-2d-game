@@ -42,9 +42,9 @@ $(document).ready(() => {
         })
     }
     $('#human').click(() => {
-        addNewPlayer('Human');
+        addNewPlayer(Constants.HUMAN_TYPE);
     })
     $('#zombie').click(() => {
-        addNewPlayer('Zombie');
+        addNewPlayer(Constants.ZOMBIE_TYPE);
     })
 })

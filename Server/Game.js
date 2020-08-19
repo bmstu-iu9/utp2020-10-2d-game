@@ -24,7 +24,7 @@ class Game {
     randomHuman() {
         let keys = Object.keys(this.players),
             curPlayer = this.players[keys[Math.floor(Math.random() * (keys.length - 1))]];
-        while (curPlayer.role !== 'Human')
+        while (curPlayer.role !== Constants.HUMAN_TYPE)
             curPlayer = this.players[keys[Math.floor(Math.random() * keys.length)]];
         return new Point(Math.abs(curPlayer.x - 15), Math.abs(curPlayer.y - 15));
     }
@@ -96,7 +96,7 @@ class Game {
 
     turningIntoZombie(id) {
         const player = this.players[id];
-        this.players[id] = new Player('Zombie', player.name, player.screenWidth, player.screenHeight, player.w, player.h);
+        this.players[id] = new Player(Constants.ZOMBIE_TYPE, player.name, player.screenWidth, player.screenHeight);
         this.players[id].x = player.x;
         this.players[id].y = player.y;
         --this.humanCount;
@@ -144,9 +144,7 @@ class Game {
         //удаляем убитых игроков
         for (let key in this.players) {
             if (!this.players[key].isAlive()) {
-                if (this.players[key].role === 'Human')
-                    --this.humanCount;
-                else --this.zombieCount;
+                this.players[key].role ===  Constants.HUMAN_TYPE ? --this.humanCount : --this.zombieCount;
                 delete this.players[key];
                 delete this.clients[key];
             }
