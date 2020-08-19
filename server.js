@@ -5,14 +5,13 @@ const io = require('socket.io')(http);
 const path = require('path');
 const Game = require('./Server/Game.js')
 const game = new Game();
-const Player = require('./Server/Player.js');
 const fs = require('fs');
 const Constants = require('./Constants.js');
 
 
 io.on(Constants.CONNECT, socket => {
     console.log('user connected');
-    socket.on(Constants.SET_PLAYER_NAME, function (player) {
+    socket.on(Constants.SET_PLAYER_NAME, function(player) {
         if (player.name.length === 0) { //пустое имя недопустимо
             socket.emit(Constants.INVALID_NICKNAME, 'nickname is invalid');
         } else {
@@ -23,7 +22,7 @@ io.on(Constants.CONNECT, socket => {
             } else socket.emit(Constants.USER_EXISTS, player.name + ' username is taken! Try some other username.');
         }
     });
-    socket.on(Constants.PLAYER_ACTION, function (state) {
+    socket.on(Constants.PLAYER_ACTION, function(state) {
         if (state.down) {
             game.players[socket.id].moveDown();
         }
@@ -45,6 +44,12 @@ io.on(Constants.CONNECT, socket => {
                 mouseMove: state.mouseMove,
             });
         }
+    });
+    socket.on(Constants.NEW_MSG, function(msg) {
+        io.sockets.emit(Constants.NEW_MSG, {
+            name: game.players[socket.id].name,
+            msg: msg
+        });
     })
     socket.on(Constants.DISCONNECT, () => {
         if (socket.id in game.players) {
@@ -57,20 +62,22 @@ setInterval(() => {
     game.update();
     game.sendState();
 }, Constants.FRAME_RATE)
-setInterval(function () {
+setInterval(function() {
     game.addPill();
 }, 10000);
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
     res.sendfile('index.html');
 });
 app.use('/dist', express.static(path.join(__dirname, '/dist')));
 app.use('/css', express.static(`${__dirname}/css`));
-app.get('/client.js', function (req, res) {
+app.get('/client.js', function(req, res) {
     fs.readFile('client.js', (err, code) => {
-        res.writeHead(200, { 'Content-Type': 'text/javascript' });
+        res.writeHead(200, {
+            'Content-Type': 'text/javascript'
+        });
         res.end(code);
     })
 })
-http.listen(3000, function () {
+http.listen(3000, function() {
     console.log('listening on *:3000');
 });

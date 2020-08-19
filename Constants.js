@@ -17,7 +17,7 @@ module.exports = Object.freeze({
     IMG_NAMES: [
         'Zombie.svg', //Zombie
         'Human.svg', //Human
-        'Virus.png',//моделька снарядов - кашля
+        'Virus.png', //моделька снарядов - кашля
         'medicinedrawn.svg', //лекарство
         'Bullet.png' //пуля
     ],
@@ -36,5 +36,7 @@ module.exports = Object.freeze({
     SET_PLAYER_NAME: 'setPlayerName',
     CONNECT: 'connection',
     DISCONNECT: 'disconnect',
-    GAME_OVER: 'gameOver'
+    GAME_OVER: 'gameOver',
+    CHAT_WIDTH: 400,
+    NEW_MSG: 'newMessage'
 })
