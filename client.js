@@ -29,7 +29,7 @@ $(document).ready(() => {
             socket.on(Constants.PLAY, function() {
                 document.body.innerHTML = '<canvas id = "game-canvas"></canvas>\
                 <div id="game-chat"><input type="text" id="chat-input"></div>';
-                const chatDisplay = document.getElementById('game-chat');;
+                const chatDisplay = document.getElementById('game-chat');
                 const chatInput = document.getElementById('chat-input');
                 const chat = Chat.create(socket, chatInput, chatDisplay);
                 const canvas = document.getElementById('game-canvas');

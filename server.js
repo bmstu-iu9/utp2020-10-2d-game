@@ -36,20 +36,25 @@ io.on(Constants.CONNECT, socket => {
             game.players[socket.id].moveRight();
         }
         if (state.mouse) {
-            game.addProjectile(socket, {
-                x: game.players[socket.id].x + 80,
-                y: game.players[socket.id].y + 65,
-                mouseX: state.mouseX,
-                mouseY: state.mouseY,
-                mouseMove: state.mouseMove,
-            });
+            if (state.mouseX < game.w) {
+                game.addProjectile(socket, {
+                    x: game.players[socket.id].x + 80,
+                    y: game.players[socket.id].y + 65,
+                    mouseX: state.mouseX,
+                    mouseY: state.mouseY,
+                    mouseMove: state.mouseMove,
+                });
+            }
         }
     });
     socket.on(Constants.NEW_MSG, function(msg) {
-        io.sockets.emit(Constants.NEW_MSG, {
-            name: game.players[socket.id].name,
-            msg: msg
-        });
+        game.clients.forEach((client, socketID) => {
+            const currentPlayer = game.players[socketID]
+            game.clients.get(socketID).emit(Constants.NEW_MSG, {
+                name: currentPlayer.name,
+                msg: msg
+            })
+        })
     })
     socket.on(Constants.DISCONNECT, () => {
         if (socket.id in game.players) {
