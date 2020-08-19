@@ -87,10 +87,14 @@ class Game {
 
     renderGame(canvas, context) {
         this.render.clear(canvas, context);
+        let player = this.players[this.socket.id];
+        context.save();
+        context.translate(player.screenWidth/2 - player.x - player.w/2,player.screenHeight/2-player.y-player.h/2);
         this.render.drawProjectiles(context, this.players);
         this.render.drawPlayers(context, this.players);
         this.render.drawPills(context, this.pills);
         this.render.drawEpidemicArea(context, this.area);
+        context.restore();
     }
 }
 

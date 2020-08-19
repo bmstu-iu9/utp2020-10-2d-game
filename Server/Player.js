@@ -56,27 +56,27 @@ class Player extends Rect {
     }
 
     moveDown() {
-        if (this.y + 120 < this.screenHeight) {
+        // if (this.y + 120 < this.screenHeight) {
             this.y += this.dy;
-        }
+        // }
     }
 
     moveUp() {
-        if (this.y > 0) {
+        // if (this.y > 0) {
             this.y -= this.dy;
-        }
+        // }
     }
 
     moveLeft() {
-        if (this.x > 0) {
+        // if (this.x > 0) {
             this.x -= this.dx;
-        }
+        // }
     }
 
     moveRight() {
-        if (this.x + 90 < this.screenWidth) {
+        // if (this.x + 90 < this.screenWidth) {
             this.x += this.dx;
-        }
+        // }
     }
 
     //двигает все снаряды этого игрока
