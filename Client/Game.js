@@ -14,7 +14,7 @@ class Game {
         this.players = {};
         this.pills = {};
         this.area = null;
-        this.newO = new Point(0,0);
+        this.newO = new Point(0, 0);
         this.animationFrameId = null;
         this.lastUpdateTime = 0;
         this.dt = 0;
@@ -81,7 +81,7 @@ class Game {
                 left: this.input.leftPressed,
                 right: this.input.rightPressed,
                 mouse: this.input.mousePressed,
-                mouseX: this.input.mouseX - this.newO.x ,
+                mouseX: this.input.mouseX - this.newO.x,
                 mouseY: this.input.mouseY - this.newO.y,
                 dt: this.dt
             })
@@ -90,14 +90,14 @@ class Game {
 
     renderGame(canvas, context) {
         this.render.clear(canvas, context);
-        context.save();
-        context.translate(this.newO.x,this.newO.y);
+        context.save(); //добавляет текущее положение экрана в стек
+        context.translate(this.newO.x, this.newO.y); //переносит начало координат в зааданную точку
         this.render.drawFrame(context);
         this.render.drawProjectiles(context, this.players);
         this.render.drawPlayers(context, this.players);
         this.render.drawPills(context, this.pills);
         this.render.drawEpidemicArea(context, this.area);
-        context.restore();
+        context.restore(); //достаёт из стека последнее состояние экрана
     }
 }
 

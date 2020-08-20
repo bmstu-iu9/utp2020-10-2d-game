@@ -36,11 +36,8 @@ class Render {
     }
 
     drawPlayers(context, players) {
-        // context.save(); //заносит в стек текущее положение экрана
         context.font = "12px Arial";
         context.fillStyle = "#0095DD";
-        // context.translate(players[socket.id].screenWidth/2 - players[socket.id].x/2,players[socket.id].screenHeight/2-players[socket.id].y/2);
-        // console.log(players[socket.id]);
         let dy = 15;
         for (let key in players) {
             console.log(players[key])
@@ -65,7 +62,6 @@ class Render {
             context.drawImage(img, x, y, players[key].w, players[key].h);
             y -= 2 * dy;
         }
-        // context.restore(); //достаёт из стека последнее состояние
     }
 
     drawPills(context, pills) {
