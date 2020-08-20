@@ -7,7 +7,6 @@ class Input {
         this.mousePressed = false;
         this.mouseX = 0;
         this.mouseY = 0;
-        this.mouseMove = false;
     }
 
     static create(document) {
@@ -49,7 +48,6 @@ class Input {
         this.mousePressed = false;
     }
     mouseMoveHandler(event) {
-        this.mouseMove = true;
         this.mouseX = event.clientX;
         this.mouseY = event.clientY;
     }

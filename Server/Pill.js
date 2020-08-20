@@ -3,11 +3,16 @@ const Constants = require('../Constants.js')
     //класс лекарства
 class Pill extends Rect {
     constructor(w, h) {
-        super(w * (Math.random() - 90 / w),
-            h * (Math.random() - 90 / h),
+        super(Math.random() * Constants.WORLD_WIDTH,
+            Math.random() * Constants.WORLD_HEIGHT,
             Constants.PILL_WIDTH,
             Constants.PILL_HEIGHT);
         this.health = Constants.HEALTH_OF_PILL;
+        this.exist = true;
+    }
+
+    isExist() {
+        return this.exist;
     }
 }
 module.exports = Pill;

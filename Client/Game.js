@@ -1,6 +1,7 @@
-const Constants = require('../Constants.js'),
-    Render = require('./Render.js'),
-    Input = require('./Input.js');
+const Constants = require('../Constants.js');
+const Render = require('./Render.js');
+const Input = require('./Input.js');
+const Point = require('../Server/Point.js')
 
 class Game {
     constructor(render, input, socket) {
@@ -13,7 +14,7 @@ class Game {
         this.players = {};
         this.pills = {};
         this.area = null;
-
+        this.newO = new Point(0, 0);
         this.animationFrameId = null;
         this.lastUpdateTime = 0;
         this.dt = 0;
@@ -68,6 +69,8 @@ class Game {
         this.players = state.players;
         this.pills = state.pills;
         this.area = state.area;
+        this.newO = new Point(this.me.screenWidth / 2 - this.me.x - this.me.w / 2,
+            this.me.screenHeight / 2 - this.me.y - this.me.h / 2);
     }
 
     update() {
@@ -78,9 +81,8 @@ class Game {
                 left: this.input.leftPressed,
                 right: this.input.rightPressed,
                 mouse: this.input.mousePressed,
-                mouseX: this.input.mouseX,
-                mouseY: this.input.mouseY,
-                mouseMove: this.input.mouseMove,
+                mouseX: this.input.mouseX - this.newO.x,
+                mouseY: this.input.mouseY - this.newO.y,
                 dt: this.dt
             })
         }
@@ -88,10 +90,15 @@ class Game {
 
     renderGame(canvas, context) {
         this.render.clear(canvas, context);
+        context.save(); //добавляет текущее положение экрана в стек
+        context.translate(this.newO.x, this.newO.y); //переносит начало координат в зааданную точку
+        this.render.drawFrame(context);
+        this.render.drawField(context);
         this.render.drawProjectiles(context, this.players);
         this.render.drawPlayers(context, this.players);
         this.render.drawPills(context, this.pills);
         this.render.drawEpidemicArea(context, this.area);
+        context.restore(); //достаёт из стека последнее состояние экрана
     }
 }
 

@@ -1,4 +1,7 @@
 module.exports = Object.freeze({
+    WORLD_MIN: 0,
+    WORLD_WIDTH: 3000,
+    WORLD_HEIGHT: 3000,
     ZOMBIE_MAX_HEALTH: 1.00,
     HUMAN_MAX_HEALTH: 1.00,
     SPEED_OF_COUGH: 5, //скорость полёта кашля
@@ -18,15 +21,16 @@ module.exports = Object.freeze({
         'Zombie.svg', //Zombie
         'Human.svg', //Human
         'Virus.png',//моделька снарядов - кашля
-        'medicinedrawn.svg', //лекарство
-        'Bullet.png' //пуля
+        'Medicine.svg', //лекарство
+        'Bullet.png', //пуля
+        'Field.jpg'
     ],
     STATE_UPDATE: 'update',
     PLAYER_ACTION: 'playerAction',
     PLAY: 'playTheGame',
     RELOAD_PISTOL: 5000, //длительность перезарядки пистолета
-    TYPE_BULLET: 'bullet',
-    TYPE_COUGH: 'cough',
+    BULLET_TYPE: 'bullet',
+    COUGH_TYPE: 'cough',
     BULLET_DAMAGE: 0.10, //урон от пули
     COUGH_DAMAGE: 0.05, //урон от кашля
     MAX_RADIUS_OF_EPIDEMIC_AREA: 100,
@@ -36,5 +40,19 @@ module.exports = Object.freeze({
     SET_PLAYER_NAME: 'setPlayerName',
     CONNECT: 'connection',
     DISCONNECT: 'disconnect',
-    GAME_OVER: 'gameOver'
+    GAME_OVER: 'gameOver',
+    PROJECTILE_WIDTH: 10,
+    PROJECTILE_HEIGHT: 10,
+    ZOMBIE_TYPE: 'Zombie',
+    HUMAN_TYPE: 'Human',
+    NICKNAME_FONT: "15px Arial",
+    NICKNAME_COLOR: "#0095DD",
+    HP_BAR_FRAME_COLOR: "#000000",
+    HP_COLOR: "#32CD32",
+    HP_ABSENT_COLOR: "#B22222", //цвет отнятого здоровья
+    EPIDEMIC_AREA_COLOR: 'rgb(46, 139, 87, 0.25)',
+    HUMAN_TIME_BETWEEN_SHOOTS: 50,
+    ZOMBIE_TIME_BETWEEN_SHOOTS: 100,
+    FIELD_PIECE_WIDTH: 150,
+    FIELD_PIECE_HEIGHT: 150
 })
