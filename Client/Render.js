@@ -59,10 +59,10 @@ class Render {
     }
 
     drawPills(context, pills) {
-        for (let i in pills) {
-            context.drawImage(this.imgs['medicinedrawn.svg'], pills[i].x, pills[i].y,
+        pills.forEach((pill) => {
+            context.drawImage(this.imgs['Medicine.svg'], pill.x, pill.y,
                 Constants.PILL_WIDTH, Constants.PILL_HEIGHT);
-        }
+        })
     }
 
     drawEpidemicArea(context, area) {
@@ -84,9 +84,9 @@ class Render {
             for (let y = 0; y < Constants.WORLD_HEIGHT;) {
                 context.drawImage(this.imgs['Field.jpg'], x, y,
                     Constants.FIELD_PIECE_WIDTH, Constants.FIELD_PIECE_HEIGHT);
-                y += 150;
+                y += Constants.FIELD_PIECE_HEIGHT;
             }
-            x += 150;
+            x += Constants.FIELD_PIECE_WIDTH;
         }
     }
 }

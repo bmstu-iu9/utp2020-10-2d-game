@@ -21,7 +21,7 @@ module.exports = Object.freeze({
         'Zombie.svg', //Zombie
         'Human.svg', //Human
         'Virus.png',//моделька снарядов - кашля
-        'medicinedrawn.svg', //лекарство
+        'Medicine.svg', //лекарство
         'Bullet.png', //пуля
         'Field.jpg'
     ],
