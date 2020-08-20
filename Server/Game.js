@@ -153,34 +153,7 @@ class Game {
     }
 
     addProjectile(socket, projectile) {
-        if (this.players[socket.id].isWeaponEmpty()) { //если патроны закончились
-            if (!this.players[socket.id].reloading) { //если оружие не перезаряжается
-                this.players[socket.id].reloading = true;
-                this.players[socket.id].reloadingStart = Date.now();
-            } else if (Date.now() - this.players[socket.id].reloadingStart >= Constants.RELOAD_PISTOL) {
-                this.players[socket.id].countOfBulletInWeapon = this.players[socket.id].weaponCapacity;
-                this.players[socket.id].reloading = false;
-            }
-        } else {
-            let p, startPoint
-            this.players[socket.id].shoot();
-            let player = this.players[socket.id],
-                points = (new Point(player.x + player.w / 2, player.y + player.h / 2 + 40)).findPoints(
-                    new Point(projectile.mouseX, projectile.mouseY),
-                    (player.h * player.h + player.w * player.w) / 4),
-                fP = points.firstPoint,
-                sP = points.secondPoint;
-            if (new Point(projectile.mouseX, projectile.mouseY).findDist(fP) >
-                new Point(projectile.mouseX, projectile.mouseY).findDist(sP)) {
-                p = sP;
-            } else {
-                p = fP;
-            }
-            startPoint = new Point(player.x + player.w / 2,
-                player.y + player.h / 2 + 40);
-            this.players[socket.id].addProjectile(p, startPoint, projectile.mouseX, projectile.mouseY)
-
-        }
+        this.players[socket.id].shoot(projectile);
     }
 
     moveProjectiles() {

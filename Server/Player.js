@@ -1,6 +1,7 @@
 const Rect = require('./Rect.js');
 const Constants = require('../Constants');
 const Projectile = require('./Projectile.js');
+const Point = require('./Point.js')
 //класс игрока
 class Player extends Rect {
     constructor(role, name, w, h) {
@@ -13,24 +14,48 @@ class Player extends Rect {
         this.dx = 3;
         this.dy = 3;
         this.alive = true;
+        this.timeOfLastShoot = Date.now();
         if (role === Constants.HUMAN_TYPE) {
             this.countOfBulletInWeapon = 5; //текущее количество пуль в оружии
             this.weaponCapacity = 5; //максимальная ёмкость в обойме
             this.reloading = false; //показывает находится ли оружие в процессе перезарядки
             this.health = Constants.HUMAN_MAX_HEALTH;
+            this.timeBetweenShoot = Constants.HUMAN_TIME_BETWEEN_SHOOTS;
         } else {
             this.health = Constants.ZOMBIE_MAX_HEALTH;
+            this.timeBetweenShoot = Constants.ZOMBIE_TIME_BETWEEN_SHOOTS;
         }
     }
 
-    shoot() {
-        if (this.role === Constants.ZOMBIE_TYPE) {
-            return true;
-        } else {
-            if (this.countOfBulletInWeapon > 0) {
+    shoot(projectile) {
+        if (this.isWeaponEmpty()) { //если патроны закончились
+            if (!this.reloading) { //если оружие не перезаряжается
+                this.reloading = true;
+                this.reloadingStart = Date.now();
+            } else if (Date.now() - this.reloadingStart >= Constants.RELOAD_PISTOL) {
+                this.countOfBulletInWeapon = this.weaponCapacity;
+                this.reloading = false;
+            }
+            return;
+        }
+        if (Date.now() - this.timeOfLastShoot >= this.timeBetweenShoot) {
+            this.timeOfLastShoot = Date.now();
+            if (this.role === Constants.HUMAN_TYPE)
                 --this.countOfBulletInWeapon;
-                return true;
-            } else return false;
+            let p, startPoint
+            const points = (new Point(this.x + this.w / 2, this.y + this.h / 2 + 40)).findPoints(
+                new Point(projectile.mouseX, projectile.mouseY),
+                (this.h * this.h + this.w * this.w) / 4),
+                fP = points.firstPoint,
+                sP = points.secondPoint;
+            if (new Point(projectile.mouseX, projectile.mouseY).findDist(fP) >
+                new Point(projectile.mouseX, projectile.mouseY).findDist(sP)) {
+                p = sP;
+            } else {
+                p = fP;
+            }
+            startPoint = new Point(this.x + this.w / 2, this.y + this.h / 2 + 40);
+            this.addProjectile(p, startPoint, projectile.mouseX, projectile.mouseY)
         }
     }
 
