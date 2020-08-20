@@ -38,11 +38,8 @@ io.on(Constants.CONNECT, socket => {
         if (state.mouse) {
             if (state.mouseX < game.w) {
                 game.addProjectile(socket, {
-                    x: game.players[socket.id].x + 80,
-                    y: game.players[socket.id].y + 65,
                     mouseX: state.mouseX,
                     mouseY: state.mouseY,
-                    mouseMove: state.mouseMove,
                 });
             }
         }
