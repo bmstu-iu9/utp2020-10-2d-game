@@ -165,7 +165,7 @@ class Game {
             let p, startPoint
             this.players[socket.id].shoot();
             let player = this.players[socket.id],
-                points = (new Point(player.x + player.w / 2, player.y + player.h / 2 + 30)).findPoints(
+                points = (new Point(player.x + player.w / 2, player.y + player.h / 2 + 40)).findPoints(
                     new Point(projectile.mouseX, projectile.mouseY),
                     (player.h * player.h + player.w * player.w) / 4),
                 fP = points.firstPoint,
@@ -176,8 +176,8 @@ class Game {
             } else {
                 p = fP;
             }
-            startPoint = new Point(player.x + Constants.PLAYER_WIDTH / 2,
-                player.y + Constants.PLAYER_HEIGHT / 2 + 30);
+            startPoint = new Point(player.x + player.w / 2,
+                player.y + player.h / 2 + 40);
             this.players[socket.id].addProjectile(p, startPoint, projectile.mouseX, projectile.mouseY)
 
         }

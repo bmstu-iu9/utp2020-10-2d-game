@@ -56,7 +56,7 @@ class Player extends Rect {
     }
 
     moveDown() {
-        if (this.y + this.h < Constants.WORLD_HEIGHT) {
+        if (this.y + this.h + 40 < Constants.WORLD_HEIGHT) {
             this.y += this.dy;
         }
     }

@@ -43,5 +43,11 @@ module.exports = Object.freeze({
     PROJECTILE_WIDTH: 10,
     PROJECTILE_HEIGHT: 10,
     ZOMBIE_TYPE: 'Zombie',
-    HUMAN_TYPE: 'Human'
+    HUMAN_TYPE: 'Human',
+    NICKNAME_FONT: "15px Arial",
+    NICKNAME_COLOR: "#0095DD",
+    HP_BAR_FRAME_COLOR: "#000000",
+    HP_COLOR: "#32CD32",
+    HP_ABSENT_COLOR: "#B22222", //цвет отнятого здоровья
+    EPIDEMIC_AREA_COLOR: 'rgb(46, 139, 87, 0.25)'
 })
