@@ -84,7 +84,8 @@ class Game {
                 mouseX: this.input.mouseX - this.newO.x,
                 mouseY: this.input.mouseY - this.newO.y,
                 dt: this.dt,
-                mouseInChat: chat.mouseInChat
+                mouseInChat: chat.mouseInChat,
+                inputFocus: chat.inputFocus
             })
         }
     }

@@ -7,6 +7,7 @@ class Chat {
         this.display = display;
         this.body = body;
         this.mouseIn = false;
+        this.isTyping = false;
     }
 
     static create(socket, input, display, body) {
@@ -29,6 +30,16 @@ class Chat {
     mouseLeave() {
         this.mouseIn = false;
         console.log('chat unhover');
+    }
+
+    startTyping() {
+        this.isTyping = true;
+        console.log('focus on input');
+    }
+
+    stopTyping() {
+        this.isTyping = false;
+        console.log('focus out input');
     }
 
     keyDownHandler(e) {

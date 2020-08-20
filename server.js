@@ -23,16 +23,16 @@ io.on(Constants.CONNECT, socket => {
         }
     });
     socket.on(Constants.PLAYER_ACTION, function(state) {
-        if (state.down) {
+        if (state.down && !state.inputFocus) {
             game.players[socket.id].moveDown();
         }
-        if (state.left) {
+        if (state.left && !state.inputFocus) {
             game.players[socket.id].moveLeft();
         }
-        if (state.up) {
+        if (state.up && !state.inputFocus) {
             game.players[socket.id].moveUp();
         }
-        if (state.right) {
+        if (state.right && !state.inputFocus) {
             game.players[socket.id].moveRight();
         }
         if (state.mouse) {
