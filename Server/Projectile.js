@@ -2,8 +2,8 @@ const Rect = require('./Rect.js');
 const Point = require('./Point.js');
 const Constants = require('../Constants.js');
 class Projectile extends Rect {
-    constructor(x, y,startPoint, mouseX, mouseY, type) {
-        super(x, y, Constants.PROJECTILE_WIDTH,Constants.PROJECTILE_HEIGHT);
+    constructor(x, y, startPoint, mouseX, mouseY, type) {
+        super(x, y, Constants.PROJECTILE_WIDTH, Constants.PROJECTILE_HEIGHT);
         this.mouseX = mouseX; //координаты мышки в момент выпуска сняряда
         this.mouseY = mouseY; //используяются для определения траектории полёта снаряда
         this.startPoint = startPoint;
@@ -18,16 +18,6 @@ class Projectile extends Rect {
             this.damage = Constants.COUGH_DAMAGE;
             this.flightDistance = Constants.COUGH_FLIGHT_DISTANCE;
         }
-    }
-
-    //заменяет свойства this,с именами из массива fields, одноимёнными свойствами из props(если в props их нет, то оствялет то, что было в this)
-    cloneWith(props) {
-        const fields = ['x', 'y', 'w', 'h', 'mouseX', 'mouseY', 'type', 'projectileSpeed', 'damage', 'startPoint'],
-            res = new Projectile();
-        for (let field in fields) {
-            res[fields[field]] = (props[fields[field]] == undefined) ? this[fields[field]] : props[fields[field]];
-        }
-        return res;
     }
 
     //перемещение снаряда по изначальной траектории(прямой startPoint и (mouseX,mouseY)

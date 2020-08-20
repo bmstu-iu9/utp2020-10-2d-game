@@ -59,12 +59,12 @@ class Game {
     //проверяет какие таблетки подобрал игрок
     collisionWithPills(id) {
         let player = this.players[id];
-        for (let i in this.pills) {
-            if (player.intersect(this.pills[i])) {
-                this.players[id].increaseHealth(this.pills[i].health);
-                this.pills[i].exist = false;
+        this.pills.forEach((pill) => {
+            if (player.intersect(pill)) {
+                player.increaseHealth(pill.health);
+                pill.exist = false;
             }
-        }
+        })
     }
 
     //просчитываем получение урона игроком id от снарядов других игроков
