@@ -28,6 +28,7 @@ class Game {
         return game;
     }
 
+    //скачиваем все нужные изображения
     downloadImages() {
         let downloadImage = (imageName) => {
             return new Promise(resolve => {
@@ -44,6 +45,7 @@ class Game {
         this.render.loadImgs(this.imgs);
     }
 
+    //игра в текущее мнгновение
     start(canvas, context, chat) {
         this.dt = Date.now() - this.lastUpdateTime;
         this.lastUpdateTime = Date.now();
@@ -51,19 +53,15 @@ class Game {
         this.update(chat);
         this.socket.on(Constants.STATE_UPDATE, this.getState.bind(this));
         this.renderGame(canvas, context);
-
-        //this.animationFrameId =  window.requestAnimationFrame(this.start(canvas,context).bind(this));
     }
 
-    stop() {
-        window.cancelAnimationFrame(this.animationFrameId);
-    }
-
+    //инициализация
     init() {
         this.lastUpdateTime = Date.now();
         this.socket.on(Constants.STATE_UPDATE, this.getState.bind(this));
     }
 
+    //функция для обработки серверной информации об игре
     getState(state) {
         this.me = state.me;
         this.players = state.players;
@@ -73,6 +71,7 @@ class Game {
             this.me.screenHeight / 2 - this.me.y - this.me.h / 2);
     }
 
+    //посылаем обновленную информацию от клиента на сервер
     update(chat) {
         if (this.me) {
             this.socket.emit(Constants.PLAYER_ACTION, {
@@ -90,6 +89,7 @@ class Game {
         }
     }
 
+    //рисуем игру
     renderGame(canvas, context) {
         this.render.clear(canvas, context);
         context.save(); //добавляет текущее положение экрана в стек

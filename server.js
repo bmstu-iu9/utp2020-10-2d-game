@@ -44,6 +44,12 @@ io.on(Constants.CONNECT, socket => {
             }
         }
     });
+    socket.on(Constants.USER_TYPING, function() {
+        game.clients.forEach((client, socketID) => {
+            const currentPlayer = game.players[socketID]
+            game.clients.get(socketID).emit(Constants.USER_TYPING, currentPlayer.name)
+        })
+    })
     socket.on(Constants.NEW_MSG, function(msg) {
         game.clients.forEach((client, socketID) => {
             const currentPlayer = game.players[socketID]
