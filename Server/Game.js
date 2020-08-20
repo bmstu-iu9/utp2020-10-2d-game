@@ -176,7 +176,7 @@ class Game {
             } else {
                 p = fP;
             }
-            startPoint = new Point(player.x + Constants.PILL_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2);
+            startPoint = new Point(player.x + Constants.PLAYER_WIDTH / 2, player.y + Constants.PLAYER_HEIGHT / 2);
             this.players[socket.id].addProjectile(p, startPoint, projectile.mouseX, projectile.mouseY)
 
         }

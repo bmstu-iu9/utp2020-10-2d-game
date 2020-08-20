@@ -56,27 +56,27 @@ class Player extends Rect {
     }
 
     moveDown() {
-        // if (this.y + 120 < this.screenHeight) {
+        if (this.y + this.h < Constants.WORLD_HEIGHT) {
             this.y += this.dy;
-        // }
+        }
     }
 
     moveUp() {
-        // if (this.y > 0) {
+        if (this.y > 0) {
             this.y -= this.dy;
-        // }
+        }
     }
 
     moveLeft() {
-        // if (this.x > 0) {
+        if (this.x > 0) {
             this.x -= this.dx;
-        // }
+        }
     }
 
     moveRight() {
-        // if (this.x + 90 < this.screenWidth) {
+        if (this.x + this.w < Constants.WORLD_WIDTH) {
             this.x += this.dx;
-        // }
+        }
     }
 
     //двигает все снаряды этого игрока
@@ -92,10 +92,11 @@ class Player extends Rect {
     isAlive() {
         return this.alive;
     }
-    addProjectile(p,startPoint,mouseX,mouseY) {
+
+    addProjectile(p, startPoint, mouseX, mouseY) {
         if (this.role === Constants.ZOMBIE_TYPE)
-            this.projectiles.unshift(new Projectile(p.x,p.y,startPoint,mouseX,mouseY,Constants.COUGH_TYPE));
-        else this.projectiles.unshift(new Projectile(p.x,p.y,startPoint,mouseX,mouseY,Constants.BULLET_TYPE));
+            this.projectiles.unshift(new Projectile(p.x, p.y, startPoint, mouseX, mouseY, Constants.COUGH_TYPE));
+        else this.projectiles.unshift(new Projectile(p.x, p.y, startPoint, mouseX, mouseY, Constants.BULLET_TYPE));
     }
 }
 module.exports = Player;

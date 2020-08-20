@@ -35,7 +35,7 @@ class Render {
         }
     }
 
-    drawPlayers(socket,context, players) {
+    drawPlayers(context, players) {
         // context.save(); //заносит в стек текущее положение экрана
         context.font = "12px Arial";
         context.fillStyle = "#0095DD";
@@ -43,6 +43,7 @@ class Render {
         // console.log(players[socket.id]);
         let dy = 15;
         for (let key in players) {
+            console.log(players[key])
             let x = players[key].x,
                 y = players[key].y + 12,
                 text = context.measureText(players[key].name);
@@ -82,6 +83,9 @@ class Render {
             context.fillStyle = 'rgb(46, 139, 87, 0.25)';
             context.fill();
         }
+    }
+    drawFrame(context) {
+        context.strokeRect(0, 0, Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT);
     }
 }
 

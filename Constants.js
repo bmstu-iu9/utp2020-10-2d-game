@@ -1,4 +1,7 @@
 module.exports = Object.freeze({
+    WORLD_MIN: 0,
+    WORLD_WIDTH: 3000,
+    WORLD_HEIGHT: 3000,
     ZOMBIE_MAX_HEALTH: 1.00,
     HUMAN_MAX_HEALTH: 1.00,
     SPEED_OF_COUGH: 5, //скорость полёта кашля
