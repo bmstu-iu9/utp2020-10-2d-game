@@ -40,7 +40,6 @@ class Render {
         context.fillStyle = "#0095DD";
         let dy = 15;
         for (let key in players) {
-            console.log(players[key])
             let x = players[key].x,
                 y = players[key].y + 12,
                 text = context.measureText(players[key].name);
