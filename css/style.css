@@ -18,7 +18,18 @@ body {
     bottom: 0;
     width: 400px;
     right: 0;
-    overflow: auto;
+}
+
+#chat-display {
+    position: absolute;
+    height: 95%;
+    width: 400px;
+    overflow: scroll;
+    bottom: 0px;
+}
+
+#chat-input {
+    display: inline-block;
 }
 
 #human {

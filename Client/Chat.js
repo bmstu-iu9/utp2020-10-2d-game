@@ -28,10 +28,13 @@ class Chat {
     }
 
     receiveMessage(data) {
-        const elem = document.createElement('p');
+        const elem = document.createElement('p'),
+            firstChild = this.body.firstChild;
         elem.id = this.socket.id;
         elem.appendChild(document.createTextNode(data.name + ': ' + data.msg));
-        this.body.appendChild(elem);
+        this.body.insertBefore(elem, firstChild);
+        //this.body.appendChild(elem);
+        //this.body.scrollIntoView(false);
     }
 }
 
