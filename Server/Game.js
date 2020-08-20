@@ -60,7 +60,7 @@ class Game {
     collisionWithPills(id) {
         let player = this.players[id];
         this.pills.forEach((pill) => {
-            if (player.intersect(pill)) {
+            if (player.intersect(pill) && player.role === Constants.HUMAN_TYPE) {
                 player.increaseHealth(pill.health);
                 pill.exist = false;
             }

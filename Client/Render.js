@@ -53,7 +53,7 @@ class Render {
             context.fillRect(x + 1 + 88 * players[key].health, y + 1, 88 * (1 - players[key].health), 6);
             y += 15;
             let img;
-            players[key].role === Constants.HUMAN_TYPE ? img = this.imgs['Human.svg'] : img = this.imgs['Zombie.png'];
+            players[key].role === Constants.HUMAN_TYPE ? img = this.imgs['Human.png'] : img = this.imgs['Zombie.png'];
             context.drawImage(img, x, y, players[key].w, players[key].h);
         }
     }

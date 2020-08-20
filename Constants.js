@@ -19,7 +19,7 @@ module.exports = Object.freeze({
     BULLET_FLIGHT_DISTANCE: 400, //дальность кашля
     IMG_NAMES: [
         'Zombie.png', //Zombie
-        'Human.svg', //Human
+        'Human.png', //Human
         'Virus.png',//моделька снарядов - кашля
         'Medicine.svg', //лекарство
         'Bullet.png', //пуля
