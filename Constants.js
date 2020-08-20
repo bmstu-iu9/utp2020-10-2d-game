@@ -22,7 +22,8 @@ module.exports = Object.freeze({
         'Human.svg', //Human
         'Virus.png',//моделька снарядов - кашля
         'medicinedrawn.svg', //лекарство
-        'Bullet.png' //пуля
+        'Bullet.png', //пуля
+        'Field.jpg'
     ],
     STATE_UPDATE: 'update',
     PLAYER_ACTION: 'playerAction',
@@ -51,5 +52,7 @@ module.exports = Object.freeze({
     HP_ABSENT_COLOR: "#B22222", //цвет отнятого здоровья
     EPIDEMIC_AREA_COLOR: 'rgb(46, 139, 87, 0.25)',
     HUMAN_TIME_BETWEEN_SHOOTS: 50,
-    ZOMBIE_TIME_BETWEEN_SHOOTS: 100
+    ZOMBIE_TIME_BETWEEN_SHOOTS: 100,
+    FIELD_PIECE_WIDTH: 150,
+    FIELD_PIECE_HEIGHT: 150
 })

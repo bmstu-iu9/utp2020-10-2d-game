@@ -78,6 +78,17 @@ class Render {
     drawFrame(context) {
         context.strokeRect(0, 0, Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT);
     }
+
+    drawField(context) {
+        for (let x = 0; x < Constants.WORLD_WIDTH;) {
+            for (let y = 0; y < Constants.WORLD_HEIGHT;) {
+                context.drawImage(this.imgs['Field.jpg'], x, y,
+                    Constants.FIELD_PIECE_WIDTH, Constants.FIELD_PIECE_HEIGHT);
+                y += 150;
+            }
+            x += 150;
+        }
+    }
 }
 
 module.exports = Render;
