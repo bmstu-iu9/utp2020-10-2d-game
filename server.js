@@ -36,7 +36,7 @@ io.on(Constants.CONNECT, socket => {
             game.players[socket.id].moveRight();
         }
         if (state.mouse) {
-            if (state.mouseX < game.w) {
+            if (!state.mouseInChat) {
                 game.addProjectile(socket, {
                     mouseX: state.mouseX,
                     mouseY: state.mouseY,

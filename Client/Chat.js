@@ -1,22 +1,34 @@
 const Constants = require('../Constants.js');
 
 class Chat {
-    constructor(socket, input, body) {
+    constructor(socket, input, display, body) {
         this.socket = socket;
         this.input = input;
+        this.display = display;
         this.body = body;
+        this.mouseIn = false;
     }
 
-    static create(socket, input, body) {
-        const chat = new Chat(socket, input, body);
+    static create(socket, input, display, body) {
+        const chat = new Chat(socket, input, display, body);
         chat.init();
         return chat;
     }
 
     init() {
         this.input.addEventListener('keydown',
-            this.keyDownHandler.bind(this))
+            this.keyDownHandler.bind(this));
         this.socket.on(Constants.NEW_MSG, this.receiveMessage.bind(this));
+    }
+
+    mouseEnter() {
+        this.mouseIn = true;
+        console.log('chat hover');
+    }
+
+    mouseLeave() {
+        this.mouseIn = false;
+        console.log('chat unhover');
     }
 
     keyDownHandler(e) {
@@ -29,10 +41,10 @@ class Chat {
 
     receiveMessage(data) {
         const elem = document.createElement('p'),
-            firstChild = this.body.firstChild;
+            firstChild = this.display.firstChild;
         elem.id = this.socket.id;
         elem.appendChild(document.createTextNode(data.name + ': ' + data.msg));
-        this.body.insertBefore(elem, firstChild);
+        this.display.insertBefore(elem, firstChild);
         //this.body.appendChild(elem);
         //this.body.scrollIntoView(false);
     }
