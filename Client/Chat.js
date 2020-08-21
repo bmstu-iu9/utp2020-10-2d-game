@@ -21,6 +21,9 @@ class Chat {
     init() {
         this.input.addEventListener('keydown',
             this.keyDownHandler.bind(this));
+        const elem = document.createElement('p');
+        elem.appendChild(document.createTextNode(''));
+        this.typing.appendChild(elem);
         this.socket.on(Constants.NEW_MSG, this.receiveMessage.bind(this));
         this.socket.on(Constants.USER_TYPING, this.type.bind(this));
     }
@@ -38,12 +41,21 @@ class Chat {
     }
 
     //выводим сообщение о печатающем пользователе
-    type(name) {
-        if (!this.typing.firstChild) {
-            const elem = document.createElement('p');
-            elem.id = this.socket.id;
-            elem.appendChild(document.createTextNode(name + ' is typing... '));
-            this.typing.appendChild(elem);
+    type(names) {
+        const elem = this.typing.firstChild;
+        if (names.length === 0) {
+            elem.innerHTML = '';
+        }
+        if (names.length === 1) {
+            elem.innerHTML = names[0] + ' is typing...';
+        } else {
+            const text = ''
+            for (let i = 0; i < names.length; i++) {
+                i === names.lenght - 1 ?
+                    text += names[i] + ' are typing...' :
+                    text += names[i] + ', ';
+            }
+            elem.innerHTML = text;
         }
     }
 
@@ -57,18 +69,14 @@ class Chat {
     //пользователь переключил фокус с ввода текста
     stopTyping() {
         this.isTyping = false;
-        const elem = document.getElementById(this.socket.id);
-        this.typing.removeChild(elem);
+        this.socket.emit(Constants.STOP_TYPING);
         console.log('focus out input');
     }
 
     //отправляем сообщение при нажатии Enter
     keyDownHandler(e) {
         if (e.key === "Enter") {
-            const elem = document.getElementById(this.socket.id);
-            this.typing.removeChild(elem);
             const msg = this.input.value;
-            this.typing.children.lenght
             this.input.value = '';
             this.startTyping();
             this.socket.emit(Constants.NEW_MSG, msg);

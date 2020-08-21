@@ -14,7 +14,7 @@ $(document).ready(() => {
           <button type = "button" id = "addPlayer">Set name</button>'
         $('#addPlayer').click(() => {
             let timer;
-            const width = document.documentElement.clientWidth - Constants.CHAT_WIDTH; // ширина клиентской части окна браузера
+            const width = document.documentElement.clientWidth * (1 - Constants.CHAT_WIDTH_PERCENT); // ширина клиентской части окна браузера
             const height = document.documentElement.clientHeight; // высота клиентской части окна браузера
             const name = $('#nameOfPlayer').val();
             socket.emit(Constants.SET_PLAYER_NAME, {

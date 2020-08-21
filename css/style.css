@@ -16,14 +16,14 @@ body {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 400px;
+    width: 20%;
     right: 0;
 }
 
 #chat-display {
     position: absolute;
     height: 95%;
-    width: 400px;
+    width: 100%;
     overflow: scroll;
     bottom: 0px;
 }

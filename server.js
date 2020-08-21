@@ -45,20 +45,22 @@ io.on(Constants.CONNECT, socket => {
         }
     });
     socket.on(Constants.USER_TYPING, function() {
-        game.clients.forEach((client, socketID) => {
-            const currentPlayer = game.players[socketID]
-            game.clients.get(socketID).emit(Constants.USER_TYPING, currentPlayer.name)
-        })
-    })
+        const currentPlayer = game.players[socket.id];
+        game.addTyping(currentPlayer);
+    });
+    socket.on(Constants.STOP_TYPING, function() {
+        const currentPlayer = game.players[socket.id];
+        game.removeTyping(currentPlayer);
+    });
     socket.on(Constants.NEW_MSG, function(msg) {
+        const currentPlayer = game.players[socket.id];
         game.clients.forEach((client, socketID) => {
-            const currentPlayer = game.players[socketID]
             game.clients.get(socketID).emit(Constants.NEW_MSG, {
                 name: currentPlayer.name,
                 msg: msg
-            })
-        })
-    })
+            });
+        });
+    });
     socket.on(Constants.DISCONNECT, () => {
         if (socket.id in game.players) {
             console.log("Player " + game.players[socket.id].name + " disconnect");
@@ -69,7 +71,7 @@ io.on(Constants.CONNECT, socket => {
 setInterval(() => {
     game.update();
     game.sendState();
-}, Constants.FRAME_RATE)
+}, Constants.FRAME_RATE);
 setInterval(function() {
     game.addPill();
 }, 10000);
