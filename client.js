@@ -34,13 +34,15 @@ $(document).ready(() => {
             socket.on(Constants.PLAY, function() {
                 document.body.innerHTML = '<canvas id = "game-canvas"></canvas>\
                 <div id="game-chat"><input type="text" id="chat-input">\
-                <div id="is-typing"></div><div id="chat-display"></div></div>';
+                <div id="is-typing"></div><div id="chat-display"></div>\
+                <div id="notifications"></div></div>';
 
                 const chatDisplay = document.getElementById('chat-display');
                 const chatInput = document.getElementById('chat-input');
                 const chatBody = document.getElementById('game-chat');
                 const chatTyping = document.getElementById('is-typing');
-                const chat = Chat.create(socket, chatInput, chatTyping, chatDisplay, chatBody);
+                const notificationBoard = document.getElementById('notifications');
+                const chat = Chat.create(socket, chatInput, chatTyping, chatDisplay, chatBody, notificationBoard);
 
 
                 const canvas = document.getElementById('game-canvas');

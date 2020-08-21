@@ -22,7 +22,15 @@ body {
 
 #chat-display {
     position: absolute;
-    height: 95%;
+    height: 55%;
+    width: 100%;
+    overflow: scroll;
+}
+
+#notifications {
+    background-color: bisque;
+    position: absolute;
+    height: 40%;
     width: 100%;
     overflow: scroll;
     bottom: 0px;

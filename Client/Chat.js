@@ -1,18 +1,19 @@
 const Constants = require('../Constants.js');
 
 class Chat {
-    constructor(socket, input, typing, display, body) {
+    constructor(socket, input, typing, display, body, note) {
         this.socket = socket;
         this.input = input;
         this.typing = typing;
         this.display = display;
         this.body = body;
+        this.note = note;
         this.mouseIn = false;
         this.isTyping = false;
     }
 
-    static create(socket, input, typing, display, body) {
-        const chat = new Chat(socket, input, typing, display, body);
+    static create(socket, input, typing, display, body, note) {
+        const chat = new Chat(socket, input, typing, display, body, note);
         chat.init();
         return chat;
     }
@@ -26,6 +27,7 @@ class Chat {
         this.typing.appendChild(elem);
         this.socket.on(Constants.NEW_MSG, this.receiveMessage.bind(this));
         this.socket.on(Constants.USER_TYPING, this.type.bind(this));
+        this.socket.on(Constants.NEW_NOTE, this.receiveNote.bind(this));
     }
 
     //фиксируем что курсор в области чата
@@ -90,8 +92,15 @@ class Chat {
         elem.id = this.socket.id;
         elem.appendChild(document.createTextNode(data.name + ': ' + data.msg));
         this.display.insertBefore(elem, firstChild);
-        //this.body.appendChild(elem);
-        //this.body.scrollIntoView(false);
+    }
+
+    //добавляем новое уведомление
+    receiveNote(data) {
+        const elem = document.createElement('p'),
+            firstChild = this.note.firstChild;
+        elem.id = this.socket.id;
+        elem.appendChild(document.createTextNode(data));
+        this.note.insertBefore(elem, firstChild);
     }
 }
 

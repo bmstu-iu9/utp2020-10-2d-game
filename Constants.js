@@ -55,5 +55,6 @@ module.exports = Object.freeze({
     HUMAN_TIME_BETWEEN_SHOOTS: 50,
     ZOMBIE_TIME_BETWEEN_SHOOTS: 100,
     USER_TYPING: 'someoneIsTyping',
-    STOP_TYPING: 'stopTyping'
+    STOP_TYPING: 'stopTyping',
+    NEW_NOTE: 'newNotification'
 })

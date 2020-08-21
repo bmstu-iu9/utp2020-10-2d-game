@@ -21,6 +21,9 @@ io.on(Constants.CONNECT, socket => {
                 game.addPlayer(player, socket);
                 chat.addUser(socket);
                 socket.emit(Constants.PLAY);
+
+                let note = 'A new player is ' + player.name;
+                Chat.sendNote(note, game.clients);
                 console.log('a new player ' + game.players[socket.id].name + ' is ' + player.role);
             } else socket.emit(Constants.USER_EXISTS, player.name + ' username is taken! Try some other username.');
         }
@@ -68,6 +71,8 @@ io.on(Constants.CONNECT, socket => {
         if (socket.id in game.players) {
             console.log("Player " + game.players[socket.id].name + " disconnect");
             game.players[socket.id].alive = false;
+            let note = game.players[socket.id].name + ' left the game:('
+            Chat.sendNote(note, game.clients);
         } else console.log("Player (no name) disconnect");
     });
 });

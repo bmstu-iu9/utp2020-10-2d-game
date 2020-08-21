@@ -2,6 +2,7 @@ const Player = require('./Player.js');
 const Epidemic = require('./Epidemic.js');
 const Point = require('./Point.js');
 const Pill = require('./Pill.js');
+const Chat = require('./Chat.js');
 const Constants = require('../Constants.js');
 class Game {
     constructor() {
@@ -52,7 +53,9 @@ class Game {
     collisionWithEpidemicArea(id) {
         if (this.players[id].role === 'Human' &&
             this.players[id].intersectCircle(this.epidemicArea)) { //люди, которых задело
-            this.turningIntoZombie(id)
+            this.turningIntoZombie(id);
+            let note = this.players[id].name + ' got to the infected area. He is zombie now';
+            Chat.sendNote(note, this.clients);
         }
     }
 
@@ -85,6 +88,8 @@ class Game {
                                 return;
                             } else {
                                 this.turningIntoZombie(id);
+                                let note = this.players[id] + ' was infected by Zombie comunity. He is zombie now too';
+                                Chat.sendNote(note, this.clients);
                                 return;
                             }
                         }
@@ -147,6 +152,8 @@ class Game {
         //удаляем убитых игроков
         for (let key in this.players) {
             if (!this.players[key].isAlive()) {
+                let note = this.players[key].name + ' has died. Completely. RIP';
+                Chat.sendNote(note, this.clients);
                 this.players[key].role === Constants.HUMAN_TYPE ? --this.humanCount : --this.zombieCount;
                 delete this.players[key];
                 delete this.clients[key];

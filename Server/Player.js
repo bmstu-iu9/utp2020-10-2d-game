@@ -1,7 +1,8 @@
 const Rect = require('./Rect.js');
 const Constants = require('../Constants');
 const Projectile = require('./Projectile.js');
-const Point = require('./Point.js')
+const Point = require('./Point.js');
+const Chat = require('./Chat.js');
 //класс игрока
 class Player extends Rect {
     constructor(role, name, w, h) {
@@ -44,8 +45,8 @@ class Player extends Rect {
                 --this.countOfBulletInWeapon;
             let p, startPoint
             const points = (new Point(this.x + this.w / 2, this.y + this.h / 2 + 40)).findPoints(
-                new Point(projectile.mouseX, projectile.mouseY),
-                (this.h * this.h + this.w * this.w) / 4),
+                    new Point(projectile.mouseX, projectile.mouseY),
+                    (this.h * this.h + this.w * this.w) / 4),
                 fP = points.firstPoint,
                 sP = points.secondPoint;
             if (new Point(projectile.mouseX, projectile.mouseY).findDist(fP) >

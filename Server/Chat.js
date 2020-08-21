@@ -28,6 +28,12 @@ class Chat {
             this.clients.get(socketID).emit(Constants.USER_TYPING, this.typing);
         });
     }
+
+    static sendNote(data, clients) {
+        clients.forEach((client, socketID) => {
+            clients.get(socketID).emit(Constants.NEW_NOTE, data);
+        });
+    }
 }
 
 module.exports = Chat;
