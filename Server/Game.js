@@ -12,17 +12,7 @@ class Game {
         this.w = 0;
         this.h = 0;
         this.pills = [];
-        this.typing = []; //печатающие в чате пользователи
         this.epidemicArea = new Epidemic(new Point(0, 0), 0);
-    }
-
-    addTyping(player) {
-        if (!this.typing.includes(player.name))
-            this.typing.push(player.name);
-    }
-
-    removeTyping(player) {
-        this.typing.splice(this.typing.indexOf(player.name), 1);
     }
 
     //проверка, что людей становится слишком много
@@ -116,6 +106,7 @@ class Game {
     update() {
         //движение снарядов
         this.moveProjectiles();
+
         //столкновение с таблетками
         for (let key in this.players) {
             if (this.players[key].isAlive())
@@ -148,10 +139,12 @@ class Game {
         for (let key in this.players)
             this.players[key].projectiles = this.players[key].projectiles.filter(
                 projectile => projectile.isExist())
-            //удаляем подобранные лекарства
+
+        //удаляем подобранные лекарства
         this.pills = this.pills.filter(
-                pill => pill.isExist())
-            //удаляем убитых игроков
+            pill => pill.isExist())
+
+        //удаляем убитых игроков
         for (let key in this.players) {
             if (!this.players[key].isAlive()) {
                 this.players[key].role === Constants.HUMAN_TYPE ? --this.humanCount : --this.zombieCount;
@@ -193,6 +186,7 @@ class Game {
         this.pills.unshift(new Pill(this.w, this.h));
     }
 
+    //отправляет текущее состояние клиентам
     sendState() {
         this.clients.forEach((client, socketID) => {
             const currentPlayer = this.players[socketID]
@@ -202,8 +196,6 @@ class Game {
                 pills: this.pills,
                 area: this.epidemicArea
             })
-            console.log(this.typing);
-            this.clients.get(socketID).emit(Constants.USER_TYPING, this.typing);
         });
     }
 }

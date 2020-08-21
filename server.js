@@ -3,8 +3,10 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const path = require('path');
-const Game = require('./Server/Game.js')
+const Game = require('./Server/Game.js');
+const Chat = require('./Server/Chat.js');
 const game = new Game();
+const chat = new Chat();
 const fs = require('fs');
 const Constants = require('./Constants.js');
 
@@ -17,6 +19,7 @@ io.on(Constants.CONNECT, socket => {
         } else {
             if (game.findName(player.name) === 0) { //проверяем есть ли игок с таким ником
                 game.addPlayer(player, socket);
+                chat.addUser(socket);
                 socket.emit(Constants.PLAY);
                 console.log('a new player ' + game.players[socket.id].name + ' is ' + player.role);
             } else socket.emit(Constants.USER_EXISTS, player.name + ' username is taken! Try some other username.');
@@ -46,11 +49,11 @@ io.on(Constants.CONNECT, socket => {
     });
     socket.on(Constants.USER_TYPING, function() {
         const currentPlayer = game.players[socket.id];
-        game.addTyping(currentPlayer);
+        chat.addTyping(currentPlayer);
     });
     socket.on(Constants.STOP_TYPING, function() {
         const currentPlayer = game.players[socket.id];
-        game.removeTyping(currentPlayer);
+        chat.removeTyping(currentPlayer);
     });
     socket.on(Constants.NEW_MSG, function(msg) {
         const currentPlayer = game.players[socket.id];
@@ -71,6 +74,7 @@ io.on(Constants.CONNECT, socket => {
 setInterval(() => {
     game.update();
     game.sendState();
+    chat.sendState();
 }, Constants.FRAME_RATE);
 setInterval(function() {
     game.addPill();
