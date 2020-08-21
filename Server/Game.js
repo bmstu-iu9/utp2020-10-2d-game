@@ -202,6 +202,7 @@ class Game {
                 pills: this.pills,
                 area: this.epidemicArea
             })
+            console.log(this.typing);
             this.clients.get(socketID).emit(Constants.USER_TYPING, this.typing);
         });
     }

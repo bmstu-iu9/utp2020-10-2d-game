@@ -48,23 +48,23 @@ $(document).ready(() => {
                 canvas.height = height;
                 const context = canvas.getContext('2d');
                 timer = setInterval(function() {
-                    $('#game-chat').hover(function() {
-                            chat.mouseEnter()
-                        },
-                        function() {
-                            chat.mouseLeave()
-                        });
-                    $('#chat-input').focusin(function() {
-                        chat.startTyping();
-                    })
-                    $('#chat-input').focusout(function() {
-                        chat.stopTyping();
-                    })
                     game.start(canvas, context, {
                         mouseInChat: chat.mouseIn,
                         inputFocus: chat.isTyping
                     });
                 }, Constants.FRAME_RATE);
+                $('#game-chat').hover(function() {
+                        chat.mouseEnter()
+                    },
+                    function() {
+                        chat.mouseLeave()
+                    });
+                $('#chat-input').focusin(function() {
+                    chat.startTyping();
+                })
+                $('#chat-input').focusout(function() {
+                    chat.stopTyping();
+                })
             })
             socket.on(Constants.GAME_OVER, function() {
                 clearInterval(timer);

@@ -43,6 +43,7 @@ class Chat {
     //выводим сообщение о печатающем пользователе
     type(names) {
         const elem = this.typing.firstChild;
+        console.log(names);
         if (names.length === 0) {
             elem.innerHTML = '';
         }
