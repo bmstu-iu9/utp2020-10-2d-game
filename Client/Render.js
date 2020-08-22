@@ -32,29 +32,35 @@ class Render {
         }
     }
 
-    drawPlayers(context, players) {
+    drawPlayers(newO,context, players) {
         context.font = Constants.NICKNAME_FONT;
         context.fillStyle = Constants.NICKNAME_COLOR;
         for (let key in players) {
             let x = players[key].x,
-                y = players[key].y + 15,
+                y = players[key].y,
                 text = context.measureText(players[key].name);
+            context.save();
+            context.translate(newO.x + x,newO.y + y);
+            y += 15;
             if (text.width < Constants.PLAYER_WIDTH) {
-                context.fillText(players[key].name, x + (90 - text.width) / 2, y, 90);
+                context.fillText(players[key].name, -1 * players[key].w / 2 + (90 - text.width) / 2, -1 * players[key].h/2 - 25, 90);
             } else {
-                context.fillText(players[key].name, x, y, 90);
+                context.fillText(players[key].name, -1 * players[key].w / 2, -1 * players[key].h/2 - 25, 90);
             }
             y += 10;
             context.fillStyle = Constants.HP_BAR_FRAME_COLOR;
-            context.fillRect(x, y, 90, 8);
+            context.fillRect(-1 * players[key].w / 2, -1 * players[key].h/2 - 15, 90, 8);
             context.fillStyle = Constants.HP_COLOR;
-            context.fillRect(x + 1, y + 1, 88 * players[key].health, 6);
+            context.fillRect(-1 * players[key].w / 2 + 1, -1 * players[key].h/2 - 15 + 1, 88 * players[key].health, 6);
             context.fillStyle = Constants.HP_ABSENT_COLOR;
-            context.fillRect(x + 1 + 88 * players[key].health, y + 1, 88 * (1 - players[key].health), 6);
+            context.fillRect(-1 * players[key].w / 2 + 1 + 88 * players[key].health, -1 * players[key].h/2 - 15 + 1, 88 * (1 - players[key].health), 6);
             y += 15;
             let img;
             players[key].role === Constants.HUMAN_TYPE ? img = this.imgs['Human.png'] : img = this.imgs['Zombie.png'];
-            context.drawImage(img, x, y, players[key].w, players[key].h);
+            context.rotate(players[key].angleOfRotation);
+            context.drawImage(img, -1 * players[key].w / 2, -1 * players[key].h/2, players[key].w, players[key].h);
+            context.rotate( - players[key].angleOfRotation);
+            context.restore();
         }
     }
 

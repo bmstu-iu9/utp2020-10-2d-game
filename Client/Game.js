@@ -67,8 +67,8 @@ class Game {
         this.players = state.players;
         this.pills = state.pills;
         this.area = state.area;
-        this.newO = new Point(this.me.screenWidth / 2 - this.me.x - this.me.w / 2,
-            this.me.screenHeight / 2 - this.me.y - this.me.h / 2);
+        this.newO = new Point(this.me.screenWidth / 2 - this.me.x,
+            this.me.screenHeight / 2 - this.me.y);
     }
 
     //посылаем обновленную информацию от клиента на сервер
@@ -93,13 +93,15 @@ class Game {
     renderGame(canvas, context) {
         this.render.clear(canvas, context);
         context.save(); //добавляет текущее положение экрана в стек
-        context.translate(this.newO.x, this.newO.y); //переносит начало координат в зааданную точку
+        context.translate(this.newO.x - this.me.w/2, this.newO.y - this.me.h/2); //переносит начало координат в зааданную точку
         this.render.drawFrame(context);
         this.render.drawField(context);
         this.render.drawProjectiles(context, this.players);
-        this.render.drawPlayers(context, this.players);
         this.render.drawPills(context, this.pills);
         this.render.drawEpidemicArea(context, this.area);
+        context.restore();
+        this.render.drawPlayers(this.newO,context,this.players);
+        // this.render.drawPlayers(context, this.players);
         context.restore(); //достаёт из стека последнее состояние экрана
     }
 }

@@ -28,6 +28,7 @@ class Player extends Rect {
         }
         this.mouseX = 0;
         this.mouseY = 0;
+        this.angleOfRotation = 0;
     }
 
     shoot(projectile) {
@@ -77,6 +78,28 @@ class Player extends Rect {
         }
         this.mouseY = state.mouseY;
         this.mouseX = state.mouseX;
+        this.updateAngleOfRotation();
+    }
+
+    updateAngleOfRotation() {
+        const A = new Point(this.x + this.w / 2, this.y + this.h / 2 + 40);
+        const C = new Point(this.mouseX, this.mouseY);
+        if (A.x <= this.mouseX && A.y >= this.mouseY) {
+            const B = new Point(this.x + this.w / 2, this.mouseY);
+            this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B));
+        }
+        if (A.x <= this.mouseX && A.y <= this.mouseY) {
+            const B = new Point(this.mouseX, this.y + this.h / 2 + 40);
+            this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B)) + Math.PI / 2;
+        }
+        if (A.x >= this.mouseX && A.y <= this.mouseY) {
+            const B = new Point(this.x + this.w / 2, this.mouseY);
+            this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B)) + Math.PI;
+        }
+        if (A.x >= this.mouseX && A.y >= this.mouseY) {
+            const B = new Point(this.mouseX, this.y + this.h / 2 + 40);
+            this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B)) + Math.PI * 3 / 2;
+        }
     }
 
     //проаерка на наличие патронов для стрельбы
