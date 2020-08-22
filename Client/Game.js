@@ -15,7 +15,6 @@ class Game {
         this.pills = {};
         this.area = null;
         this.newO = new Point(0, 0);
-        this.animationFrameId = null;
         this.lastUpdateTime = 0;
         this.dt = 0;
     }
@@ -101,8 +100,6 @@ class Game {
         this.render.drawEpidemicArea(context, this.area);
         context.restore();
         this.render.drawPlayers(this.newO,context,this.players);
-        // this.render.drawPlayers(context, this.players);
-        context.restore(); //достаёт из стека последнее состояние экрана
     }
 }
 

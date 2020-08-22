@@ -83,14 +83,10 @@ class Render {
     }
 
     drawField(context) {
-        for (let x = 0; x < Constants.WORLD_WIDTH;) {
-            for (let y = 0; y < Constants.WORLD_HEIGHT;) {
+        for (let x = 0; x < Constants.WORLD_WIDTH; x += Constants.FIELD_PIECE_WIDTH)
+            for (let y = 0; y < Constants.WORLD_HEIGHT; y += Constants.FIELD_PIECE_HEIGHT)
                 context.drawImage(this.imgs['Field.jpg'], x, y,
                     Constants.FIELD_PIECE_WIDTH, Constants.FIELD_PIECE_HEIGHT);
-                y += Constants.FIELD_PIECE_HEIGHT;
-            }
-            x += Constants.FIELD_PIECE_WIDTH;
-        }
     }
 }
 

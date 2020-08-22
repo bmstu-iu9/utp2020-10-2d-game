@@ -47,7 +47,7 @@ class Player extends Rect {
             if (this.role === Constants.HUMAN_TYPE)
                 --this.countOfBulletInWeapon;
             let p, startPoint
-            const points = (new Point(this.x + this.w / 2, this.y + this.h / 2 + 40)).findPoints(
+            const points = (new Point(this.x + this.w / 2, this.y + this.h / 2)).findPoints(
                 new Point(projectile.mouseX, projectile.mouseY),
                 (this.h * this.h + this.w * this.w) / 4),
                 fP = points.firstPoint,
@@ -58,7 +58,7 @@ class Player extends Rect {
             } else {
                 p = fP;
             }
-            startPoint = new Point(this.x + this.w / 2, this.y + this.h / 2 + 40);
+            startPoint = new Point(this.x + this.w / 2, this.y + this.h / 2);
             this.addProjectile(p, startPoint, projectile.mouseX, projectile.mouseY)
         }
     }
@@ -84,6 +84,10 @@ class Player extends Rect {
     updateAngleOfRotation() {
         const A = new Point(this.x + this.w / 2, this.y + this.h / 2 + 40);
         const C = new Point(this.mouseX, this.mouseY);
+        /*
+            Пытаемся понять, где находится 3 вершина треугольника,
+            в которой прямой угол. 1 if - 1 четверть, 2 if - 2 четверть и т.д..
+         */
         if (A.x <= this.mouseX && A.y >= this.mouseY) {
             const B = new Point(this.x + this.w / 2, this.mouseY);
             this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B));
@@ -124,7 +128,7 @@ class Player extends Rect {
     }
 
     moveDown() {
-        if (this.y + this.h + 40 < Constants.WORLD_HEIGHT) {
+        if (this.y + this.h < Constants.WORLD_HEIGHT) {
             this.y += this.dy;
         }
     }

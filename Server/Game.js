@@ -86,21 +86,19 @@ class Game {
             if (key !== id && this.players[key].role !== player.role && this.players[key].isAlive()) {
                 for (let i = 0; i < this.players[key].projectiles.length; i++) {
                     let projectile = this.players[key].projectiles[i];
-                    if (!projectile.isExist()) continue; //если снаряд уничтожен
-                    if (player.intersect(projectile)) {
-                        this.players[id].decreaseHealth(this.players[key].projectiles[i].damage); //уменьшаем здоровье игрока, по которому попали
-                        this.players[key].projectiles[i].exist = false;
-                        if (this.players[id].health === 0) {
+                    if (projectile.isExist && player.intersect(projectile)) {
+                        player.decreaseHealth(projectile.damage); //уменьшаем здоровье игрока, по которому попали
+                        projectile.exist = false;
+                        if (player.health === 0) {
                             if (player.role === 'Zombie') {
-                                this.players[id].alive = false; //удаляем его из списка игроков
+                                player.alive = false; //удаляем его из списка игроков
                                 this.clients.get(id).emit(Constants.GAME_OVER);
-                                return;
                             } else {
                                 this.turningIntoZombie(id);
-                                let note = this.players[id].name + ' was infected by Zombie comunity. He is zombie now too';
+                                let note = player.name + ' was infected by Zombie community. He is zombie now too';
                                 Chat.sendNote(note, this.clients);
-                                return;
                             }
+                            return;
                         }
                     }
                 }
