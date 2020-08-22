@@ -15,6 +15,7 @@ class Input {
         return input;
 
     }
+
     //детектит нажатие клавишы
     keyDownHandler(e) {
         if (e.key === "d" || e.key === "ArrowRight")
@@ -27,6 +28,7 @@ class Input {
             this.downPressed = true;
 
     }
+
     //детектит отпускание клавиши
     keyUpHandler(e) {
         if (e.key === "d" || e.key === "ArrowRight")
@@ -43,16 +45,19 @@ class Input {
     mouseDownHandler() {
         this.mousePressed = true;
     }
+
     //детектит отпускание кнопки мыши
     mouseUpHandler() {
         this.mousePressed = false;
     }
+
+    //детектит изменения в положении курсора
     mouseMoveHandler(event) {
         this.mouseX = event.clientX;
         this.mouseY = event.clientY;
     }
 
-
+    //установка обработчиков событий
     applyEventHandlers(document) {
         document.addEventListener('keydown', this.keyDownHandler.bind(this));
         document.addEventListener('keyup', this.keyUpHandler.bind(this));

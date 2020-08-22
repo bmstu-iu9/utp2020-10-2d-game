@@ -2,6 +2,7 @@ const Player = require('./Player.js');
 const Epidemic = require('./Epidemic.js');
 const Point = require('./Point.js');
 const Pill = require('./Pill.js');
+const Chat = require('./Chat.js');
 const Constants = require('../Constants.js');
 class Game {
     constructor() {
@@ -52,7 +53,9 @@ class Game {
     collisionWithEpidemicArea(id) {
         if (this.players[id].role === 'Human' &&
             this.players[id].intersectCircle(this.epidemicArea)) { //люди, которых задело
-            this.turningIntoZombie(id)
+            this.turningIntoZombie(id);
+            let note = this.players[id].name + ' got to the infected area. He is zombie now';
+            Chat.sendNote(note, this.clients);
         }
     }
 
@@ -85,6 +88,8 @@ class Game {
                                 return;
                             } else {
                                 this.turningIntoZombie(id);
+                                let note = this.players[id].name + ' was infected by Zombie comunity. He is zombie now too';
+                                Chat.sendNote(note, this.clients);
                                 return;
                             }
                         }
@@ -106,6 +111,7 @@ class Game {
     update() {
         //движение снарядов
         this.moveProjectiles();
+
         //столкновение с таблетками
         for (let key in this.players) {
             if (this.players[key].isAlive())
@@ -138,15 +144,19 @@ class Game {
         for (let key in this.players)
             this.players[key].projectiles = this.players[key].projectiles.filter(
                 projectile => projectile.isExist())
+
         //удаляем подобранные лекарства
         this.pills = this.pills.filter(
             pill => pill.isExist())
+
         //удаляем убитых игроков
         for (let key in this.players) {
             if (!this.players[key].isAlive()) {
-                this.players[key].role ===  Constants.HUMAN_TYPE ? --this.humanCount : --this.zombieCount;
+                let note = this.players[key].name + ' has died. Completely. RIP';
+                this.players[key].role === Constants.HUMAN_TYPE ? --this.humanCount : --this.zombieCount;
                 delete this.players[key];
                 delete this.clients[key];
+                Chat.sendNote(note, this.clients);
             }
         }
 
@@ -183,6 +193,7 @@ class Game {
         this.pills.unshift(new Pill(this.w, this.h));
     }
 
+    //отправляет текущее состояние клиентам
     sendState() {
         this.clients.forEach((client, socketID) => {
             const currentPlayer = this.players[socketID]
@@ -192,7 +203,7 @@ class Game {
                 pills: this.pills,
                 area: this.epidemicArea
             })
-        })
+        });
     }
 }
 
