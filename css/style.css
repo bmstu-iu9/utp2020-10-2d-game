@@ -1,31 +1,63 @@
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     overflow: hidden;
     overscroll-behavior: none;
-  }
+}
 
- 
-
-  #game-menu {
-    top : 20%;
-    left : 40%;
+#game-menu {
+    top: 20%;
+    left: 40%;
     position: fixed;
-  }
-  #human {
+}
+
+#game-chat {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20%;
+    right: 0;
+}
+
+#chat-display {
+    position: absolute;
+    height: 55%;
+    width: 100%;
+    overflow: scroll;
+}
+
+#notifications {
+    background-color: bisque;
+    position: absolute;
+    height: 40%;
+    width: 100%;
+    overflow: scroll;
+    bottom: 0px;
+}
+
+#chat-input {
+    display: inline-block;
+}
+
+#human {
     border-radius: 12px;
     font-size: 48px;
     color: black;
     background: #eaaa3e;
-  }
-  #zombie {
+}
+
+#zombie {
     border-radius: 12px;
     font-size: 48px;
     color: black;
     background: #3eef1a;
-  }
-  #Choose-your-role {
-    font-family: Arial, Helvetica, Verdana, sans-serif; /* Гарнитура шрифта */
-    font-size: 48px; /* Размер текста */
+}
+
+#Choose-your-role {
+    font-family: Arial, Helvetica, Verdana, sans-serif;
+    /* Гарнитура шрифта */
+    font-size: 48px;
+    /* Размер текста */
     font-weight: bolder;
-  }
+}
