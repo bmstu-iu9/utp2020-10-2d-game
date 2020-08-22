@@ -88,7 +88,7 @@ class Game {
                                 return;
                             } else {
                                 this.turningIntoZombie(id);
-                                let note = this.players[id] + ' was infected by Zombie comunity. He is zombie now too';
+                                let note = this.players[id].name + ' was infected by Zombie comunity. He is zombie now too';
                                 Chat.sendNote(note, this.clients);
                                 return;
                             }
@@ -153,10 +153,10 @@ class Game {
         for (let key in this.players) {
             if (!this.players[key].isAlive()) {
                 let note = this.players[key].name + ' has died. Completely. RIP';
-                Chat.sendNote(note, this.clients);
                 this.players[key].role === Constants.HUMAN_TYPE ? --this.humanCount : --this.zombieCount;
                 delete this.players[key];
                 delete this.clients[key];
+                Chat.sendNote(note, this.clients);
             }
         }
 
