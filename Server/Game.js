@@ -15,7 +15,16 @@ class Game {
         this.pills = [];
         this.epidemicArea = new Epidemic(new Point(0, 0), 0);
     }
-
+    updatePlayerOnInput(id,state) {
+        if (id in this.players) {
+            this.players[id].updateOnInput(state);
+            if (state.mouse && !state.mouseInChat)
+                this.addProjectile(id, {
+                    mouseX: state.mouseX,
+                    mouseY: state.mouseY,
+                });
+        }
+    }
     //проверка, что людей становится слишком много
     demographicImbalance() {
         return this.humanCount > this.zombieCount + 1;
@@ -162,8 +171,8 @@ class Game {
 
     }
 
-    addProjectile(socket, projectile) {
-        this.players[socket.id].shoot(projectile);
+    addProjectile(id, projectile) {
+        this.players[id].shoot(projectile);
     }
 
     moveProjectiles() {

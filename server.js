@@ -29,26 +29,7 @@ io.on(Constants.CONNECT, socket => {
         }
     });
     socket.on(Constants.PLAYER_ACTION, function(state) {
-        if (state.down && !state.inputFocus) {
-            game.players[socket.id].moveDown();
-        }
-        if (state.left && !state.inputFocus) {
-            game.players[socket.id].moveLeft();
-        }
-        if (state.up && !state.inputFocus) {
-            game.players[socket.id].moveUp();
-        }
-        if (state.right && !state.inputFocus) {
-            game.players[socket.id].moveRight();
-        }
-        if (state.mouse) {
-            if (!state.mouseInChat) {
-                game.addProjectile(socket, {
-                    mouseX: state.mouseX,
-                    mouseY: state.mouseY,
-                });
-            }
-        }
+        game.updatePlayerOnInput(socket.id,state);
     });
     socket.on(Constants.USER_TYPING, function() {
         const currentPlayer = game.players[socket.id];

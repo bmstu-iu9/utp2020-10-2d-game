@@ -26,6 +26,8 @@ class Player extends Rect {
             this.health = Constants.ZOMBIE_MAX_HEALTH;
             this.timeBetweenShoot = Constants.ZOMBIE_TIME_BETWEEN_SHOOTS;
         }
+        this.mouseX = 0;
+        this.mouseY = 0;
     }
 
     shoot(projectile) {
@@ -45,8 +47,8 @@ class Player extends Rect {
                 --this.countOfBulletInWeapon;
             let p, startPoint
             const points = (new Point(this.x + this.w / 2, this.y + this.h / 2 + 40)).findPoints(
-                    new Point(projectile.mouseX, projectile.mouseY),
-                    (this.h * this.h + this.w * this.w) / 4),
+                new Point(projectile.mouseX, projectile.mouseY),
+                (this.h * this.h + this.w * this.w) / 4),
                 fP = points.firstPoint,
                 sP = points.secondPoint;
             if (new Point(projectile.mouseX, projectile.mouseY).findDist(fP) >
@@ -58,6 +60,23 @@ class Player extends Rect {
             startPoint = new Point(this.x + this.w / 2, this.y + this.h / 2 + 40);
             this.addProjectile(p, startPoint, projectile.mouseX, projectile.mouseY)
         }
+    }
+
+    updateOnInput(state) {
+        if (state.down && !state.inputFocus) {
+            this.moveDown();
+        }
+        if (state.left && !state.inputFocus) {
+            this.moveLeft();
+        }
+        if (state.up && !state.inputFocus) {
+            this.moveUp();
+        }
+        if (state.right && !state.inputFocus) {
+            this.moveRight();
+        }
+        this.mouseY = state.mouseY;
+        this.mouseX = state.mouseX;
     }
 
     //проаерка на наличие патронов для стрельбы
