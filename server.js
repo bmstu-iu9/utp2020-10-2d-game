@@ -19,7 +19,6 @@ io.on(Constants.CONNECT, socket => {
         } else {
             if (game.findName(player.name) === 0) { //проверяем есть ли игок с таким ником
                 game.addPlayer(player, socket);
-                chat.addUser(socket);
                 socket.emit(Constants.PLAY);
 
                 let note = 'A new player is ' + player.name;
@@ -51,12 +50,12 @@ io.on(Constants.CONNECT, socket => {
         }
     });
     socket.on(Constants.USER_TYPING, function() {
-        const currentPlayer = game.players[socket.id];
-        chat.addTyping(currentPlayer);
+        if (socket.id in game.players)
+            chat.addTyping(game.players[socket.id]);
     });
     socket.on(Constants.STOP_TYPING, function() {
-        const currentPlayer = game.players[socket.id];
-        chat.removeTyping(currentPlayer);
+        if (socket.id in game.players)
+            chat.removeTyping(game.players[socket.id]);
     });
     socket.on(Constants.NEW_MSG, function(msg) {
         const currentPlayer = game.players[socket.id];
@@ -71,6 +70,7 @@ io.on(Constants.CONNECT, socket => {
         if (socket.id in game.players) {
             console.log("Player " + game.players[socket.id].name + " disconnect");
             game.players[socket.id].alive = false;
+            chat.removeTyping(game.players[socket.id]);
             let note = game.players[socket.id].name + ' left the game:('
             Chat.sendNote(note, game.clients);
         } else console.log("Player (no name) disconnect");
@@ -79,7 +79,7 @@ io.on(Constants.CONNECT, socket => {
 setInterval(() => {
     game.update();
     game.sendState();
-    chat.sendState();
+    chat.sendState(game.clients);
 }, Constants.FRAME_RATE);
 setInterval(function() {
     game.addPill();
