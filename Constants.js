@@ -20,9 +20,10 @@ module.exports = Object.freeze({
     IMG_NAMES: [
         'Zombie.svg', //Zombie
         'Human.svg', //Human
-        'Virus.png', //моделька снарядов - кашля
-        'medicinedrawn.svg', //лекарство
-        'Bullet.png' //пуля
+        'Virus.png',//моделька снарядов - кашля
+        'Medicine.svg', //лекарство
+        'Bullet.png', //пуля
+        'Field.jpg'
     ],
     STATE_UPDATE: 'update',
     PLAYER_ACTION: 'playerAction',
@@ -56,5 +57,7 @@ module.exports = Object.freeze({
     ZOMBIE_TIME_BETWEEN_SHOOTS: 100,
     USER_TYPING: 'someoneIsTyping',
     STOP_TYPING: 'stopTyping',
-    NEW_NOTE: 'newNotification'
+    NEW_NOTE: 'newNotification',
+    FIELD_PIECE_WIDTH: 150,
+    FIELD_PIECE_HEIGHT: 150
 })

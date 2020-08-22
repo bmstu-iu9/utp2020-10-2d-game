@@ -95,6 +95,7 @@ class Game {
         context.save(); //добавляет текущее положение экрана в стек
         context.translate(this.newO.x, this.newO.y); //переносит начало координат в зааданную точку
         this.render.drawFrame(context);
+        this.render.drawField(context);
         this.render.drawProjectiles(context, this.players);
         this.render.drawPlayers(context, this.players);
         this.render.drawPills(context, this.pills);
