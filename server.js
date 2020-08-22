@@ -40,6 +40,7 @@ io.on(Constants.CONNECT, socket => {
         if (socket.id in game.players) {
             console.log("Player " + game.players[socket.id].name + " disconnect");
             game.players[socket.id].alive = false;
+            chat.removeTyping(game.players[socket.id]);
             let note = game.players[socket.id].name + ' left the game:('
             game.sendNote(note);
         } else console.log("Player (no name) disconnect");

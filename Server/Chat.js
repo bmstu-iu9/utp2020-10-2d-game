@@ -2,7 +2,6 @@ const Constants = require('../Constants.js');
 
 class Chat {
     constructor() {
-        this.clients = new Map();
         this.typing = []; //печатающие в чате пользователи
     }
 
@@ -21,7 +20,8 @@ class Chat {
 
     //удаляет из списка печатающих игроков
     removeTyping(player) {
-        this.typing.splice(this.typing.indexOf(player.name), 1);
+        if (this.typing.includes(player.name))
+            this.typing.splice(this.typing.indexOf(player.name), 1);
     }
 
     //отправляет текущее состояние клиентам
