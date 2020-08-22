@@ -51,9 +51,9 @@ class Chat {
         if (names.length === 1) {
             elem.innerHTML = names[0] + ' is typing...';
         } else {
-            const text = ''
+            let text = ''
             for (let i = 0; i < names.length; i++) {
-                i === names.lenght - 1 ?
+                i === names.length - 1 ?
                     text += names[i] + ' are typing...' :
                     text += names[i] + ', ';
             }

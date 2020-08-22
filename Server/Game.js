@@ -14,6 +14,18 @@ class Game {
         this.h = 0;
         this.pills = [];
         this.epidemicArea = new Epidemic(new Point(0, 0), 0);
+        this.chat = new Chat();
+    }
+
+    updatePlayerOnInput(id, state) {
+        if (id in this.players) {
+            this.players[id].updateOnInput(state);
+            if (state.mouse && !state.mouseInChat)
+                this.addProjectile(id, {
+                    mouseX: state.mouseX,
+                    mouseY: state.mouseY,
+                });
+        }
     }
 
     //проверка, что людей становится слишком много
@@ -63,7 +75,7 @@ class Game {
     collisionWithPills(id) {
         let player = this.players[id];
         this.pills.forEach((pill) => {
-            if (player.intersect(pill)) {
+            if (player.intersect(pill) && player.role === Constants.HUMAN_TYPE) {
                 player.increaseHealth(pill.health);
                 pill.exist = false;
             }
@@ -77,21 +89,19 @@ class Game {
             if (key !== id && this.players[key].role !== player.role && this.players[key].isAlive()) {
                 for (let i = 0; i < this.players[key].projectiles.length; i++) {
                     let projectile = this.players[key].projectiles[i];
-                    if (!projectile.isExist()) continue; //если снаряд уничтожен
-                    if (player.intersect(projectile)) {
-                        this.players[id].decreaseHealth(this.players[key].projectiles[i].damage); //уменьшаем здоровье игрока, по которому попали
-                        this.players[key].projectiles[i].exist = false;
-                        if (this.players[id].health === 0) {
+                    if (projectile.isExist && player.intersect(projectile)) {
+                        player.decreaseHealth(projectile.damage); //уменьшаем здоровье игрока, по которому попали
+                        projectile.exist = false;
+                        if (player.health === 0) {
                             if (player.role === 'Zombie') {
-                                this.players[id].alive = false; //удаляем его из списка игроков
+                                player.alive = false; //удаляем его из списка игроков
                                 this.clients.get(id).emit(Constants.GAME_OVER);
-                                return;
                             } else {
                                 this.turningIntoZombie(id);
-                                let note = this.players[id].name + ' was infected by Zombie comunity. He is zombie now too';
+                                let note = player.name + ' was infected by Zombie community. He is zombie now too';
                                 Chat.sendNote(note, this.clients);
-                                return;
                             }
+                            return;
                         }
                     }
                 }
@@ -156,14 +166,15 @@ class Game {
                 this.players[key].role === Constants.HUMAN_TYPE ? --this.humanCount : --this.zombieCount;
                 delete this.players[key];
                 delete this.clients[key];
+                this.chat.removeUser(key);
                 Chat.sendNote(note, this.clients);
             }
         }
 
     }
 
-    addProjectile(socket, projectile) {
-        this.players[socket.id].shoot(projectile);
+    addProjectile(id, projectile) {
+        this.players[id].shoot(projectile);
     }
 
     moveProjectiles() {
@@ -186,6 +197,7 @@ class Game {
         else
             this.humanCount++;
         console.log(this.humanCount + " " + this.zombieCount);
+        this.chat.addUser(socket);
     }
 
     //добавляет новую таблетку
@@ -197,13 +209,41 @@ class Game {
     sendState() {
         this.clients.forEach((client, socketID) => {
             const currentPlayer = this.players[socketID]
-            this.clients.get(socketID).emit(Constants.STATE_UPDATE, {
+            client.emit(Constants.STATE_UPDATE, {
                 me: currentPlayer,
                 players: this.players,
                 pills: this.pills,
                 area: this.epidemicArea
             })
         });
+        this.chat.sendState();
+    }
+
+    addTyping(id) {
+        if (id in this.players) {
+            this.chat.addTyping(this.players[id]);
+        }
+    }
+
+    removeTyping(id) {
+        if (id in this.players) {
+            this.chat.removeTyping(this.players[id]);
+        }
+    }
+
+    sendMessage(id, msg) {
+        if (id in this.players) {
+            this.clients.forEach((client) => {
+                client.emit(Constants.NEW_MSG, {
+                    name: this.players[id].name,
+                    msg: msg
+                });
+            });
+        }
+    }
+
+    sendNote(data) {
+        Chat.sendNote(data, this.clients);
     }
 }
 

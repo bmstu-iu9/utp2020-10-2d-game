@@ -6,7 +6,7 @@ class Point {
     }
     //метод нахождения расстояния между точкой this и sP
     findDist(sP) {
-        return Math.round(Math.sqrt((sP.x - this.x) * (sP.x - this.x) + (sP.y - this.y) * (sP.y - this.y)));
+        return Math.sqrt((sP.x - this.x) * (sP.x - this.x) + (sP.y - this.y) * (sP.y - this.y));
     }
     //находит пару точек (x,y), которые лежат на расстоянии sqrt(dist) от this и принадлежат прямой this p
     findPoints(p, dist) {
