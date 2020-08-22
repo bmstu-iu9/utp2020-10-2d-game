@@ -20,46 +20,43 @@ class Render {
 
     drawProjectiles(context, players) {
         for (let key in players) {
-            for (let i = 0; i < players[key].projectiles.length; i++) {
-                let ppx = players[key].projectiles[i].x,
-                    ppy = players[key].projectiles[i].y,
-                    projectile = players[key].projectiles[i],
+            players[key].projectiles.forEach((projectile) => {
+                let ppx = projectile.x,
+                    ppy = projectile.y,
                     img;
                 projectile.type === Constants.COUGH_TYPE ?
                     img = this.imgs['Virus.png'] : img = this.imgs['Bullet.png'];
                 context.drawImage(img, ppx, ppy, projectile.w, projectile.h);
-            }
+            })
         }
     }
 
-    drawPlayers(newO,context, players) {
+    drawPlayers(newO, context, players) {
         context.font = Constants.NICKNAME_FONT;
         context.fillStyle = Constants.NICKNAME_COLOR;
         for (let key in players) {
-            let x = players[key].x,
-                y = players[key].y,
+            let player = players[key],
+                w = player.w,
+                h = player.h,
                 text = context.measureText(players[key].name);
             context.save();
-            context.translate(newO.x + x,newO.y + y);
-            y += 15;
+            context.translate(newO.x + player.x, newO.y + player.y);
             if (text.width < Constants.PLAYER_WIDTH) {
-                context.fillText(players[key].name, -1 * players[key].w / 2 + (90 - text.width) / 2, -1 * players[key].h/2 - 25, 90);
+                context.fillText(player.name, -1 * w / 2 + (90 - text.width) / 2, -1 * h / 2 - 25, 90);
             } else {
-                context.fillText(players[key].name, -1 * players[key].w / 2, -1 * players[key].h/2 - 25, 90);
+                context.fillText(player.name, -1 * w / 2, -1 * h / 2 - 25, 90);
             }
-            y += 10;
-            context.fillStyle = Constants.HP_BAR_FRAME_COLOR;
-            context.fillRect(-1 * players[key].w / 2, -1 * players[key].h/2 - 15, 90, 8);
             context.fillStyle = Constants.HP_COLOR;
-            context.fillRect(-1 * players[key].w / 2 + 1, -1 * players[key].h/2 - 15 + 1, 88 * players[key].health, 6);
+            context.fillRect(-w / 2, -h / 2 - 15, 90 * player.health, 8);
             context.fillStyle = Constants.HP_ABSENT_COLOR;
-            context.fillRect(-1 * players[key].w / 2 + 1 + 88 * players[key].health, -1 * players[key].h/2 - 15 + 1, 88 * (1 - players[key].health), 6);
-            y += 15;
+            context.fillRect(-w / 2 + 90 * player.health, -h / 2 - 15, 90 * (1 - player.health), 8);
+            context.fillStyle = Constants.HP_BAR_FRAME_COLOR;
+            context.strokeRect(-w / 2, -h / 2 - 15, 90, 8);
             let img;
-            players[key].role === Constants.HUMAN_TYPE ? img = this.imgs['Human.png'] : img = this.imgs['Zombie.png'];
-            context.rotate(players[key].angleOfRotation);
-            context.drawImage(img, -1 * players[key].w / 2, -1 * players[key].h/2, players[key].w, players[key].h);
-            context.rotate( - players[key].angleOfRotation);
+            player.role === Constants.HUMAN_TYPE ? img = this.imgs['Human.png'] : img = this.imgs['Zombie.png'];
+            context.rotate(player.angleOfRotation);
+            context.drawImage(img, -w / 2, -h / 2, w, h);
+            context.rotate(-player.angleOfRotation);
             context.restore();
         }
     }
