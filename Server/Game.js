@@ -14,8 +14,10 @@ class Game {
         this.h = 0;
         this.pills = [];
         this.epidemicArea = new Epidemic(new Point(0, 0), 0);
+        this.chat = new Chat();
     }
-    updatePlayerOnInput(id,state) {
+
+    updatePlayerOnInput(id, state) {
         if (id in this.players) {
             this.players[id].updateOnInput(state);
             if (state.mouse && !state.mouseInChat)
@@ -25,6 +27,7 @@ class Game {
                 });
         }
     }
+
     //проверка, что людей становится слишком много
     demographicImbalance() {
         return this.humanCount > this.zombieCount + 1;
@@ -163,6 +166,7 @@ class Game {
                 this.players[key].role === Constants.HUMAN_TYPE ? --this.humanCount : --this.zombieCount;
                 delete this.players[key];
                 delete this.clients[key];
+                this.chat.removeUser(key);
                 Chat.sendNote(note, this.clients);
             }
         }
@@ -193,6 +197,7 @@ class Game {
         else
             this.humanCount++;
         console.log(this.humanCount + " " + this.zombieCount);
+        this.chat.addUser(socket);
     }
 
     //добавляет новую таблетку
@@ -204,13 +209,41 @@ class Game {
     sendState() {
         this.clients.forEach((client, socketID) => {
             const currentPlayer = this.players[socketID]
-            this.clients.get(socketID).emit(Constants.STATE_UPDATE, {
+            client.emit(Constants.STATE_UPDATE, {
                 me: currentPlayer,
                 players: this.players,
                 pills: this.pills,
                 area: this.epidemicArea
             })
         });
+        this.chat.sendState();
+    }
+
+    addTyping(id) {
+        if (id in this.players) {
+            this.chat.addTyping(this.players[id]);
+        }
+    }
+
+    removeTyping(id) {
+        if (id in this.players) {
+            this.chat.removeTyping(this.players[id]);
+        }
+    }
+
+    sendMessage(id, msg) {
+        if (id in this.players) {
+            this.clients.forEach((client) => {
+                client.emit(Constants.NEW_MSG, {
+                    name: this.players[id].name,
+                    msg: msg
+                });
+            });
+        }
+    }
+
+    sendNote(data) {
+        Chat.sendNote(data, this.clients);
     }
 }
 

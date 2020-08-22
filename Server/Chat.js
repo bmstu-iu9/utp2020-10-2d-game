@@ -10,7 +10,9 @@ class Chat {
     addUser(socket) {
         this.clients.set(socket.id, socket);
     }
-
+    removeUser(id) {
+        delete this.clients[id];
+    }
     //добавляет к списку печатающих игроков
     addTyping(player) {
         if (!this.typing.includes(player.name))
@@ -24,14 +26,14 @@ class Chat {
 
     //отправляет текущее состояние клиентам
     sendState() {
-        this.clients.forEach((client, socketID) => {
-            this.clients.get(socketID).emit(Constants.USER_TYPING, this.typing);
+        this.clients.forEach((client) => {
+            client.emit(Constants.USER_TYPING, this.typing);
         });
     }
 
     static sendNote(data, clients) {
-        clients.forEach((client, socketID) => {
-            clients.get(socketID).emit(Constants.NEW_NOTE, data);
+        clients.forEach((client) => {
+            client.emit(Constants.NEW_NOTE, data);
         });
     }
 }
