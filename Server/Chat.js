@@ -3,6 +3,7 @@ const Constants = require('../Constants.js');
 class Chat {
     constructor() {
         this.typing = []; //печатающие в чате пользователи
+        this.clients = new Map();
     }
 
     //добавляет нового пользователя

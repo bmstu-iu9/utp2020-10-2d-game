@@ -63,7 +63,7 @@ class Render {
 
     drawPills(context, pills) {
         pills.forEach((pill) => {
-            context.drawImage(this.imgs['Medicine.svg'], pill.x, pill.y,
+            context.drawImage(this.imgs['Medicine.png'], pill.x, pill.y,
                 Constants.PILL_WIDTH, Constants.PILL_HEIGHT);
         })
     }

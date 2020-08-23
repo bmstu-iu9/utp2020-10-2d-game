@@ -12,17 +12,19 @@ class Player extends Rect {
         this.name = name;
         this.role = role;
         this.projectiles = [];
-        this.dx = 3;
-        this.dy = 3;
         this.alive = true;
         this.timeOfLastShoot = Date.now();
         if (role === Constants.HUMAN_TYPE) {
+            this.dx = Constants.HUMAN_SPEED;
+            this.dy = Constants.HUMAN_SPEED;
             this.countOfBulletInWeapon = 5; //текущее количество пуль в оружии
             this.weaponCapacity = 5; //максимальная ёмкость в обойме
             this.reloading = false; //показывает находится ли оружие в процессе перезарядки
             this.health = Constants.HUMAN_MAX_HEALTH;
             this.timeBetweenShoot = Constants.HUMAN_TIME_BETWEEN_SHOOTS;
         } else {
+            this.dx = Constants.ZOMBIE_SPEED;
+            this.dy = Constants.ZOMBIE_SPEED;
             this.health = Constants.ZOMBIE_MAX_HEALTH;
             this.timeBetweenShoot = Constants.ZOMBIE_TIME_BETWEEN_SHOOTS;
         }

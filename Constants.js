@@ -3,7 +3,9 @@ module.exports = Object.freeze({
     WORLD_WIDTH: 3000,
     WORLD_HEIGHT: 3000,
     ZOMBIE_MAX_HEALTH: 1.00,
+    ZOMBIE_SPEED: 3,
     HUMAN_MAX_HEALTH: 1.00,
+    HUMAN_SPEED: 3,
     SPEED_OF_COUGH: 5, //скорость полёта кашля
     SPEED_OF_BULLET: 10, //скорость полёта пули
     BULLET_WIDTH: 10, //длина модельки пули
@@ -21,7 +23,7 @@ module.exports = Object.freeze({
         'Zombie.png', //Zombie
         'Human.png', //Human
         'Virus.png',//моделька снарядов - кашля
-        'Medicine.svg', //лекарство
+        'Medicine.png', //лекарство
         'Bullet.png', //пуля
         'Field.jpg'
     ],
