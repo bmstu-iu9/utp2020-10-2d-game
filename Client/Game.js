@@ -72,6 +72,8 @@ class Game {
 
     //посылаем обновленную информацию от клиента на сервер
     update(chat) {
+        let ldb = document.getElementById('leaderboard');
+        let canvasX = ldb.clientWidth;
         if (this.me) {
             this.socket.emit(Constants.PLAYER_ACTION, {
                 up: this.input.upPressed,
@@ -79,7 +81,7 @@ class Game {
                 left: this.input.leftPressed,
                 right: this.input.rightPressed,
                 mouse: this.input.mousePressed,
-                mouseX: this.input.mouseX - this.newO.x,
+                mouseX: this.input.mouseX - this.newO.x - canvasX,
                 mouseY: this.input.mouseY - this.newO.y,
                 dt: this.dt,
                 mouseInChat: chat.mouseInChat,

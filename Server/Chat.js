@@ -10,11 +10,12 @@ class Chat {
     addUser(socket) {
         this.clients.set(socket.id, socket);
     }
-    removeUser(id) {
-            delete this.clients[id];
-        }
-        //добавляет к списку печатающих игроков
 
+    removeUser(id) {
+        delete this.clients[id];
+    }
+
+    //добавляет к списку печатающих игроков
     addTyping(player) {
         if (!this.typing.includes(player.name))
             this.typing.push(player.name);
