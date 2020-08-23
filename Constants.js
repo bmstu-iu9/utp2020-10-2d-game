@@ -23,6 +23,7 @@ module.exports = Object.freeze({
         'Zombie.png', //Zombie
         'Human.png', //Human
         'Virus.png',//моделька снарядов - кашля
+        'Mask.png',
         'Medicine.png', //лекарство
         'Bullet.png', //пуля
         'Field.jpg'
@@ -61,5 +62,6 @@ module.exports = Object.freeze({
     STOP_TYPING: 'stopTyping',
     NEW_NOTE: 'newNotification',
     FIELD_PIECE_WIDTH: 150,
-    FIELD_PIECE_HEIGHT: 150
+    FIELD_PIECE_HEIGHT: 150,
+    MEDICINE_MASK_MULTIPLIER: 0.25
 })

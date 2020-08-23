@@ -15,6 +15,17 @@ class Game {
         this.pills = [];
         this.epidemicArea = new Epidemic(new Point(0, 0), 0);
         this.chat = new Chat();
+        this.lastUpdateTime = 0;
+    }
+
+    static create() {
+        const game = new Game();
+        game.init();
+        return game;
+    }
+
+    init() {
+        this.lastUpdateTime = Date.now();
     }
 
     updatePlayerOnInput(id, state) {
@@ -202,7 +213,7 @@ class Game {
 
     //добавляет новую таблетку
     addPill() {
-        this.pills.unshift(new Pill(this.w, this.h));
+        this.pills.unshift(new Pill(Constants.PILL_WIDTH, Constants.PILL_HEIGHT));
     }
 
     //отправляет текущее состояние клиентам

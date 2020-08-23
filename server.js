@@ -4,7 +4,7 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const path = require('path');
 const Game = require('./Server/Game.js');
-const game = new Game();
+const game = Game.create();
 const fs = require('fs');
 const Constants = require('./Constants.js');
 
