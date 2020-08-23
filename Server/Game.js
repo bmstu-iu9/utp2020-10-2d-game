@@ -96,9 +96,11 @@ class Game {
                         projectile.exist = false;
                         if (player.health === 0) {
                             if (player.role === 'Zombie') {
+                                this.leaderboard.addKill(key);
                                 player.alive = false; //удаляем его из списка игроков
                                 this.clients.get(id).emit(Constants.GAME_OVER);
                             } else {
+                                this.leaderboard.addZombie(key);
                                 this.turningIntoZombie(id);
                                 let note = player.name + ' was infected by Zombie community. He is zombie now too';
                                 Chat.sendNote(note, this.clients);

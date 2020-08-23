@@ -24,13 +24,13 @@ class Leaderboard {
     //увеличивает число убитых игроком
     addKill(id) {
         if (this.clients.has(id))
-            this.clients[id].kills++;
+            this.clients.get(id).kills++;
     }
 
     //увеличивает число превращенных в зомби игроком
     addZombie(id) {
         if (this.clients.has(id))
-            this.clients[id].zombies++;
+            this.clients.get(id).zombies++;
     }
 
     //отправляет текущее состояние клиентам
