@@ -50,9 +50,6 @@ setInterval(() => {
     game.update();
     game.sendState();
 }, Constants.FRAME_RATE);
-setInterval(function() {
-    game.addPill();
-}, 10000);
 app.get('/', function(req, res) {
     res.sendfile('index.html');
 });

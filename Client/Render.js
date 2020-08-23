@@ -22,11 +22,8 @@ class Render {
         for (let key in players) {
             players[key].projectiles.forEach((projectile) => {
                 let ppx = projectile.x,
-                    ppy = projectile.y,
-                    img;
-                projectile.type === Constants.COUGH_TYPE ?
-                    img = this.imgs['Virus.png'] : img = this.imgs['Bullet.png'];
-                context.drawImage(img, ppx, ppy, projectile.w, projectile.h);
+                    ppy = projectile.y;
+                context.drawImage(this.imgs[projectile.type], ppx, ppy, projectile.w, projectile.h);
             })
         }
     }
@@ -52,18 +49,16 @@ class Render {
             context.fillRect(-w / 2 + 90 * player.health, -h / 2 - 15, 90 * (1 - player.health), 8);
             context.fillStyle = Constants.HP_BAR_FRAME_COLOR;
             context.strokeRect(-w / 2, -h / 2 - 15, 90, 8);
-            let img;
-            player.role === Constants.HUMAN_TYPE ? img = this.imgs['Human.png'] : img = this.imgs['Zombie.png'];
             context.rotate(player.angleOfRotation);
-            context.drawImage(img, -w / 2, -h / 2, w, h);
+            context.drawImage(this.imgs[player.role], -w / 2, -h / 2, w, h);
             context.rotate(-player.angleOfRotation);
             context.restore();
         }
     }
 
-    drawPills(context, pills) {
-        pills.forEach((pill) => {
-            context.drawImage(this.imgs['Medicine.png'], pill.x, pill.y, pill.w, pill.h);
+    drawPowerups(context, powerups) {
+        powerups.forEach((powerup) => {
+            context.drawImage(this.imgs[powerup.type], powerup.x, powerup.y, powerup.w, powerup.h);
         })
     }
 
@@ -84,7 +79,7 @@ class Render {
     drawField(context) {
         for (let x = 0; x < Constants.WORLD_WIDTH; x += Constants.FIELD_PIECE_WIDTH)
             for (let y = 0; y < Constants.WORLD_HEIGHT; y += Constants.FIELD_PIECE_HEIGHT)
-                context.drawImage(this.imgs['Field.jpg'], x, y,
+                context.drawImage(this.imgs[Constants.FIELD_TYPE], x, y,
                     Constants.FIELD_PIECE_WIDTH, Constants.FIELD_PIECE_HEIGHT);
     }
 }
