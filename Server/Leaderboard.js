@@ -3,6 +3,7 @@ const Constants = require('../Constants.js');
 class Leaderboard {
     constructor() {
         this.clients = new Map();
+        this.sockets = [];
     }
 
     //добавляет нового пользователя
@@ -14,11 +15,13 @@ class Leaderboard {
             kills: 0,
             zombies: 0
         });
+        this.sockets.push(socket.id);
     }
 
     //удаляет пользователя
     removeUser(id) {
-        delete this.clients[id];
+        this.clients.delete(id);
+        this.sockets.splice(this.sockets.indexOf(id), 1);
     }
 
     //увеличивает число убитых игроком
@@ -35,15 +38,22 @@ class Leaderboard {
 
     //отправляет текущее состояние клиентам
     sendState() {
+        let arr = [];
+        this.clients.forEach((client, socketID) => {
+            arr.push([socketID, client]);
+        });
+        arr.sort(function(a, b) {
+            return (b[1].kills + b[1].zombies) - (a[1].kills + a[1].zombies)
+        });
         this.clients.forEach((client) => {
-            client.socket.emit(Constants.CLEAR_LDB);
             let texts = [];
             let text = '';
-            this.clients.forEach((client2) => {
-                text = '<div><p>' + client2.name + '</p>' +
-                    '<p>Kills: ' + client2.kills + ' Zombies: ' + client2.zombies + '</p></div>';
+            for (let i = 0; i < arr.length; i++) {
+                let user = arr[i][1];
+                text = '<div><p>' + user.name + '</p>' +
+                    '<p>Kills: ' + user.kills + ' Zombies: ' + user.zombies + '</p></div>';
                 texts.push(text);
-            });
+            }
             client.socket.emit(Constants.LDB_UPDATE, texts);
         });
     }

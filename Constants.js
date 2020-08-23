@@ -60,6 +60,5 @@ module.exports = Object.freeze({
     NEW_NOTE: 'newNotification',
     FIELD_PIECE_WIDTH: 150,
     FIELD_PIECE_HEIGHT: 150,
-    LDB_UPDATE: 'leaderboardUpdate',
-    CLEAR_LDB: 'cleanLeaderboard'
+    LDB_UPDATE: 'leaderboardUpdate'
 })

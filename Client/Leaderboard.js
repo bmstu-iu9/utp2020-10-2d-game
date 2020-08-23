@@ -24,6 +24,7 @@ class Leaderboard {
 
     //обновляем
     update(blocks) {
+        this.clear();
         for (let i = 0; i < blocks.length; i++)
             this.display.innerHTML += blocks[i];
     }
