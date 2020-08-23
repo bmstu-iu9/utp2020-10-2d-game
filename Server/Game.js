@@ -3,6 +3,7 @@ const Epidemic = require('./Epidemic.js');
 const Point = require('./Point.js');
 const Pill = require('./Pill.js');
 const Chat = require('./Chat.js');
+const Leaderboard = require('./Leaderboard.js');
 const Constants = require('../Constants.js');
 class Game {
     constructor() {
@@ -15,6 +16,7 @@ class Game {
         this.pills = [];
         this.epidemicArea = new Epidemic(new Point(0, 0), 0);
         this.chat = new Chat();
+        this.leaderboard = new Leaderboard();
     }
 
     updatePlayerOnInput(id, state) {
@@ -167,6 +169,7 @@ class Game {
                 delete this.players[key];
                 delete this.clients[key];
                 this.chat.removeUser(key);
+                this.leaderboard.removeUser(key);
                 Chat.sendNote(note, this.clients);
             }
         }
@@ -198,6 +201,7 @@ class Game {
             this.humanCount++;
         console.log(this.humanCount + " " + this.zombieCount);
         this.chat.addUser(socket);
+        this.leaderboard.addUser(socket, player);
     }
 
     //добавляет новую таблетку
@@ -217,6 +221,7 @@ class Game {
             })
         });
         this.chat.sendState();
+        this.leaderboard.sendState();
     }
 
     addTyping(id) {

@@ -20,7 +20,7 @@ module.exports = Object.freeze({
     IMG_NAMES: [
         'Zombie.png', //Zombie
         'Human.png', //Human
-        'Virus.png',//моделька снарядов - кашля
+        'Virus.png', //моделька снарядов - кашля
         'Medicine.svg', //лекарство
         'Bullet.png', //пуля
         'Field.jpg'
@@ -59,5 +59,7 @@ module.exports = Object.freeze({
     STOP_TYPING: 'stopTyping',
     NEW_NOTE: 'newNotification',
     FIELD_PIECE_WIDTH: 150,
-    FIELD_PIECE_HEIGHT: 150
+    FIELD_PIECE_HEIGHT: 150,
+    LDB_UPDATE: 'leaderboardUpdate',
+    CLEAR_LDB: 'cleanLeaderboard'
 })

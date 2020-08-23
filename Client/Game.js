@@ -92,14 +92,14 @@ class Game {
     renderGame(canvas, context) {
         this.render.clear(canvas, context);
         context.save(); //добавляет текущее положение экрана в стек
-        context.translate(this.newO.x - this.me.w/2, this.newO.y - this.me.h/2); //переносит начало координат в зааданную точку
+        context.translate(this.newO.x - this.me.w / 2, this.newO.y - this.me.h / 2); //переносит начало координат в зааданную точку
         this.render.drawFrame(context);
         this.render.drawField(context);
         this.render.drawProjectiles(context, this.players);
         this.render.drawPills(context, this.pills);
         this.render.drawEpidemicArea(context, this.area);
         context.restore();
-        this.render.drawPlayers(this.newO,context,this.players);
+        this.render.drawPlayers(this.newO, context, this.players);
     }
 }
 

@@ -11,7 +11,7 @@ const Constants = require('./Constants.js');
 
 io.on(Constants.CONNECT, socket => {
     console.log('user connected');
-    socket.on(Constants.SET_PLAYER_NAME, function (player) {
+    socket.on(Constants.SET_PLAYER_NAME, function(player) {
         if (player.name.length === 0) { //пустое имя недопустимо
             socket.emit(Constants.INVALID_NICKNAME, 'nickname is invalid');
         } else {
@@ -24,16 +24,16 @@ io.on(Constants.CONNECT, socket => {
             } else socket.emit(Constants.USER_EXISTS, player.name + ' username is taken! Try some other username.');
         }
     });
-    socket.on(Constants.PLAYER_ACTION, function (state) {
+    socket.on(Constants.PLAYER_ACTION, function(state) {
         game.updatePlayerOnInput(socket.id, state);
     });
-    socket.on(Constants.USER_TYPING, function () {
+    socket.on(Constants.USER_TYPING, function() {
         game.addTyping(socket.id)
     });
-    socket.on(Constants.STOP_TYPING, function () {
+    socket.on(Constants.STOP_TYPING, function() {
         game.removeTyping(socket.id);
     });
-    socket.on(Constants.NEW_MSG, function (msg) {
+    socket.on(Constants.NEW_MSG, function(msg) {
         game.sendMessage(socket.id, msg);
     });
     socket.on(Constants.DISCONNECT, () => {
