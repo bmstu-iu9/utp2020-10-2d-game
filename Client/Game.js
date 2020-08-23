@@ -72,6 +72,8 @@ class Game {
 
     //посылаем обновленную информацию от клиента на сервер
     update(chat) {
+        let ldb = document.getElementById('leaderboard');
+        let canvasX = ldb.clientWidth;
         if (this.me) {
             this.socket.emit(Constants.PLAYER_ACTION, {
                 up: this.input.upPressed,
@@ -79,7 +81,7 @@ class Game {
                 left: this.input.leftPressed,
                 right: this.input.rightPressed,
                 mouse: this.input.mousePressed,
-                mouseX: this.input.mouseX - this.newO.x,
+                mouseX: this.input.mouseX - this.newO.x - canvasX,
                 mouseY: this.input.mouseY - this.newO.y,
                 dt: this.dt,
                 mouseInChat: chat.mouseInChat,
@@ -92,14 +94,14 @@ class Game {
     renderGame(canvas, context) {
         this.render.clear(canvas, context);
         context.save(); //добавляет текущее положение экрана в стек
-        context.translate(this.newO.x - this.me.w/2, this.newO.y - this.me.h/2); //переносит начало координат в зааданную точку
+        context.translate(this.newO.x - this.me.w / 2, this.newO.y - this.me.h / 2); //переносит начало координат в зааданную точку
         this.render.drawFrame(context);
         this.render.drawField(context);
         this.render.drawProjectiles(context, this.players);
         this.render.drawPowerups(context, this.powerups);
         this.render.drawEpidemicArea(context, this.area);
         context.restore();
-        this.render.drawPlayers(this.newO,context,this.players);
+        this.render.drawPlayers(this.newO, context, this.players);
     }
 }
 

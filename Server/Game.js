@@ -2,6 +2,7 @@ const Player = require('./Player.js');
 const Epidemic = require('./Epidemic.js');
 const Point = require('./Point.js');
 const Chat = require('./Chat.js');
+const Leaderboard = require('./Leaderboard.js');
 const Constants = require('../Constants.js');
 const Powerup = require('./Powerup.js');
 class Game {
@@ -27,6 +28,7 @@ class Game {
     init() {
         this.lastUpdateTime = Date.now();
         this.lastCreationPowerupTime = 0;
+        this.leaderboard = new Leaderboard();
     }
 
     updatePlayerOnInput(id, state) {
@@ -115,9 +117,11 @@ class Game {
                         projectile.exist = false;
                         if (player.health === 0) {
                             if (player.role === 'Zombie') {
+                                this.leaderboard.addKill(key);
                                 player.alive = false; //удаляем его из списка игроков
                                 this.clients.get(id).emit(Constants.GAME_OVER);
                             } else {
+                                this.leaderboard.addZombie(key);
                                 this.turningIntoZombie(id);
                                 let note = player.name + ' was infected by Zombie community. He is zombie now too';
                                 Chat.sendNote(note, this.clients);
@@ -198,6 +202,7 @@ class Game {
                 delete this.players[key];
                 delete this.clients[key];
                 this.chat.removeUser(key);
+                this.leaderboard.removeUser(key);
                 Chat.sendNote(note, this.clients);
             }
         }
@@ -229,6 +234,7 @@ class Game {
             this.humanCount++;
         console.log(this.humanCount + " " + this.zombieCount);
         this.chat.addUser(socket);
+        this.leaderboard.addUser(socket, player);
     }
 
     //отправляет текущее состояние клиентам
@@ -243,6 +249,7 @@ class Game {
             })
         });
         this.chat.sendState();
+        this.leaderboard.sendState();
     }
 
     addTyping(id) {
