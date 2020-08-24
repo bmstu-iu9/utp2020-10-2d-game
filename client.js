@@ -2,6 +2,8 @@ const $ = require('jquery');
 const Constants = require('./Constants.js');
 const Game = require('./Client/Game.js');
 const Chat = require('./Client/Chat.js');
+const Leaderboard = require('./Client/Leaderboard.js');
+
 $(document).ready(() => {
     const socket = io();
     const game = Game.create(document, socket);
@@ -14,7 +16,7 @@ $(document).ready(() => {
           <button type = "button" id = "addPlayer">Set name</button>'
         $('#addPlayer').click(() => {
             let timer;
-            const width = document.documentElement.clientWidth * (1 - Constants.CHAT_WIDTH_PERCENT); // ширина клиентской части окна браузера
+            const width = document.documentElement.clientWidth * (1 - Constants.CHAT_WIDTH_PERCENT * 2); // ширина клиентской части окна браузера
             const height = document.documentElement.clientHeight; // высота клиентской части окна браузера
             const name = $('#nameOfPlayer').val();
             socket.emit(Constants.SET_PLAYER_NAME, {
@@ -32,7 +34,8 @@ $(document).ready(() => {
                 document.getElementById('nameError').innerHTML = data;
             })
             socket.on(Constants.PLAY, function() {
-                document.body.innerHTML = '<canvas id = "game-canvas"></canvas>\
+                document.body.innerHTML = '<div id="container"><div id="leaderboard"></div></div>\
+                <div id="canvas-container"><canvas id = "game-canvas"></canvas></div>\
                 <div id="game-chat"><input type="text" id="chat-input">\
                 <div id="is-typing"></div><div id="chat-display"></div>\
                 <div id="notifications"></div></div>';
@@ -44,6 +47,8 @@ $(document).ready(() => {
                 const notificationBoard = document.getElementById('notifications');
                 const chat = Chat.create(socket, chatInput, chatTyping, chatDisplay, chatBody, notificationBoard);
 
+                const leaderboardDiplay = document.getElementById('leaderboard');
+                const leaderboard = Leaderboard.create(socket, leaderboardDiplay);
 
                 const canvas = document.getElementById('game-canvas');
                 canvas.width = width;

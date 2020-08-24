@@ -1,9 +1,10 @@
 const Player = require('./Player.js');
 const Epidemic = require('./Epidemic.js');
 const Point = require('./Point.js');
-const Pill = require('./Pill.js');
 const Chat = require('./Chat.js');
+const Leaderboard = require('./Leaderboard.js');
 const Constants = require('../Constants.js');
+const Powerup = require('./Powerup.js');
 class Game {
     constructor() {
         this.clients = new Map();
@@ -12,9 +13,22 @@ class Game {
         this.zombieCount = 0;
         this.w = 0;
         this.h = 0;
-        this.pills = [];
+        this.powerups = [];
         this.epidemicArea = new Epidemic(new Point(0, 0), 0);
         this.chat = new Chat();
+        this.lastUpdateTime = 0;
+    }
+
+    static create() {
+        const game = new Game();
+        game.init();
+        return game;
+    }
+
+    init() {
+        this.lastUpdateTime = Date.now();
+        this.lastCreationPowerupTime = 0;
+        this.leaderboard = new Leaderboard();
     }
 
     updatePlayerOnInput(id, state) {
@@ -72,12 +86,21 @@ class Game {
     }
 
     //проверяет какие таблетки подобрал игрок
-    collisionWithPills(id) {
+    collisionWithPowerups(id) {
         let player = this.players[id];
-        this.pills.forEach((pill) => {
-            if (player.intersect(pill) && player.role === Constants.HUMAN_TYPE) {
-                player.increaseHealth(pill.health);
-                pill.exist = false;
+        this.powerups.forEach((powerup) => {
+            switch (powerup.type) {
+                case Constants.POWERUP_PILL_TYPE:
+                    if (player.role === Constants.HUMAN_TYPE && player.intersect(powerup)) {
+                        player.increaseHealth(powerup.data);
+                        powerup.exist = false;
+                    }
+                    break;
+                case Constants.POWERUP_MASK_TYPE:
+                    if (player.role === Constants.HUMAN_TYPE && player.intersect(powerup)) {
+                        player.multi = powerup.data; ///////////////////////////////////
+                        powerup.exist = false;
+                    }
             }
         })
     }
@@ -94,9 +117,11 @@ class Game {
                         projectile.exist = false;
                         if (player.health === 0) {
                             if (player.role === 'Zombie') {
+                                this.leaderboard.addKill(key);
                                 player.alive = false; //удаляем его из списка игроков
                                 this.clients.get(id).emit(Constants.GAME_OVER);
                             } else {
+                                this.leaderboard.addZombie(key);
                                 this.turningIntoZombie(id);
                                 let note = player.name + ' was infected by Zombie community. He is zombie now too';
                                 Chat.sendNote(note, this.clients);
@@ -118,14 +143,24 @@ class Game {
         ++this.zombieCount;
     }
 
+    createNewPowerup() {
+        const currentTime = this.lastUpdateTime;
+        if (currentTime - this.lastCreationPowerupTime >= Constants.POWERUP_APPEARANCE_PERIOD) {
+            this.lastCreationPowerupTime = currentTime;
+            this.powerups.unshift(Powerup.create());
+        }
+    }
+
     update() {
+        this.lastUpdateTime = Date.now();
+        this.createNewPowerup();
         //движение снарядов
         this.moveProjectiles();
 
         //столкновение с таблетками
         for (let key in this.players) {
             if (this.players[key].isAlive())
-                this.collisionWithPills(key);
+                this.collisionWithPowerups(key);
         }
         if (!this.epidemicArea.coordinateFixed)
             this.outbreak();
@@ -156,8 +191,8 @@ class Game {
                 projectile => projectile.isExist())
 
         //удаляем подобранные лекарства
-        this.pills = this.pills.filter(
-            pill => pill.isExist())
+        this.powerups = this.powerups.filter(
+            powerup => powerup.isExist());
 
         //удаляем убитых игроков
         for (let key in this.players) {
@@ -167,6 +202,7 @@ class Game {
                 delete this.players[key];
                 delete this.clients[key];
                 this.chat.removeUser(key);
+                this.leaderboard.removeUser(key);
                 Chat.sendNote(note, this.clients);
             }
         }
@@ -198,11 +234,7 @@ class Game {
             this.humanCount++;
         console.log(this.humanCount + " " + this.zombieCount);
         this.chat.addUser(socket);
-    }
-
-    //добавляет новую таблетку
-    addPill() {
-        this.pills.unshift(new Pill(this.w, this.h));
+        this.leaderboard.addUser(socket, player);
     }
 
     //отправляет текущее состояние клиентам
@@ -212,11 +244,12 @@ class Game {
             client.emit(Constants.STATE_UPDATE, {
                 me: currentPlayer,
                 players: this.players,
-                pills: this.pills,
-                area: this.epidemicArea
+                powerups: this.powerups,
+                area: this.epidemicArea,
             })
         });
         this.chat.sendState();
+        this.leaderboard.sendState();
     }
 
     addTyping(id) {

@@ -10,11 +10,11 @@ class Projectile extends Rect {
         this.type = type;
         this.exist = true;
         if (this.type === Constants.BULLET_TYPE) {
-            this.projectileSpeed = Constants.SPEED_OF_BULLET;
+            this.projectileSpeed = Constants.BULLET_SPEED;
             this.damage = Constants.BULLET_DAMAGE;
             this.flightDistance = Constants.BULLET_FLIGHT_DISTANCE;
         } else {
-            this.projectileSpeed = Constants.SPEED_OF_COUGH;
+            this.projectileSpeed = Constants.COUGH_SPEED;
             this.damage = Constants.COUGH_DAMAGE;
             this.flightDistance = Constants.COUGH_FLIGHT_DISTANCE;
         }

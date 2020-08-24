@@ -2,37 +2,59 @@ module.exports = Object.freeze({
     WORLD_MIN: 0,
     WORLD_WIDTH: 3000,
     WORLD_HEIGHT: 3000,
+
     ZOMBIE_MAX_HEALTH: 1.00,
+    ZOMBIE_SPEED: 3,
+    ZOMBIE_TYPE: 'Zombie',
+    ZOMBIE_TIME_BETWEEN_SHOOTS: 100,
+
     HUMAN_MAX_HEALTH: 1.00,
-    SPEED_OF_COUGH: 5, //скорость полёта кашля
-    SPEED_OF_BULLET: 10, //скорость полёта пули
-    BULLET_WIDTH: 10, //длина модельки пули
-    BULLET_HEIGHT: 10, //ширина модельки пули
+    HUMAN_SPEED: 3,
+    HUMAN_TIME_BETWEEN_SHOOTS: 50,
+    HUMAN_TYPE: 'Human',
+
+    COUGH_SPEED: 5, //скорость полёта кашля
     COUGH_WIDTH: 10, //длина снаряда кашя
     COUGH_HEIGHT: 10, //ширина снаряда кашля
+    COUGH_DAMAGE: 0.05, //урон от кашля
+    COUGH_TYPE: 'Cough',
+    COUGH_FLIGHT_DISTANCE: 200, //дальность кашля
+
+    BULLET_SPEED: 10, //скорость полёта пули
+    BULLET_WIDTH: 10, //длина модельки пули
+    BULLET_HEIGHT: 10, //ширина модельки пули
+    BULLET_FLIGHT_DISTANCE: 400, //дальность кашля
+    BULLET_TYPE: 'Bullet',
+    BULLET_DAMAGE: 0.10, //урон от пули
+
     PLAYER_WIDTH: 90, //длина прямоугольника модельки человека
     PLAYER_HEIGHT: 90, //ширина прямоугольника модельки человека
-    PILL_WIDTH: 50, //длина прямоугльника модельки лекарства
-    PILL_HEIGHT: 50, //ширина прямоугольника модельки лекарства
-    HEALTH_OF_PILL: 0.10, //лечение от лекарства
-    COUGH_FLIGHT_DISTANCE: 200, //дальность кашля
-    BULLET_FLIGHT_DISTANCE: 400, //дальность кашля
+
+    POWERUP_WIDTH: 50,
+    POWERUP_HEIGHT: 50,
+    POWERUP_APPEARANCE_PERIOD: 10000,
+    POWERUP_PILL_TYPE: 'Pill',
+    POWERUP_MASK_TYPE: 'Mask',
+    POWERUP_PILL_HEALTH: 0.10,
+    POWERUP_MASK_MULTIPLIER: 0.25,
+
     IMG_NAMES: [
         'Zombie.png', //Zombie
         'Human.png', //Human
-        'Virus.png',//моделька снарядов - кашля
-        'Medicine.svg', //лекарство
+        'Cough.png',//моделька снарядов - кашля
+        'Mask.png',
+        'Pill.png', //лекарство
         'Bullet.png', //пуля
         'Field.jpg'
+    ],
+    POWERUP_TYPES: [
+        'Mask',
+        'Pill'
     ],
     STATE_UPDATE: 'update',
     PLAYER_ACTION: 'playerAction',
     PLAY: 'playTheGame',
     RELOAD_PISTOL: 5000, //длительность перезарядки пистолета
-    BULLET_TYPE: 'bullet',
-    COUGH_TYPE: 'cough',
-    BULLET_DAMAGE: 0.10, //урон от пули
-    COUGH_DAMAGE: 0.05, //урон от кашля
     MAX_RADIUS_OF_EPIDEMIC_AREA: 100,
     FRAME_RATE: 1000 / 60,
     USER_EXISTS: 'usersExists',
@@ -45,19 +67,17 @@ module.exports = Object.freeze({
     NEW_MSG: 'newMessage',
     PROJECTILE_WIDTH: 10,
     PROJECTILE_HEIGHT: 10,
-    ZOMBIE_TYPE: 'Zombie',
-    HUMAN_TYPE: 'Human',
     NICKNAME_FONT: "15px Arial", //шрифт для имен над игроками
     NICKNAME_COLOR: "#0095DD", //цвет для имен над игроками
     HP_BAR_FRAME_COLOR: "#000000", //цвет контура шкалы здоровья
     HP_COLOR: "#32CD32", //цвет оставшегося здоровья
     HP_ABSENT_COLOR: "#B22222", //цвет отнятого здоровья
     EPIDEMIC_AREA_COLOR: 'rgb(46, 139, 87, 0.25)',
-    HUMAN_TIME_BETWEEN_SHOOTS: 50,
-    ZOMBIE_TIME_BETWEEN_SHOOTS: 100,
     USER_TYPING: 'someoneIsTyping',
     STOP_TYPING: 'stopTyping',
     NEW_NOTE: 'newNotification',
     FIELD_PIECE_WIDTH: 150,
-    FIELD_PIECE_HEIGHT: 150
+    FIELD_PIECE_HEIGHT: 150,
+    FIELD_TYPE: 'Field',
+    LDB_UPDATE: 'leaderboardUpdate'
 })

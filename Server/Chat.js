@@ -3,15 +3,18 @@ const Constants = require('../Constants.js');
 class Chat {
     constructor() {
         this.typing = []; //печатающие в чате пользователи
+        this.clients = new Map();
     }
 
     //добавляет нового пользователя
     addUser(socket) {
         this.clients.set(socket.id, socket);
     }
+
     removeUser(id) {
         delete this.clients[id];
     }
+
     //добавляет к списку печатающих игроков
     addTyping(player) {
         if (!this.typing.includes(player.name))
