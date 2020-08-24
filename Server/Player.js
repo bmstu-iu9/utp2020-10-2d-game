@@ -13,7 +13,7 @@ class Player extends Rect {
         this.role = role;
         this.projectiles = [];
         this.alive = true;
-        this.timeOfLastShoot = Date.now();
+        this.timeOfLastShoot = 0;
         this.powerups = {};
         if (role === Constants.HUMAN_TYPE) {
             this.dx = Constants.HUMAN_SPEED;
@@ -41,14 +41,14 @@ class Player extends Rect {
             if (!this.reloading) { //если оружие не перезаряжается
                 this.reloading = true;
                 this.reloadingStart = Date.now();
-            } else if (Date.now() - this.reloadingStart >= Constants.RELOAD_PISTOL) {
+            } else if (this.lastUpdateTime - this.reloadingStart >= Constants.RELOAD_PISTOL) {
                 this.countOfBulletInWeapon = this.weaponCapacity;
                 this.reloading = false;
             }
             return;
         }
-        if (Date.now() - this.timeOfLastShoot >= this.timeBetweenShoot) {
-            this.timeOfLastShoot = Date.now();
+        if (this.lastUpdateTime - this.timeOfLastShoot >= this.timeBetweenShoot) {
+            this.timeOfLastShoot = this.lastUpdateTime;
             if (this.role === Constants.HUMAN_TYPE)
                 --this.countOfBulletInWeapon;
             let p, startPoint

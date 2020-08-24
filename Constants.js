@@ -6,7 +6,7 @@ module.exports = Object.freeze({
     ZOMBIE_MAX_HEALTH: 1.00,
     ZOMBIE_SPEED: 3,
     ZOMBIE_TYPE: 'Zombie',
-    ZOMBIE_TIME_BETWEEN_SHOOTS: 100,
+    ZOMBIE_TIME_BETWEEN_SHOOTS: 200,
 
     HUMAN_MAX_HEALTH: 1.00,
     HUMAN_SPEED: 3,
