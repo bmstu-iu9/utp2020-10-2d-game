@@ -13,7 +13,8 @@ class Player extends Rect {
         this.role = role;
         this.projectiles = [];
         this.alive = true;
-        this.timeOfLastShoot = Date.now();
+        this.timeOfLastShoot = 0;
+        this.powerups = {};
         if (role === Constants.HUMAN_TYPE) {
             this.dx = Constants.HUMAN_SPEED;
             this.dy = Constants.HUMAN_SPEED;
@@ -31,6 +32,8 @@ class Player extends Rect {
         this.mouseX = 0;
         this.mouseY = 0;
         this.angleOfRotation = 0;
+        this.damageMultiplier = Constants.PLAYER_DEFAULT_MULTIPLIER;
+        this.lastUpdateTime = Date.now();
     }
 
     shoot(projectile) {
@@ -38,14 +41,14 @@ class Player extends Rect {
             if (!this.reloading) { //если оружие не перезаряжается
                 this.reloading = true;
                 this.reloadingStart = Date.now();
-            } else if (Date.now() - this.reloadingStart >= Constants.RELOAD_PISTOL) {
+            } else if (this.lastUpdateTime - this.reloadingStart >= Constants.RELOAD_PISTOL) {
                 this.countOfBulletInWeapon = this.weaponCapacity;
                 this.reloading = false;
             }
             return;
         }
-        if (Date.now() - this.timeOfLastShoot >= this.timeBetweenShoot) {
-            this.timeOfLastShoot = Date.now();
+        if (this.lastUpdateTime - this.timeOfLastShoot >= this.timeBetweenShoot) {
+            this.timeOfLastShoot = this.lastUpdateTime;
             if (this.role === Constants.HUMAN_TYPE)
                 --this.countOfBulletInWeapon;
             let p, startPoint
@@ -62,6 +65,39 @@ class Player extends Rect {
             }
             startPoint = new Point(this.x + this.w / 2, this.y + this.h / 2);
             this.addProjectile(p, startPoint, projectile.mouseX, projectile.mouseY)
+        }
+    }
+
+    update(currentTime) {
+        this.lastUpdateTime = currentTime;
+        this.updatePowerups();
+
+    }
+    updatePowerups() {
+        for(let key in this.powerups) {
+            const powerup = this.powerups[key];
+            if(this.lastUpdateTime >= powerup.expirationTime) {
+                switch (powerup.type) {
+                    case Constants.POWERUP_PILL_TYPE:
+                        break;
+                    case Constants.POWERUP_MASK_TYPE:
+                        this.damageMultiplier = Constants.PLAYER_DEFAULT_MULTIPLIER;
+                        break;
+                }
+                delete this.powerups[key];
+            }
+        }
+    }
+    pickUpPowerup(powerup) {
+        powerup.pickUp(this.lastUpdateTime);
+        this.powerups[powerup.type] = powerup;
+        switch (powerup.type) {
+            case Constants.POWERUP_PILL_TYPE:
+                this.increaseHealth(powerup.data);
+                break;
+            case Constants.POWERUP_MASK_TYPE:
+                this.damageMultiplier = powerup.data;
+                break;
         }
     }
 
@@ -84,26 +120,26 @@ class Player extends Rect {
     }
 
     updateAngleOfRotation() {
-        const A = new Point(this.x + this.w / 2, this.y + this.h / 2 + 40);
+        const A = new Point(this.x + this.w / 2, this.y + this.h / 2);
         const C = new Point(this.mouseX, this.mouseY);
         /*
             Пытаемся понять, где находится 3 вершина треугольника,
-            в которой прямой угол. 1 if - 1 четверть, 2 if - 2 четверть и т.д..
+            в которой прямой угол.(A - чачало координат) 1 if - 1 четверть, 2 if - 2 четверть и т.д..
          */
-        if (A.x <= this.mouseX && A.y >= this.mouseY) {
-            const B = new Point(this.x + this.w / 2, this.mouseY);
+        if (A.x <= C.x && A.y >= C.y) {
+            const B = new Point(A.x, C.y);
             this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B));
         }
-        if (A.x <= this.mouseX && A.y <= this.mouseY) {
-            const B = new Point(this.mouseX, this.y + this.h / 2 + 40);
+        if (A.x <= C.x && A.y <= C.y) {
+            const B = new Point(C.x, A.y);
             this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B)) + Math.PI / 2;
         }
-        if (A.x >= this.mouseX && A.y <= this.mouseY) {
-            const B = new Point(this.x + this.w / 2, this.mouseY);
+        if (A.x >= C.x && A.y <= C.y) {
+            const B = new Point(A.x, C.y);
             this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B)) + Math.PI;
         }
-        if (A.x >= this.mouseX && A.y >= this.mouseY) {
-            const B = new Point(this.mouseX, this.y + this.h / 2 + 40);
+        if (A.x >= C.x && A.y >= C.y) {
+            const B = new Point(C.x, A.y);
             this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B)) + Math.PI * 3 / 2;
         }
     }

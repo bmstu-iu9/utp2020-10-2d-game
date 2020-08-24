@@ -92,14 +92,12 @@ class Game {
             switch (powerup.type) {
                 case Constants.POWERUP_PILL_TYPE:
                     if (player.role === Constants.HUMAN_TYPE && player.intersect(powerup)) {
-                        player.increaseHealth(powerup.data);
-                        powerup.exist = false;
+                        player.pickUpPowerup(powerup);
                     }
                     break;
                 case Constants.POWERUP_MASK_TYPE:
                     if (player.role === Constants.HUMAN_TYPE && player.intersect(powerup)) {
-                        player.multi = powerup.data; ///////////////////////////////////
-                        powerup.exist = false;
+                        player.pickUpPowerup(powerup);
                     }
             }
         })
@@ -113,7 +111,7 @@ class Game {
                 for (let i = 0; i < this.players[key].projectiles.length; i++) {
                     let projectile = this.players[key].projectiles[i];
                     if (projectile.isExist && player.intersect(projectile)) {
-                        player.decreaseHealth(projectile.damage); //уменьшаем здоровье игрока, по которому попали
+                        player.decreaseHealth(projectile.damage * player.damageMultiplier); //уменьшаем здоровье игрока, по которому попали
                         projectile.exist = false;
                         if (player.health === 0) {
                             if (player.role === 'Zombie') {
@@ -151,9 +149,17 @@ class Game {
         }
     }
 
+    updatePlayers() {
+        for (let key in this.players) {
+            this.players[key].update(this.lastUpdateTime);
+        }
+
+    }
+
     update() {
         this.lastUpdateTime = Date.now();
         this.createNewPowerup();
+        this.updatePlayers();
         //движение снарядов
         this.moveProjectiles();
 
