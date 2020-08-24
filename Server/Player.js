@@ -14,6 +14,7 @@ class Player extends Rect {
         this.projectiles = [];
         this.alive = true;
         this.timeOfLastShoot = Date.now();
+        this.powerups = {};
         if (role === Constants.HUMAN_TYPE) {
             this.dx = Constants.HUMAN_SPEED;
             this.dy = Constants.HUMAN_SPEED;
@@ -31,6 +32,8 @@ class Player extends Rect {
         this.mouseX = 0;
         this.mouseY = 0;
         this.angleOfRotation = 0;
+        this.damageMultiplier = Constants.PLAYER_DEFAULT_MULTIPLIER;
+        this.lastUpdateTime = Date.now();
     }
 
     shoot(projectile) {
@@ -62,6 +65,39 @@ class Player extends Rect {
             }
             startPoint = new Point(this.x + this.w / 2, this.y + this.h / 2);
             this.addProjectile(p, startPoint, projectile.mouseX, projectile.mouseY)
+        }
+    }
+
+    update(currentTime) {
+        this.lastUpdateTime = currentTime;
+        this.updatePowerups();
+
+    }
+    updatePowerups() {
+        for(let key in this.powerups) {
+            const powerup = this.powerups[key];
+            if(this.lastUpdateTime >= powerup.expirationTime) {
+                switch (powerup.type) {
+                    case Constants.POWERUP_PILL_TYPE:
+                        break;
+                    case Constants.POWERUP_MASK_TYPE:
+                        this.damageMultiplier = Constants.PLAYER_DEFAULT_MULTIPLIER;
+                        break;
+                }
+                delete this.powerups[key];
+            }
+        }
+    }
+    pickUpPowerup(powerup) {
+        powerup.pickUp(this.lastUpdateTime);
+        this.powerups[powerup.type] = powerup;
+        switch (powerup.type) {
+            case Constants.POWERUP_PILL_TYPE:
+                this.increaseHealth(powerup.data);
+                break;
+            case Constants.POWERUP_MASK_TYPE:
+                this.damageMultiplier = powerup.data;
+                break;
         }
     }
 

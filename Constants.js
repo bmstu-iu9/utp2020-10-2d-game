@@ -29,14 +29,16 @@ module.exports = Object.freeze({
 
     PLAYER_WIDTH: 90, //длина прямоугольника модельки человека
     PLAYER_HEIGHT: 90, //ширина прямоугольника модельки человека
+    PLAYER_DEFAULT_MULTIPLIER: 1.00,
 
     POWERUP_WIDTH: 50,
     POWERUP_HEIGHT: 50,
     POWERUP_APPEARANCE_PERIOD: 10000,
     POWERUP_PILL_TYPE: 'Pill',
-    POWERUP_MASK_TYPE: 'Mask',
     POWERUP_PILL_HEALTH: 0.10,
+    POWERUP_MASK_TYPE: 'Mask',
     POWERUP_MASK_MULTIPLIER: 0.25,
+    POWERUP_MASK_DURATION: 5000,
 
     IMG_NAMES: [
         'Zombie.png', //Zombie
