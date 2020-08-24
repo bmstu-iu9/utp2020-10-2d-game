@@ -84,26 +84,26 @@ class Player extends Rect {
     }
 
     updateAngleOfRotation() {
-        const A = new Point(this.x + this.w / 2, this.y + this.h / 2 + 40);
+        const A = new Point(this.x + this.w / 2, this.y + this.h / 2);
         const C = new Point(this.mouseX, this.mouseY);
         /*
             Пытаемся понять, где находится 3 вершина треугольника,
-            в которой прямой угол. 1 if - 1 четверть, 2 if - 2 четверть и т.д..
+            в которой прямой угол.(A - чачало координат) 1 if - 1 четверть, 2 if - 2 четверть и т.д..
          */
-        if (A.x <= this.mouseX && A.y >= this.mouseY) {
-            const B = new Point(this.x + this.w / 2, this.mouseY);
+        if (A.x <= C.x && A.y >= C.y) {
+            const B = new Point(A.x, C.y);
             this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B));
         }
-        if (A.x <= this.mouseX && A.y <= this.mouseY) {
-            const B = new Point(this.mouseX, this.y + this.h / 2 + 40);
+        if (A.x <= C.x && A.y <= C.y) {
+            const B = new Point(C.x, A.y);
             this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B)) + Math.PI / 2;
         }
-        if (A.x >= this.mouseX && A.y <= this.mouseY) {
-            const B = new Point(this.x + this.w / 2, this.mouseY);
+        if (A.x >= C.x && A.y <= C.y) {
+            const B = new Point(A.x, C.y);
             this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B)) + Math.PI;
         }
-        if (A.x >= this.mouseX && A.y >= this.mouseY) {
-            const B = new Point(this.mouseX, this.y + this.h / 2 + 40);
+        if (A.x >= C.x && A.y >= C.y) {
+            const B = new Point(C.x, A.y);
             this.angleOfRotation = Math.atan(B.findDist(C) / A.findDist(B)) + Math.PI * 3 / 2;
         }
     }

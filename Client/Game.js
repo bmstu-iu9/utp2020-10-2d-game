@@ -81,15 +81,21 @@ class Game {
                 left: this.input.leftPressed,
                 right: this.input.rightPressed,
                 mouse: this.input.mousePressed,
-                mouseX: this.input.mouseX - this.newO.x - canvasX,
-                mouseY: this.input.mouseY - this.newO.y,
+                /*
+                    вычитая параметры экрана, находим положение курсора мыши
+                    относительно середины экрана(где находится игрок), далее
+                    переводим эти координаты в с.к. серверного игрового поля,
+                    за счёт того, что мы знаем положение игрока на сервере(x,y),
+                    и знаем,как относительно него располагается курсор.
+                 */
+                mouseX: this.input.mouseX - document.documentElement.clientWidth / 2 + this.me.x + this.me.w / 2,
+                mouseY: this.input.mouseY - document.documentElement.clientHeight / 2 + this.me.y + this.me.h / 2,
                 dt: this.dt,
                 mouseInChat: chat.mouseInChat,
                 inputFocus: chat.inputFocus
             })
         }
     }
-
     //рисуем игру
     renderGame(canvas, context) {
         this.render.clear(canvas, context);
