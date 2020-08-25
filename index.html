@@ -7,18 +7,37 @@
     <title>Game</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="/socket.io/socket.io.js"></script>
-    
+
 </head>
 
 <body>
-<div id="game-menu">
-    <h1 id="Choose-your-role">Choose your role</h1>
-    <button type="button" id="human">HUMAN</button>
-    <button id="zombie" id="zombie">ZOMBIE</button>
-</div>
-<script src="dist/client.bundle.js">
-
-</script>
+    <div id="game-menu">
+        <h1 id="Choose-your-role">Choose your role</h1>
+        <button type="button" id="human">HUMAN</button>
+        <button id="zombie" id="zombie">ZOMBIE</button>
+    </div>
+    <div id="autenfication" class="hidden">
+        <div id="nameError"></div>
+        <input type="text" id="nameOfPlayer" placeholder="Enter your name">
+        <button type="button" id="addPlayer">Set name</button>
+    </div>
+    <div id="game" class="hidden">
+        <div id="ldb-container">
+            <div id="leaderboard"></div>
+        </div>
+        <div id="canvas-container">
+            <canvas id="game-canvas"></canvas>
+        </div>
+        <div id="chat-container">
+            <div id="game-chat"><input type="text" id="chat-input">
+                <div id="is-typing"></div>
+                <div id="chat-display"></div>
+                <div id="notifications"></div>
+            </div>
+        </div>
+    </div>
+    <script src="dist/client.bundle.js">
+    </script>
 </body>
 
 </html>

@@ -12,8 +12,8 @@ $(document).ready(() => {
 
 
     const addNewPlayer = (role) => {
-        document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
-          <button type = "button" id = "addPlayer">Set name</button>'
+        $('#game-menu').addClass('hidden');
+        $('#autenfication').removeClass('hidden');
         $('#addPlayer').click(() => {
             let timer;
             const width = document.documentElement.clientWidth * (1 - Constants.CHAT_WIDTH_PERCENT * 2); // ширина клиентской части окна браузера
@@ -34,11 +34,8 @@ $(document).ready(() => {
                 document.getElementById('nameError').innerHTML = data;
             })
             socket.on(Constants.PLAY, function() {
-                document.body.innerHTML = '<div id="container"><div id="leaderboard"></div></div>\
-                <div id="canvas-container"><canvas id = "game-canvas"></canvas></div>\
-                <div id="game-chat"><input type="text" id="chat-input">\
-                <div id="is-typing"></div><div id="chat-display"></div>\
-                <div id="notifications"></div></div>';
+                $('#autenfication').addClass('hidden');
+                $('#game').removeClass('hidden');
 
                 const chatDisplay = document.getElementById('chat-display');
                 const chatInput = document.getElementById('chat-input');

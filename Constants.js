@@ -27,6 +27,9 @@ module.exports = Object.freeze({
     BULLET_TYPE: 'Bullet',
     BULLET_DAMAGE: 0.10, //урон от пули
 
+    PROJECTILE_WIDTH: 10,
+    PROJECTILE_HEIGHT: 10,
+
     PLAYER_WIDTH: 90, //длина прямоугольника модельки человека
     PLAYER_HEIGHT: 90, //ширина прямоугольника модельки человека
     PLAYER_DEFAULT_MULTIPLIER: 1.00,
@@ -43,7 +46,7 @@ module.exports = Object.freeze({
     IMG_NAMES: [
         'Zombie.png', //Zombie
         'Human.png', //Human
-        'Cough.png',//моделька снарядов - кашля
+        'Cough.png', //моделька снарядов - кашля
         'Mask.png',
         'Pill.png', //лекарство
         'Bullet.png', //пуля
@@ -53,33 +56,38 @@ module.exports = Object.freeze({
         'Mask',
         'Pill'
     ],
+
+
     STATE_UPDATE: 'update',
     PLAYER_ACTION: 'playerAction',
     PLAY: 'playTheGame',
-    RELOAD_PISTOL: 5000, //длительность перезарядки пистолета
-    MAX_RADIUS_OF_EPIDEMIC_AREA: 100,
-    FRAME_RATE: 1000 / 60,
     USER_EXISTS: 'usersExists',
     INVALID_NICKNAME: 'invalidNickname',
     SET_PLAYER_NAME: 'setPlayerName',
     CONNECT: 'connection',
     DISCONNECT: 'disconnect',
     GAME_OVER: 'gameOver',
-    CHAT_WIDTH_PERCENT: 0.2, //проуент экрана, занимаемого чатом
     NEW_MSG: 'newMessage',
-    PROJECTILE_WIDTH: 10,
-    PROJECTILE_HEIGHT: 10,
+    USER_TYPING: 'someoneIsTyping',
+    STOP_TYPING: 'stopTyping',
+    NEW_NOTE: 'newNotification',
+
+
+    CHAT_WIDTH_PERCENT: 0.2, //проуент экрана, занимаемого чатом
+
     NICKNAME_FONT: "15px Arial", //шрифт для имен над игроками
     NICKNAME_COLOR: "#0095DD", //цвет для имен над игроками
     HP_BAR_FRAME_COLOR: "#000000", //цвет контура шкалы здоровья
     HP_COLOR: "#32CD32", //цвет оставшегося здоровья
     HP_ABSENT_COLOR: "#B22222", //цвет отнятого здоровья
     EPIDEMIC_AREA_COLOR: 'rgb(46, 139, 87, 0.25)',
-    USER_TYPING: 'someoneIsTyping',
-    STOP_TYPING: 'stopTyping',
-    NEW_NOTE: 'newNotification',
+
     FIELD_PIECE_WIDTH: 150,
     FIELD_PIECE_HEIGHT: 150,
     FIELD_TYPE: 'Field',
-    LDB_UPDATE: 'leaderboardUpdate'
+    LDB_UPDATE: 'leaderboardUpdate',
+
+    RELOAD_PISTOL: 5000, //длительность перезарядки пистолета
+    MAX_RADIUS_OF_EPIDEMIC_AREA: 100,
+    FRAME_RATE: 1000 / 60
 })
