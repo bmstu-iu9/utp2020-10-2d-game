@@ -87,7 +87,7 @@ class Chat {
 
     //добавляем новое сообщение в чат
     receiveMessage(data) {
-        const elem = document.createElement('p'),
+        const elem = document.createElement('div'),
             firstChild = this.display.firstChild;
         elem.id = this.socket.id;
         elem.appendChild(document.createTextNode(data.name + ': ' + data.msg));

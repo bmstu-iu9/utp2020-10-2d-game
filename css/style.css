@@ -21,7 +21,8 @@ body {
 }
 
 #leaderboard {
-    background-color: rgb(124, 117, 117);
+    background-color: rgb(117, 124, 118);
+    text-align: center;
     top: 0;
     bottom: 0;
     left: 0;
@@ -30,13 +31,25 @@ body {
     overflow-y: auto;
 }
 
+#leaderboard div,
+#chat-display div {
+    margin: 3px;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    background: linear-gradient(to right, rgb(117, 124, 118), rgb(86, 102, 88));
+}
+
+#chat-display div {
+    padding: 8px 0px;
+}
+
 #ldb-container {
     box-sizing: border-box;
     width: 20%;
     height: 100%;
     position: absolute;
     left: 0;
-    border: solid rgb(27, 24, 24) medium;
+    border: solid rgb(29, 32, 29) medium;
 }
 
 #chat-container {
@@ -45,7 +58,7 @@ body {
     height: 100%;
     position: absolute;
     right: 0;
-    border: solid rgb(27, 24, 24) medium;
+    border: solid rgb(29, 32, 29) medium;
 }
 
 #canvas-container {
@@ -61,6 +74,7 @@ body {
     top: 0;
     bottom: 0;
     width: 100%;
+    background-color: rgb(117, 124, 118);
 }
 
 #chat-input {
@@ -76,12 +90,15 @@ body {
 }
 
 #notifications {
-    background-color: rgb(124, 117, 117);
+    box-sizing: border-box;
+    background-color: rgb(86, 102, 88);
     position: absolute;
     height: 40%;
     width: 100%;
     overflow-y: auto;
     bottom: 0px;
+    border-top: solid rgb(29, 32, 29) medium;
+    text-align: center;
 }
 
 #chat-input {

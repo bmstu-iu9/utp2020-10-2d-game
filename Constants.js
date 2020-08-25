@@ -50,7 +50,8 @@ module.exports = Object.freeze({
         'Mask.png',
         'Pill.png', //лекарство
         'Bullet.png', //пуля
-        'Field.jpg'
+        'Field.jpg',
+        'back.jpg'
     ],
     POWERUP_TYPES: [
         'Mask',
@@ -71,12 +72,13 @@ module.exports = Object.freeze({
     USER_TYPING: 'someoneIsTyping',
     STOP_TYPING: 'stopTyping',
     NEW_NOTE: 'newNotification',
+    LDB_UPDATE: 'leaderboardUpdate',
 
 
     CHAT_WIDTH_PERCENT: 0.20, //проуент экрана, занимаемого чатом
 
     NICKNAME_FONT: "15px Arial", //шрифт для имен над игроками
-    NICKNAME_COLOR: "#0095DD", //цвет для имен над игроками
+    NICKNAME_COLOR: "#000000", //цвет для имен над игроками
     HP_BAR_FRAME_COLOR: "#000000", //цвет контура шкалы здоровья
     HP_COLOR: "#32CD32", //цвет оставшегося здоровья
     HP_MASK_COLOR: "#66cdaa",
@@ -86,7 +88,6 @@ module.exports = Object.freeze({
     FIELD_PIECE_WIDTH: 150,
     FIELD_PIECE_HEIGHT: 150,
     FIELD_TYPE: 'Field',
-    LDB_UPDATE: 'leaderboardUpdate',
 
     RELOAD_PISTOL: 5000, //длительность перезарядки пистолета
     MAX_RADIUS_OF_EPIDEMIC_AREA: 100,

@@ -16,6 +16,7 @@ class Render {
 
     clear(canvas, context) {
         context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(this.imgs['back'], 0, 0);
     }
 
     drawProjectiles(context, players) {
