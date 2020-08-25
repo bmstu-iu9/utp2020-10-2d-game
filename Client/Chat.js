@@ -77,7 +77,7 @@ class Chat {
 
     //отправляем сообщение при нажатии Enter
     keyDownHandler(e) {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && this.input.value != '') {
             const msg = this.input.value;
             this.input.value = '';
             this.startTyping();

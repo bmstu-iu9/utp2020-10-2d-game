@@ -73,12 +73,13 @@ module.exports = Object.freeze({
     NEW_NOTE: 'newNotification',
 
 
-    CHAT_WIDTH_PERCENT: 0.2, //проуент экрана, занимаемого чатом
+    CHAT_WIDTH_PERCENT: 0.20, //проуент экрана, занимаемого чатом
 
     NICKNAME_FONT: "15px Arial", //шрифт для имен над игроками
     NICKNAME_COLOR: "#0095DD", //цвет для имен над игроками
     HP_BAR_FRAME_COLOR: "#000000", //цвет контура шкалы здоровья
     HP_COLOR: "#32CD32", //цвет оставшегося здоровья
+    HP_MASK_COLOR: "#66cdaa",
     HP_ABSENT_COLOR: "#B22222", //цвет отнятого здоровья
     EPIDEMIC_AREA_COLOR: 'rgb(46, 139, 87, 0.25)',
 

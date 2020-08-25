@@ -27,23 +27,25 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    overflow: scroll;
+    overflow-y: auto;
 }
 
 #ldb-container {
+    box-sizing: border-box;
     width: 20%;
     height: 100%;
     position: absolute;
     left: 0;
-    /*float: left;*/
+    border: solid rgb(27, 24, 24) medium;
 }
 
 #chat-container {
+    box-sizing: border-box;
     width: 20%;
     height: 100%;
     position: absolute;
     right: 0;
-    /*float: left;*/
+    border: solid rgb(27, 24, 24) medium;
 }
 
 #canvas-container {
@@ -52,7 +54,6 @@ body {
     position: absolute;
     left: 20%;
     right: 20%;
-    /*float: left;*/
 }
 
 #game-chat {
@@ -62,11 +63,16 @@ body {
     width: 100%;
 }
 
+#chat-input {
+    box-sizing: border-box;
+    width: 100%;
+}
+
 #chat-display {
     position: absolute;
     height: 55%;
     width: 100%;
-    overflow: scroll;
+    overflow-y: auto;
 }
 
 #notifications {
@@ -74,7 +80,7 @@ body {
     position: absolute;
     height: 40%;
     width: 100%;
-    overflow: scroll;
+    overflow-y: auto;
     bottom: 0px;
 }
 

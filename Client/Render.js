@@ -43,7 +43,9 @@ class Render {
             } else {
                 context.fillText(player.name, -1 * w / 2, -1 * h / 2 - 25, 90);
             }
-            context.fillStyle = Constants.HP_COLOR;
+            player.damageMultiplier === Constants.PLAYER_DEFAULT_MULTIPLIER ?
+                context.fillStyle = Constants.HP_COLOR :
+                context.fillStyle = Constants.HP_MASK_COLOR;
             context.fillRect(-w / 2, -h / 2 - 15, 90 * player.health, 8);
             context.fillStyle = Constants.HP_ABSENT_COLOR;
             context.fillRect(-w / 2 + 90 * player.health, -h / 2 - 15, 90 * (1 - player.health), 8);
