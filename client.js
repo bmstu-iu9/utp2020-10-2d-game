@@ -52,6 +52,8 @@ $(document).ready(() => {
                 canvas.height = height;
                 const context = canvas.getContext('2d');
                 timer = setInterval(function() {
+                    canvas.width = document.documentElement.clientWidth * (1 - Constants.CHAT_WIDTH_PERCENT * 2);
+                    canvas.height = document.documentElement.clientHeight;
                     game.start(canvas, context, {
                         mouseInChat: chat.mouseIn,
                         inputFocus: chat.isTyping
