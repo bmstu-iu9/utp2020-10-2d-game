@@ -72,29 +72,30 @@ class Game {
 
     //посылаем обновленную информацию от клиента на сервер
     update(chat) {
-            if (this.me) {
-                this.socket.emit(Constants.PLAYER_ACTION, {
-                    up: this.input.upPressed,
-                    down: this.input.downPressed,
-                    left: this.input.leftPressed,
-                    right: this.input.rightPressed,
-                    mouse: this.input.mousePressed,
-                    /*
-                        вычитая параметры экрана, находим положение курсора мыши
-                        относительно середины экрана(где находится игрок), далее
-                        переводим эти координаты в с.к. серверного игрового поля,
-                        за счёт того, что мы знаем положение игрока на сервере(x,y),
-                        и знаем,как относительно него располагается курсор.
-                     */
-                    mouseX: this.input.mouseX - document.documentElement.clientWidth / 2 + this.me.x + this.me.w / 2,
-                    mouseY: this.input.mouseY - document.documentElement.clientHeight / 2 + this.me.y + this.me.h / 2,
-                    dt: this.dt,
-                    mouseInChat: chat.mouseInChat,
-                    inputFocus: chat.inputFocus
-                })
-            }
+        if (this.me) {
+            this.socket.emit(Constants.PLAYER_ACTION, {
+                up: this.input.upPressed,
+                down: this.input.downPressed,
+                left: this.input.leftPressed,
+                right: this.input.rightPressed,
+                mouse: this.input.mousePressed,
+                /*
+                    вычитая параметры экрана, находим положение курсора мыши
+                    относительно середины экрана(где находится игрок), далее
+                    переводим эти координаты в с.к. серверного игрового поля,
+                    за счёт того, что мы знаем положение игрока на сервере(x,y),
+                    и знаем,как относительно него располагается курсор.
+                */
+                mouseX: this.input.mouseX - document.documentElement.clientWidth / 2 + this.me.x + this.me.w / 2,
+                mouseY: this.input.mouseY - document.documentElement.clientHeight / 2 + this.me.y + this.me.h / 2,
+                dt: this.dt,
+                mouseInChat: chat.mouseInChat,
+                inputFocus: chat.inputFocus
+            })
         }
-        //рисуем игру
+    }
+
+    //рисуем игру
     renderGame(canvas, context) {
         this.render.clear(canvas, context);
         context.save(); //добавляет текущее положение экрана в стек
