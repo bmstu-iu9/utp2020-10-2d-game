@@ -63,8 +63,17 @@ class Game {
             let c = this.randomHuman();
             this.epidemicArea = new Epidemic(c, 0);
             this.epidemicArea.coordinateFixed = true;
-            this.epidemicArea.marker = true;
-            this.epidemicArea.start = Date.now();
+            if (this.epidemicArea.first) {
+                setTimeout(function(epidemicArea) {
+                    epidemicArea.marker = true;
+                    epidemicArea.start = Date.now();
+                }, 5000, this.epidemicArea);
+                this.epidemicArea.first = false;
+            } else {
+                this.epidemicArea.marker = true;
+                this.epidemicArea.start = Date.now();
+            }
+
         }
     }
 
