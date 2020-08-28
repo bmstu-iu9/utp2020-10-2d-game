@@ -243,6 +243,12 @@ class Game {
         this.leaderboard.addUser(socket, player);
     }
 
+    start() {
+        this.clients.forEach((client, socketID) => {
+            client.emit(Constants.PLAY);
+        });
+    }
+
     //отправляет текущее состояние клиентам
     sendState() {
         this.clients.forEach((client, socketID) => {

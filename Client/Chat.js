@@ -1,19 +1,19 @@
 const Constants = require('../Constants.js');
 
 class Chat {
-    constructor(socket, input, typing, display, body, note) {
+    constructor(socket) {
         this.socket = socket;
-        this.input = input;
-        this.typing = typing;
-        this.display = display;
-        this.body = body;
-        this.note = note;
+        this.input = document.getElementById('chat-input');
+        this.typing = document.getElementById('is-typing');
+        this.display = document.getElementById('chat-display');
+        this.body = document.getElementById('game-chat');
+        this.note = document.getElementById('notifications');
         this.mouseIn = false;
         this.isTyping = false;
     }
 
-    static create(socket, input, typing, display, body, note) {
-        const chat = new Chat(socket, input, typing, display, body, note);
+    static create(socket) {
+        const chat = new Chat(socket);
         chat.init();
         return chat;
     }

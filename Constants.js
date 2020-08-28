@@ -73,6 +73,7 @@ module.exports = Object.freeze({
     STOP_TYPING: 'stopTyping',
     NEW_NOTE: 'newNotification',
     LDB_UPDATE: 'leaderboardUpdate',
+    TO_LOBBY: 'toLobby',
 
 
     CHAT_WIDTH_PERCENT: 0.20, //проуент экрана, занимаемого чатом

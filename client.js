@@ -3,10 +3,12 @@ const Constants = require('./Constants.js');
 const Game = require('./Client/Game.js');
 const Chat = require('./Client/Chat.js');
 const Leaderboard = require('./Client/Leaderboard.js');
+const Lobby = require('./Client/Lobby.js');
 
 $(document).ready(() => {
     const socket = io();
     const game = Game.create(document, socket);
+    const lobby = new Lobby();
 
     game.downloadImages();
 
@@ -33,19 +35,16 @@ $(document).ready(() => {
                 console.log(data);
                 document.getElementById('nameError').innerHTML = data;
             })
+            socket.on(Constants.TO_LOBBY, function(name) {
+                lobby.init();
+                lobby.addUser(name);
+            })
             socket.on(Constants.PLAY, function() {
-                $('#autenfication').addClass('hidden');
+                $('#lobby').addClass('hidden');
                 $('#game').removeClass('hidden');
 
-                const chatDisplay = document.getElementById('chat-display');
-                const chatInput = document.getElementById('chat-input');
-                const chatBody = document.getElementById('game-chat');
-                const chatTyping = document.getElementById('is-typing');
-                const notificationBoard = document.getElementById('notifications');
-                const chat = Chat.create(socket, chatInput, chatTyping, chatDisplay, chatBody, notificationBoard);
-
-                const leaderboardDiplay = document.getElementById('leaderboard');
-                const leaderboard = Leaderboard.create(socket, leaderboardDiplay);
+                const chat = Chat.create(socket);
+                const leaderboard = Leaderboard.create(socket);
 
                 const canvas = document.getElementById('game-canvas');
                 canvas.width = width;
