@@ -51,7 +51,7 @@ module.exports = Object.freeze({
         'Pill.png', //лекарство
         'Bullet.png', //пуля
         'Field.jpg',
-        'back.jpg'
+        'back.jpg', //картинка для фона
     ],
     POWERUP_TYPES: [
         'Mask',

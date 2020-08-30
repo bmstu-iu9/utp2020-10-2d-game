@@ -66,10 +66,10 @@ $(document).ready(() => {
                     });
                 $('#chat-input').focusin(function() {
                     chat.startTyping();
-                })
+                });
                 $('#chat-input').focusout(function() {
                     chat.stopTyping();
-                })
+                });
             })
             socket.on(Constants.GAME_OVER, function() {
                 clearInterval(timer);
