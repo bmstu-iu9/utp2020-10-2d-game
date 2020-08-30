@@ -77,10 +77,7 @@ $(document).ready(() => {
             })
         })
     }
-    $('#human').click(() => {
+    $('#play').click(() => {
         addNewPlayer(Constants.HUMAN_TYPE);
-    })
-    $('#zombie').click(() => {
-        addNewPlayer(Constants.ZOMBIE_TYPE);
     })
 })
