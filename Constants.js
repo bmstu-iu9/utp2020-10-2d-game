@@ -84,7 +84,9 @@ module.exports = Object.freeze({
     HP_COLOR: "#32CD32", //цвет оставшегося здоровья
     HP_MASK_COLOR: "#66cdaa",
     HP_ABSENT_COLOR: "#B22222", //цвет отнятого здоровья
+
     EPIDEMIC_AREA_COLOR: 'rgb(46, 139, 87, 0.25)',
+    EPIDEMIC_AREA_TIME_OF_FIRST_EPIDEMIC: 10000,
 
     FIELD_PIECE_WIDTH: 150,
     FIELD_PIECE_HEIGHT: 150,

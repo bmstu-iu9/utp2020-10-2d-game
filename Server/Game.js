@@ -17,6 +17,7 @@ class Game {
         this.epidemicArea = new Epidemic(new Point(0, 0), 0);
         this.chat = new Chat();
         this.lastUpdateTime = 0;
+        this.timeToStart = 0;
     }
 
     static create() {
@@ -63,16 +64,8 @@ class Game {
             let c = this.randomHuman();
             this.epidemicArea = new Epidemic(c, 0);
             this.epidemicArea.coordinateFixed = true;
-            if (this.epidemicArea.first) {
-                setTimeout(function(epidemicArea) {
-                    epidemicArea.marker = true;
-                    epidemicArea.start = Date.now();
-                }, 5000, this.epidemicArea);
-                this.epidemicArea.first = false;
-            } else {
-                this.epidemicArea.marker = true;
-                this.epidemicArea.start = Date.now();
-            }
+            this.epidemicArea.marker = true;
+            this.epidemicArea.start = Date.now();
 
         }
     }
@@ -177,7 +170,8 @@ class Game {
             if (this.players[key].isAlive())
                 this.collisionWithPowerups(key);
         }
-        if (!this.epidemicArea.coordinateFixed)
+        if (!this.epidemicArea.coordinateFixed &&
+            this.lastUpdateTime - this.timeToStart >= Constants.EPIDEMIC_AREA_TIME_OF_FIRST_EPIDEMIC)
             this.outbreak();
         else if (this.epidemicArea.marker) {
             if (this.epidemicArea.isTooBig()) {
@@ -253,6 +247,7 @@ class Game {
     }
 
     start() {
+        this.timeToStart = this.lastUpdateTime;
         this.clients.forEach((client, socketID) => {
             client.emit(Constants.PLAY);
         });

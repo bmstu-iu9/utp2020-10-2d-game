@@ -20,7 +20,7 @@ io.on(Constants.CONNECT, socket => {
                 let playersCount = Object.keys(game.players).length;
                 if (playersCount < 2) {
                     socket.emit(Constants.TO_LOBBY, player.name);
-                } else if (playersCount = 2) {
+                } else if (playersCount === 2) {
                     socket.emit(Constants.TO_LOBBY);
                     game.start();
                 }
