@@ -10,6 +10,8 @@ $(document).ready(() => {
     const game = Game.create(document, socket);
     const lobby = new Lobby();
 
+    $('#game-over').addClass('hidden');
+
     game.downloadImages();
 
 
@@ -73,7 +75,8 @@ $(document).ready(() => {
             })
             socket.on(Constants.GAME_OVER, function() {
                 clearInterval(timer);
-                document.body.innerHTML = '<div> <h1>GAME OVER</h1></div>';
+                $('#game').addClass('hidden');
+                $('#game-over').removeClass('hidden');
             })
         })
     }

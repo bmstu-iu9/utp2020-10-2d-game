@@ -187,3 +187,9 @@ body {
     background: rgb(45, 122, 42);
     box-shadow: 0 0 0 4px rgb(179, 252, 169);
 }
+
+#game-over-pic {
+    position: absolute;
+    left: 30%;
+    top: 20%;
+}
