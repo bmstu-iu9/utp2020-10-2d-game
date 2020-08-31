@@ -38,6 +38,7 @@ body {
     border: 0;
     font-size: 32px;
     font-family: 'Zombie-Style';
+    color: Black;
     padding: 15px;
     border-radius: 15px;
     background: rgb(122, 45, 42);
@@ -54,6 +55,8 @@ body {
     border: 0;
     padding: 15px;
     font-size: 32px;
+    font-weight: 900;
+    color: Black;
     background: transparent;
 }
 
@@ -177,6 +180,7 @@ body {
     border: 0;
     font-size: 64px;
     font-family: 'Zombie-Style';
+    color: Black;
     padding: 30px;
     border-radius: 15px;
     background: rgb(122, 45, 42);

@@ -33,6 +33,7 @@ module.exports = Object.freeze({
     PLAYER_WIDTH: 90, //длина прямоугольника модельки человека
     PLAYER_HEIGHT: 90, //ширина прямоугольника модельки человека
     PLAYER_DEFAULT_MULTIPLIER: 1.00,
+    PLAYER_QUANTITY_TO_START: 2,
 
     POWERUP_WIDTH: 50,
     POWERUP_HEIGHT: 50,

@@ -18,9 +18,9 @@ io.on(Constants.CONNECT, socket => {
             if (game.findName(player.name) === 0) { //проверяем есть ли игок с таким ником
                 game.addPlayer(player, socket);
                 let playersCount = Object.keys(game.players).length;
-                if (playersCount < 2) {
+                if (playersCount < Constants.PLAYER_QUANTITY_TO_START) {
                     socket.emit(Constants.TO_LOBBY, player.name);
-                } else if (playersCount === 2) {
+                } else if (playersCount === Constants.PLAYER_QUANTITY_TO_START) {
                     socket.emit(Constants.TO_LOBBY);
                     game.start();
                 }
