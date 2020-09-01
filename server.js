@@ -17,7 +17,13 @@ io.on(Constants.CONNECT, socket => {
         } else {
             if (game.findName(player.name) === 0) { //проверяем есть ли игок с таким ником
                 game.addPlayer(player, socket);
-                socket.emit(Constants.PLAY);
+                let playersCount = Object.keys(game.players).length;
+                if (playersCount < Constants.PLAYER_QUANTITY_TO_START) {
+                    socket.emit(Constants.TO_LOBBY, player.name);
+                } else if (playersCount === Constants.PLAYER_QUANTITY_TO_START) {
+                    socket.emit(Constants.TO_LOBBY);
+                    game.start();
+                }
                 let note = 'A new player is ' + player.name;
                 game.sendNote(note);
                 console.log('a new player ' + game.players[socket.id].name + ' is ' + player.role);
@@ -44,6 +50,7 @@ io.on(Constants.CONNECT, socket => {
             let note = game.players[socket.id].name + ' left the game:('
             game.sendNote(note);
         } else console.log("Player (no name) disconnect");
+
     });
 });
 setInterval(() => {

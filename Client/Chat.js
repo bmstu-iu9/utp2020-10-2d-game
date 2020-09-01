@@ -1,19 +1,19 @@
 const Constants = require('../Constants.js');
 
 class Chat {
-    constructor(socket, input, typing, display, body, note) {
+    constructor(socket) {
         this.socket = socket;
-        this.input = input;
-        this.typing = typing;
-        this.display = display;
-        this.body = body;
-        this.note = note;
+        this.input = document.getElementById('chat-input');
+        this.typing = document.getElementById('is-typing');
+        this.display = document.getElementById('chat-display');
+        this.body = document.getElementById('game-chat');
+        this.note = document.getElementById('notifications');
         this.mouseIn = false;
         this.isTyping = false;
     }
 
-    static create(socket, input, typing, display, body, note) {
-        const chat = new Chat(socket, input, typing, display, body, note);
+    static create(socket) {
+        const chat = new Chat(socket);
         chat.init();
         return chat;
     }
@@ -77,7 +77,7 @@ class Chat {
 
     //отправляем сообщение при нажатии Enter
     keyDownHandler(e) {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && this.input.value != '') {
             const msg = this.input.value;
             this.input.value = '';
             this.startTyping();
@@ -87,7 +87,7 @@ class Chat {
 
     //добавляем новое сообщение в чат
     receiveMessage(data) {
-        const elem = document.createElement('p'),
+        const elem = document.createElement('div'),
             firstChild = this.display.firstChild;
         elem.id = this.socket.id;
         elem.appendChild(document.createTextNode(data.name + ': ' + data.msg));

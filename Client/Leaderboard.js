@@ -1,13 +1,13 @@
 const Constants = require('../Constants.js');
 
 class Leaderboard {
-    constructor(socket, display) {
+    constructor(socket) {
         this.socket = socket;
-        this.display = display;
+        this.display = document.getElementById('leaderboard');
     }
 
-    static create(socket, display) {
-        const leaderboard = new Leaderboard(socket, display);
+    static create(socket) {
+        const leaderboard = new Leaderboard(socket);
         leaderboard.init();
         return leaderboard;
     }
