@@ -43,6 +43,7 @@ $(document).ready(() => {
             })
             socket.on(Constants.PLAY, function() {
                 $('#lobby').addClass('hidden');
+                $('#back').addClass('hidden');
                 $('#game').removeClass('hidden');
 
                 const chat = Chat.create(socket);
@@ -76,6 +77,7 @@ $(document).ready(() => {
             socket.on(Constants.GAME_OVER, function() {
                 clearInterval(timer);
                 $('#game').addClass('hidden');
+                $('#back').removeClass('hidden');
                 $('#game-over').removeClass('hidden');
             })
         })
