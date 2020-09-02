@@ -1,6 +1,7 @@
 const Rect = require('./Rect.js');
 const Point = require('./Point.js');
 const Constants = require('../Constants.js');
+const Wall = require('../Wall.js');
 class Projectile extends Rect {
     constructor(x, y, startPoint, mouseX, mouseY, type) {
         super(x, y, Constants.PROJECTILE_WIDTH, Constants.PROJECTILE_HEIGHT);
@@ -40,6 +41,14 @@ class Projectile extends Rect {
     flewAway() {
         return this.startPoint.findDist(new Point(this.x, this.y)) > this.flightDistance;
     }
+
+    isWall() {
+		for (let arr of Wall) {
+			if (this.x > arr[0] && this.x < arr[1] && this.y > arr[2] && this.y < arr[3]) {
+				return true;
+			}
+    	}
+	}
 
     //существует ли снаряд
     isExist() {

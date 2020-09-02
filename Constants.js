@@ -4,12 +4,12 @@ module.exports = Object.freeze({
     WORLD_HEIGHT: 3000,
 
     ZOMBIE_MAX_HEALTH: 1.00,
-    ZOMBIE_SPEED: 3,
+    ZOMBIE_SPEED: 10,
     ZOMBIE_TYPE: 'Zombie',
     ZOMBIE_TIME_BETWEEN_SHOOTS: 200,
 
     HUMAN_MAX_HEALTH: 1.00,
-    HUMAN_SPEED: 3,
+    HUMAN_SPEED: 10,
     HUMAN_TIME_BETWEEN_SHOOTS: 50,
     HUMAN_TYPE: 'Human',
 
@@ -47,7 +47,8 @@ module.exports = Object.freeze({
         'Mask.png',
         'Pill.png', //лекарство
         'Bullet.png', //пуля
-        'Field.jpg'
+        'Field.jpg',
+	'Stone.jpg'
     ],
     POWERUP_TYPES: [
         'Mask',
@@ -81,5 +82,7 @@ module.exports = Object.freeze({
     FIELD_PIECE_WIDTH: 150,
     FIELD_PIECE_HEIGHT: 150,
     FIELD_TYPE: 'Field',
+    STONE_TYPE: 'Stone',
+	STONE_SIZE: 75,
     LDB_UPDATE: 'leaderboardUpdate'
 })

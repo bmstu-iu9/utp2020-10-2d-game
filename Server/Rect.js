@@ -20,6 +20,7 @@ class Rect {
 
     leftDown() {
         return new Point(this.x, this.y + this.h);
+
     }
 
     rightDown() {

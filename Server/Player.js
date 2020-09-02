@@ -3,10 +3,11 @@ const Constants = require('../Constants');
 const Projectile = require('./Projectile.js');
 const Point = require('./Point.js');
 const Chat = require('./Chat.js');
+const Wall = require('../Wall.js');
 //класс игрока
 class Player extends Rect {
     constructor(role, name, w, h) {
-        super(0, 0, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+        super(1200, 1200, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
         this.screenWidth = w;
         this.screenHeight = h;
         this.name = name;
@@ -166,26 +167,62 @@ class Player extends Rect {
     }
 
     moveDown() {
-        if (this.y + this.h < Constants.WORLD_HEIGHT) {
-            this.y += this.dy;
+	let flag = true;
+	for (let arr of Wall) {
+		if (this.x + this.w < arr[0] + this.dx || this.x >= arr[1] - this.dx || this.y + this.h < arr[2] || this.y >= arr[3] - this.dy) {
+		}
+		else { 
+			flag = false;
+			break;
+		}
+	}
+	if (flag && this.y + this.h < Constants.WORLD_HEIGHT) {
+		this.y += this.dy;
         }
     }
 
     moveUp() {
-        if (this.y > 0) {
-            this.y -= this.dy;
+	let flag = true;
+	for (let arr of Wall) {
+		if (this.x + this.w <= arr[0] + this.dx || this.x >= arr[1] - this.dx || this.y + this.h <= arr[2] + this.dy || this.y > arr[3]) {
+		}
+		else { 
+			flag = false;
+			break;
+		}
+	}
+	if (flag && this.y > 0) {
+		this.y -= this.dy;
         }
     }
 
     moveLeft() {
-        if (this.x > 0) {
-            this.x -= this.dx;
+	let flag = true;
+	for (let arr of Wall) {
+		if (this.x + this.w <= arr[0] + this.dx || this.x > arr[1] || this.y + this.h <= arr[2] + this.dy || this.y >= arr[3] - this.dy) {
+		}
+		else { 
+			flag = false;
+			break;
+		}
+	}
+	if (flag && this.x > 0) {
+		this.x -= this.dx;
         }
     }
 
     moveRight() {
-        if (this.x + this.w < Constants.WORLD_WIDTH) {
-            this.x += this.dx;
+	let flag = true;
+	for (let arr of Wall) {
+		if (this.x + this.w < arr[0] || this.x >= arr[1] - this.dx || this.y + this.h <= arr[2] + this.dy || this.y >= arr[3] - this.dy) {
+		}
+		else { 
+			flag = false;
+			break;
+		}
+	}
+	if (flag && this.x + this.w < Constants.WORLD_WIDTH) {
+		this.x += this.dx;
         }
     }
 
@@ -193,7 +230,7 @@ class Player extends Rect {
     moveProjectiles() {
         for (let i = 0; i < this.projectiles.length; i++) {
             this.projectiles[i].move();
-            if (this.projectiles[i].flewAway()) { //удаляем, если снаряд вылетел за свою зону поражения
+            if (this.projectiles[i].isWall() || this.projectiles[i].flewAway()) { //удаляем, если снаряд вылетел за свою зону поражения
                 this.projectiles[i].exist = false;
             }
         }
