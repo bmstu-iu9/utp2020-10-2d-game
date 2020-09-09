@@ -35,7 +35,7 @@ class Game {
                 img.src = `/css/${imageName}`;
                 img.onload = () => {
                     console.log(`Downloaded ${imageName}`);
-                    this.imgs[imageName.slice(0,imageName.length - 4)] = img;
+                    this.imgs[imageName.slice(0, imageName.length - 4)] = img;
                     resolve();
                 };
             });
@@ -72,8 +72,6 @@ class Game {
 
     //посылаем обновленную информацию от клиента на сервер
     update(chat) {
-        let ldb = document.getElementById('leaderboard');
-        let canvasX = ldb.clientWidth;
         if (this.me) {
             this.socket.emit(Constants.PLAYER_ACTION, {
                 up: this.input.upPressed,
@@ -87,7 +85,7 @@ class Game {
                     переводим эти координаты в с.к. серверного игрового поля,
                     за счёт того, что мы знаем положение игрока на сервере(x,y),
                     и знаем,как относительно него располагается курсор.
-                 */
+                */
                 mouseX: this.input.mouseX - document.documentElement.clientWidth / 2 + this.me.x + this.me.w / 2,
                 mouseY: this.input.mouseY - document.documentElement.clientHeight / 2 + this.me.y + this.me.h / 2,
                 dt: this.dt,
@@ -96,6 +94,7 @@ class Game {
             })
         }
     }
+
     //рисуем игру
     renderGame(canvas, context) {
         this.render.clear(canvas, context);

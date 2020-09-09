@@ -1,91 +1,207 @@
+@font-face {
+    font-family: 'Zombie-Style';
+    src: url(17788.otf);
+    font-weight: bold;
+}
+
 html,
 body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
     overflow: hidden;
     overscroll-behavior: none;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Zombie-Style', Arial;
+    background: linear-gradient(to right, rgb(117, 124, 118), rgb(116, 33, 33));
+}
+
+#back {
+    width: 100%;
+    height: 100%;
+    background-image: url(back.jpg);
+    opacity: 0.1;
+    background-size: cover;
+}
+
+.hidden {
+    display: none !important;
 }
 
 #game-menu {
-    top: 20%;
+    top: 35%;
     left: 40%;
     position: fixed;
 }
 
+#input {
+    max-width: 35%;
+    position: fixed;
+    top: 30%;
+    right: 5%;
+}
+
+#addPlayer {
+    box-sizing: border-box;
+    margin: 20px;
+    border: 0;
+    font-size: 32px;
+    font-family: 'Zombie-Style';
+    color: Black;
+    padding: 15px;
+    border-radius: 15px;
+    background: rgb(122, 45, 42);
+    transition: 0.3s ease-out;
+}
+
+#addPlayer:hover {
+    background: rgb(45, 122, 42);
+    box-shadow: 0 0 0 4px rgb(179, 252, 169);
+}
+
+#nameOfPlayer {
+    box-sizing: border-box;
+    border: 0;
+    padding: 15px;
+    font-size: 32px;
+    font-weight: 900;
+    color: Black;
+    background: transparent;
+}
+
+#lobby-display {
+    font-size: xx-large;
+    top: 20%;
+    left: 60%;
+    position: fixed;
+}
+
+#lobbyZombie {
+    position: fixed;
+    height: 90%;
+    left: 0;
+    bottom: 0;
+}
+
+#blood1 {
+    position: absolute;
+    width: 60%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+#blood2 {
+    position: absolute;
+    height: 80%;
+    top: 0;
+    right: 0;
+}
+
+#game {
+    width: 100%;
+    height: 100%;
+}
+
 #leaderboard {
-    background-color: rgb(124, 117, 117);
+    background-color: rgb(117, 124, 118);
+    text-align: center;
     top: 0;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    overflow: scroll;
+    overflow-y: auto;
 }
 
-#container {
-    display: inline-block;
+#leaderboard div,
+#chat-display div {
+    margin: 3px;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    background: linear-gradient(to right, rgb(117, 124, 118), rgb(86, 102, 88));
+}
+
+#chat-display div {
+    padding: 8px 0px;
+}
+
+#ldb-container {
+    box-sizing: border-box;
     width: 20%;
     height: 100%;
+    position: absolute;
+    left: 0;
+    border: solid rgb(29, 32, 29) medium;
+}
+
+#chat-container {
+    box-sizing: border-box;
+    width: 20%;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    border: solid rgb(29, 32, 29) medium;
 }
 
 #canvas-container {
-    display: inline-block;
-    position: relative;
     width: 60%;
     height: 100%;
-}
-
-#canvas {
-    width: 100%;
+    position: absolute;
+    left: 20%;
+    right: 20%;
 }
 
 #game-chat {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 20%;
-    right: 0;
+    width: 100%;
+    background-color: rgb(117, 124, 118);
+}
+
+#chat-input {
+    box-sizing: border-box;
+    display: inline-block;
+    width: 100%;
 }
 
 #chat-display {
     position: absolute;
     height: 55%;
     width: 100%;
-    overflow: scroll;
+    overflow-y: auto;
 }
 
 #notifications {
-    background-color: rgb(124, 117, 117);
+    box-sizing: border-box;
+    background-color: rgb(86, 102, 88);
     position: absolute;
     height: 40%;
     width: 100%;
-    overflow: scroll;
+    overflow-y: auto;
     bottom: 0px;
+    border-top: solid rgb(29, 32, 29) medium;
+    text-align: center;
 }
 
-#chat-input {
-    display: inline-block;
+#play {
+    border: 0;
+    font-size: 64px;
+    font-family: 'Zombie-Style';
+    color: Black;
+    padding: 30px;
+    border-radius: 15px;
+    background: rgb(122, 45, 42);
+    transition: 0.3s ease-out;
 }
 
-#human {
-    border-radius: 12px;
-    font-size: 48px;
-    color: black;
-    background: #eaaa3e;
+#play:hover {
+    background: rgb(45, 122, 42);
+    box-shadow: 0 0 0 4px rgb(179, 252, 169);
 }
 
-#zombie {
-    border-radius: 12px;
-    font-size: 48px;
-    color: black;
-    background: #3eef1a;
-}
-
-#Choose-your-role {
-    font-family: Arial, Helvetica, Verdana, sans-serif;
-    /* Гарнитура шрифта */
-    font-size: 48px;
-    /* Размер текста */
-    font-weight: bolder;
+#game-over-pic {
+    position: absolute;
+    left: 30%;
+    top: 20%;
 }

@@ -4,21 +4,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Game</title>
+    <title>CovidZ2020</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" href="css/icon.png" type="image/x-icon">
     <script src="/socket.io/socket.io.js"></script>
-    
+
 </head>
 
 <body>
-<div id="game-menu">
-    <h1 id="Choose-your-role">Choose your role</h1>
-    <button type="button" id="human">HUMAN</button>
-    <button id="zombie" id="zombie">ZOMBIE</button>
-</div>
-<script src="dist/client.bundle.js">
-
-</script>
+    <div id="back"></div>
+    <div id="game-menu">
+        <button type="button" id="play">PLAY</button>
+        <img src="css/back1.png" id="lobbyZombie">
+    </div>
+    <div id="autenfication" class="hidden">
+        <div id="input">
+            <div id="nameError"></div>
+            <input type="text" id="nameOfPlayer" placeholder="Enter your name">
+            <button type="button" id="addPlayer">Set name</button>
+        </div>
+        <img src="css/blood1.png" id="blood1">
+    </div>
+    <div id="lobby" class="hidden">
+        <div id="lobby-display">
+            <p>Waiting for the game...</p>
+            <ul id="lobby-list"></ul>
+        </div>
+        <img src="css/blood1.png" id="blood1">
+    </div>
+    <div id="game" class="hidden">
+        <div id="ldb-container">
+            <div id="leaderboard"></div>
+        </div>
+        <div id="canvas-container">
+            <canvas id="game-canvas"></canvas>
+        </div>
+        <div id="chat-container">
+            <div id="game-chat">
+                <input type="text" id="chat-input" placeholder="Press Enter to send">
+                <div id="is-typing"></div>
+                <div id="chat-display"></div>
+                <div id="notifications"></div>
+            </div>
+        </div>
+    </div>
+    <div id="game-over">
+        <img src="css/gameOver.png" id="game-over-pic">
+    </div>
+    <script src="dist/client.bundle.js">
+    </script>
 </body>
 
 </html>

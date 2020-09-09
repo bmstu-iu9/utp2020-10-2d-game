@@ -3,17 +3,21 @@ const Constants = require('./Constants.js');
 const Game = require('./Client/Game.js');
 const Chat = require('./Client/Chat.js');
 const Leaderboard = require('./Client/Leaderboard.js');
+const Lobby = require('./Client/Lobby.js');
 
 $(document).ready(() => {
     const socket = io();
     const game = Game.create(document, socket);
+    const lobby = new Lobby();
+
+    $('#game-over').addClass('hidden');
 
     game.downloadImages();
 
 
     const addNewPlayer = (role) => {
-        document.body.innerHTML = '<div id = "nameError"></div><input type = "text" id = "nameOfPlayer" placeholder = "Enter your name">\
-          <button type = "button" id = "addPlayer">Set name</button>'
+        $('#game-menu').addClass('hidden');
+        $('#autenfication').removeClass('hidden');
         $('#addPlayer').click(() => {
             let timer;
             const width = document.documentElement.clientWidth * (1 - Constants.CHAT_WIDTH_PERCENT * 2); // ширина клиентской части окна браузера
@@ -33,28 +37,25 @@ $(document).ready(() => {
                 console.log(data);
                 document.getElementById('nameError').innerHTML = data;
             })
+            socket.on(Constants.TO_LOBBY, function(name) {
+                lobby.init();
+                lobby.addUser(name);
+            })
             socket.on(Constants.PLAY, function() {
-                document.body.innerHTML = '<div id="container"><div id="leaderboard"></div></div>\
-                <div id="canvas-container"><canvas id = "game-canvas"></canvas></div>\
-                <div id="game-chat"><input type="text" id="chat-input">\
-                <div id="is-typing"></div><div id="chat-display"></div>\
-                <div id="notifications"></div></div>';
+                $('#lobby').addClass('hidden');
+                $('#back').addClass('hidden');
+                $('#game').removeClass('hidden');
 
-                const chatDisplay = document.getElementById('chat-display');
-                const chatInput = document.getElementById('chat-input');
-                const chatBody = document.getElementById('game-chat');
-                const chatTyping = document.getElementById('is-typing');
-                const notificationBoard = document.getElementById('notifications');
-                const chat = Chat.create(socket, chatInput, chatTyping, chatDisplay, chatBody, notificationBoard);
-
-                const leaderboardDiplay = document.getElementById('leaderboard');
-                const leaderboard = Leaderboard.create(socket, leaderboardDiplay);
+                const chat = Chat.create(socket);
+                const leaderboard = Leaderboard.create(socket);
 
                 const canvas = document.getElementById('game-canvas');
                 canvas.width = width;
                 canvas.height = height;
                 const context = canvas.getContext('2d');
                 timer = setInterval(function() {
+                    canvas.width = document.documentElement.clientWidth * (1 - Constants.CHAT_WIDTH_PERCENT * 2);
+                    canvas.height = document.documentElement.clientHeight;
                     game.start(canvas, context, {
                         mouseInChat: chat.mouseIn,
                         inputFocus: chat.isTyping
@@ -68,21 +69,20 @@ $(document).ready(() => {
                     });
                 $('#chat-input').focusin(function() {
                     chat.startTyping();
-                })
+                });
                 $('#chat-input').focusout(function() {
                     chat.stopTyping();
-                })
+                });
             })
             socket.on(Constants.GAME_OVER, function() {
                 clearInterval(timer);
-                document.body.innerHTML = '<div> <h1>GAME OVER</h1></div>';
+                $('#game').addClass('hidden');
+                $('#back').removeClass('hidden');
+                $('#game-over').removeClass('hidden');
             })
         })
     }
-    $('#human').click(() => {
+    $('#play').click(() => {
         addNewPlayer(Constants.HUMAN_TYPE);
-    })
-    $('#zombie').click(() => {
-        addNewPlayer(Constants.ZOMBIE_TYPE);
     })
 })
