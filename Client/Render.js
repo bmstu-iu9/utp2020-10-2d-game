@@ -1,4 +1,5 @@
 const Constants = require('../Constants.js');
+const Wall = require('../Wall.js');
 
 class Render {
     constructor() {
@@ -84,7 +85,14 @@ class Render {
             for (let y = 0; y < Constants.WORLD_HEIGHT; y += Constants.FIELD_PIECE_HEIGHT)
                 context.drawImage(this.imgs[Constants.FIELD_TYPE], x, y,
                     Constants.FIELD_PIECE_WIDTH, Constants.FIELD_PIECE_HEIGHT);
-    }
+		for (let arr of Wall) {
+			for (let i = arr[0]; i < arr[1]; i+= Constants.STONE_SIZE) {
+				for (let j = arr[2]; j < arr[3]; j += Constants.STONE_SIZE) {
+					context.drawImage(this.imgs[Constants.STONE_TYPE], i, j, Constants.FIELD_PIECE_WIDTH / 2, Constants.FIELD_PIECE_HEIGHT / 2);
+				}
+			}
+		}
+	}
 }
 
 module.exports = Render;

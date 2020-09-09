@@ -4,12 +4,12 @@ module.exports = Object.freeze({
     WORLD_HEIGHT: 3000,
 
     ZOMBIE_MAX_HEALTH: 1.00,
-    ZOMBIE_SPEED: 3,
+    ZOMBIE_SPEED: 5,
     ZOMBIE_TYPE: 'Zombie',
     ZOMBIE_TIME_BETWEEN_SHOOTS: 200,
 
     HUMAN_MAX_HEALTH: 1.00,
-    HUMAN_SPEED: 3,
+    HUMAN_SPEED: 5,
     HUMAN_TIME_BETWEEN_SHOOTS: 50,
     HUMAN_TYPE: 'Human',
 
@@ -52,12 +52,15 @@ module.exports = Object.freeze({
         'Pill.png', //лекарство
         'Bullet.png', //пуля
         'Field.jpg',
-        'back.jpg', //картинка для фона
+        'Stone.jpg',
+        'back.jpg' //картинка для фона
     ],
     POWERUP_TYPES: [
         'Mask',
         'Pill'
     ],
+    STONE_TYPE: 'Stone',
+    STONE_SIZE: 75,
 
 
     STATE_UPDATE: 'update',
@@ -75,6 +78,7 @@ module.exports = Object.freeze({
     NEW_NOTE: 'newNotification',
     LDB_UPDATE: 'leaderboardUpdate',
     TO_LOBBY: 'toLobby',
+    LDB_UPDATE: 'leaderboardUpdate',
 
 
     CHAT_WIDTH_PERCENT: 0.20, //проуент экрана, занимаемого чатом
@@ -92,6 +96,7 @@ module.exports = Object.freeze({
     FIELD_PIECE_WIDTH: 150,
     FIELD_PIECE_HEIGHT: 150,
     FIELD_TYPE: 'Field',
+
 
     RELOAD_PISTOL: 5000, //длительность перезарядки пистолета
     MAX_RADIUS_OF_EPIDEMIC_AREA: 100,
