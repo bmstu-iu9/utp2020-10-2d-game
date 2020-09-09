@@ -7,7 +7,22 @@ const Wall = require('../Wall.js');
 //класс игрока
 class Player extends Rect {
     constructor(role, name, w, h) {
-        super(1200, 1200, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+		let x, y;
+		while (true) {
+			x = Math.random() * Constants.WORLD_WIDTH;
+			y = Math.random() * Constants.WORLD_HEIGHT;
+			let flag = true;
+			for (let arr of Wall) {
+				if (x + Constants.PLAYER_WIDTH > arr[0] && x < arr[1] && y + Constants.PLAYER_WIDTH > arr[2] && y < arr[3]) {
+					flag = false;
+					break;
+				}
+    		}
+			if (flag) {
+				break;
+			}
+		}
+		super(x, y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
         this.screenWidth = w;
         this.screenHeight = h;
         this.name = name;
