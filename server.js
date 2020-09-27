@@ -8,7 +8,7 @@ const game = Game.create();
 const fs = require('fs');
 const Constants = require('./Constants.js');
 
-
+let lobby = []
 io.on(Constants.CONNECT, socket => {
     console.log('user connected');
     socket.on(Constants.SET_PLAYER_NAME, function(player) {
@@ -19,7 +19,9 @@ io.on(Constants.CONNECT, socket => {
                 game.addPlayer(player, socket);
                 let playersCount = Object.keys(game.players).length;
                 if (playersCount < Constants.PLAYER_QUANTITY_TO_START) {
-                    socket.emit(Constants.TO_LOBBY, player.name);
+                    socket.emit(Constants.TO_LOBBY, lobby);
+                    io.sockets.emit(Constants.ADD_TO_LOBBY, player.name);
+                    lobby.push(player.name)
                 } else if (playersCount === Constants.PLAYER_QUANTITY_TO_START) {
                     socket.emit(Constants.TO_LOBBY);
                     game.start();

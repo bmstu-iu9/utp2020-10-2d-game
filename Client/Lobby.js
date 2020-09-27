@@ -5,12 +5,15 @@ class Lobby {
         this.list = document.getElementById('lobby-list');
     }
 
-    init() {
+    init(users) {
         $('#autenfication').addClass('hidden');
         $('#lobby').removeClass('hidden');
+        for (let i = 0; i < users.length; i++) {
+            this.list.innerHTML += '<li>' + users[i] + '</li>';
+        }
     }
 
-    addUser(name) {
+    add(name) {
         this.list.innerHTML += '<li>' + name + '</li>';
     }
 }

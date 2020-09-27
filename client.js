@@ -37,9 +37,11 @@ $(document).ready(() => {
                 console.log(data);
                 document.getElementById('nameError').innerHTML = data;
             })
-            socket.on(Constants.TO_LOBBY, function(name) {
-                lobby.init();
-                lobby.addUser(name);
+            socket.on(Constants.TO_LOBBY, function(users) {
+                lobby.init(users);
+            })
+            socket.on(Constants.ADD_TO_LOBBY, function(name) {
+                lobby.add(name);
             })
             socket.on(Constants.PLAY, function() {
                 $('#lobby').addClass('hidden');
