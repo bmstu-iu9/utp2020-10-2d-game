@@ -175,7 +175,7 @@ class Player extends Rect {
 
     decreaseHealth(damage) {
         this.health -= damage;
-        if (this.health < 0) {
+        if (this.health <= 0) {
             this.alive = false;
             this.health = 0;
         }
