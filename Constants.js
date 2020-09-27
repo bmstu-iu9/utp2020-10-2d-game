@@ -78,6 +78,7 @@ module.exports = Object.freeze({
     NEW_NOTE: 'newNotification',
     LDB_UPDATE: 'leaderboardUpdate',
     TO_LOBBY: 'toLobby',
+    ADD_TO_LOBBY: 'addToLobby',
     LDB_UPDATE: 'leaderboardUpdate',
 
 
